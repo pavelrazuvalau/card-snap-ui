@@ -1,8 +1,8 @@
 /// 🔶 Domain Use Case: AddCard
-/// 
+///
 /// Business operation for adding a new loyalty card.
 /// Similar to Angular service methods but focused on single business operations.
-/// 
+///
 /// In Angular, you'd have:
 /// ```typescript
 /// @Injectable()
@@ -14,7 +14,7 @@
 ///   }
 /// }
 /// ```
-/// 
+///
 /// In Flutter/Dart, we use dedicated use case classes for single operations.
 library domain.usecases;
 
@@ -32,7 +32,7 @@ class AddCardRequest {
   final String? imageUrl;
   final String? colorHex;
   final String? notes;
-  
+
   const AddCardRequest({
     required this.name,
     required this.storeName,
@@ -42,7 +42,7 @@ class AddCardRequest {
     this.colorHex,
     this.notes,
   });
-  
+
   /// Validate request data
   /// 🔹 Business validation before processing
   bool get isValid {
@@ -58,11 +58,11 @@ class AddCardRequest {
 /// 🔹 Pure domain logic - no UI or framework dependencies
 class AddCard {
   final CardRepository repository;
-  
+
   /// Constructor injection (like Angular dependency injection)
   /// 🔹 Depends on abstraction, not implementation
   const AddCard(this.repository);
-  
+
   /// Execute the use case
   /// 🔹 Main business operation
   /// 🧠 Offline-first: works without network connectivity
@@ -70,28 +70,28 @@ class AddCard {
     try {
       // Business validation
       if (!request.isValid) {
-        return Result.failure(
-          DomainException('Invalid card data provided'),
-        );
+        return Result.failure(DomainException('Invalid card data provided'));
       }
-      
+
       // Check for duplicate cards
       final existingCardsResult = await repository.getAllCards();
       if (existingCardsResult.isFailure) {
         return Result.failure(existingCardsResult.errorOrNull!);
       }
-      
+
       final existingCards = existingCardsResult.dataOrNull!;
-      final isDuplicate = existingCards.any((card) =>
-          card.barcodeData == request.barcodeData &&
-          card.storeName.toLowerCase() == request.storeName.toLowerCase());
-      
+      final isDuplicate = existingCards.any(
+        (card) =>
+            card.barcodeData == request.barcodeData &&
+            card.storeName.toLowerCase() == request.storeName.toLowerCase(),
+      );
+
       if (isDuplicate) {
         return Result.failure(
           DomainException('Card with this barcode already exists'),
         );
       }
-      
+
       // Create domain entity
       final now = DateTime.now();
       final card = LoyaltyCard(
@@ -106,18 +106,17 @@ class AddCard {
         colorHex: request.colorHex,
         notes: request.notes,
       );
-      
+
       // Validate entity
       if (!card.isValid) {
         return Result.failure(
           DomainException('Generated card data is invalid'),
         );
       }
-      
+
       // Persist through repository
       final result = await repository.addCard(card);
       return result;
-      
     } catch (e) {
       return Result.failure(
         DomainException(
@@ -127,7 +126,7 @@ class AddCard {
       );
     }
   }
-  
+
   /// Generate unique card ID
   /// 🔹 Business logic for ID generation
   /// 🧠 Uses timestamp + random for uniqueness

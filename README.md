@@ -19,12 +19,63 @@ Depth of understanding comes before delivery speed. Clarity, commentary, and rep
 
 ## Where to Go Next
 
-- **Architecture & detailed patterns:** `ARCHITECTURE.md`
-- **Business requirements & SRS baseline:** `BUSINESS.md`
-- **AI copilot operating rules:** `AGENTS.md`
-- **Automation & infrastructure:** `infra/`
-- **Narrative docs & guides:** `docs/`
-- **Release process & changelog:** `ARCHITECTURE.md` §20, `CHANGELOG.md`
+- **Architecture & detailed patterns:** [ARCHITECTURE.md](ARCHITECTURE.md)
+- **Business requirements & SRS baseline:** [BUSINESS.md](BUSINESS.md)
+- **AI copilot operating rules:** [AGENTS.md](AGENTS.md)
+- **Automation & infrastructure:** [infra/](infra/)
+- **Narrative docs & guides:** [docs/](docs/)
+- **Release process & changelog:** [ARCHITECTURE.md](ARCHITECTURE.md) §20, [CHANGELOG.md](CHANGELOG.md)
+
+## Project Structure & Key Files
+
+### Documentation
+- [ARCHITECTURE.md](ARCHITECTURE.md) - Detailed architecture guide
+- [BUSINESS.md](BUSINESS.md) - Business requirements
+- [AGENTS.md](AGENTS.md) - AI copilot playbook
+- [MOBILE_SETUP.md](MOBILE_SETUP.md) - Mobile development setup guide
+
+### Launch Scripts
+- [run_web.sh](run_web.sh) - Linux/macOS web launcher
+  - Chrome (hot reload) - Recommended
+  - Edge (hot reload)
+  - Firefox (static build)
+  - Run tests
+- [run_web.bat](run_web.bat) - Windows CMD launcher
+  - Chrome (hot reload) - Recommended
+  - Edge (hot reload)
+  - Firefox (static build)
+  - Run tests
+- [run_app.ps1](run_app.ps1) - PowerShell launcher
+  - Chrome (hot reload) - Recommended
+  - Edge (hot reload)
+  - Firefox (static build)
+  - Run tests
+  - Check Flutter setup
+
+### Core Platform Layer
+- [lib/core/platform/browser_launcher.dart](lib/core/platform/browser_launcher.dart) - Browser abstraction interface
+- [lib/core/platform/README.md](lib/core/platform/README.md) - Platform layer documentation
+- [lib/core/platform/CHANGELOG.md](lib/core/platform/CHANGELOG.md) - Platform layer version history
+
+### Source Code Layers
+- [lib/core/](lib/core/) - Core utilities and constants
+  - [lib/core/constants/app_constants.dart](lib/core/constants/app_constants.dart) - App-wide constants
+  - [lib/core/errors/app_exceptions.dart](lib/core/errors/app_exceptions.dart) - Error handling
+  - [lib/core/platform/](lib/core/platform/) - Platform-specific adaptations
+- [lib/domain/](lib/domain/) - Pure business logic (no Flutter imports)
+  - [lib/domain/entities/card.dart](lib/domain/entities/card.dart) - Card entity
+  - [lib/domain/repositories/card_repository.dart](lib/domain/repositories/card_repository.dart) - Repository interface
+  - [lib/domain/usecases/add_card.dart](lib/domain/usecases/add_card.dart) - Add card use case
+- [lib/data/](lib/data/) - Data sources and repositories
+  - [lib/data/repositories/local_card_repository.dart](lib/data/repositories/local_card_repository.dart) - Local implementation
+  - [lib/data/datasources/local_card_datasource.dart](lib/data/datasources/local_card_datasource.dart) - Data source
+- [lib/presentation/](lib/presentation/) - UI layer
+  - [lib/presentation/pages/card_list_page.dart](lib/presentation/pages/card_list_page.dart) - Card list page
+  - [lib/presentation/widgets/](lib/presentation/widgets/) - Reusable widgets
+    - [lib/presentation/widgets/adaptive/](lib/presentation/widgets/adaptive/) - Adaptive cross-platform widgets
+      - Factory pattern for platform-specific UI components
+      - Supports Material, Cupertino, and Web themes
+- [lib/main.dart](lib/main.dart) - Application entry point
 
 ---
 
@@ -32,14 +83,19 @@ Depth of understanding comes before delivery speed. Clarity, commentary, and rep
 
 ### Web Development (Local Testing)
 ```bash
-# Windows
+# Windows (CMD)
 run_web.bat
+
+# Windows (PowerShell)
+.\run_app.ps1
 
 # Linux/Mac  
 ./run_web.sh
 
-# Manual
-flutter run -d chrome
+# Manual - choose your browser
+flutter run -d chrome     # Chrome (recommended)
+flutter run -d edge       # Edge
+flutter build web         # Build for Firefox, then open in browser
 ```
 
 ### Mobile Development (iOS/Android)
@@ -59,7 +115,12 @@ flutter build ios --release    # iOS
 - **Flutter SDK** 3.9.2+
 - **Android Studio** (for Android development)
 - **Xcode** (for iOS development, macOS only)
-- **Chrome/Edge** (for web development)
+- **Web Browsers** (for web development):
+  - Chrome (recommended, hot reload support)
+  - Edge (hot reload support)
+  - Firefox (requires build step, no hot reload)
+
+> **Note:** Flutter's web support currently provides hot reload for Chrome and Edge only. For Firefox, use `flutter build web` then open `build/web/index.html` in the browser.
 
 Use `flutter test integration_test` for end-to-end suites when changes cross layers. See `ARCHITECTURE.md` for architecture-specific testing guidance.
 
@@ -81,6 +142,19 @@ Use `flutter test integration_test` for end-to-end suites when changes cross lay
   Enable the desired platform with `flutter config --enable-<platform>-desktop` or `--enable-web`, then run `flutter run -d chrome` or the relevant desktop device. Treat these builds as educational sandboxes unless explicitly promoted to release scope.
 
 > The current environment may not have Flutter installed. Do not execute these commands until the toolchain is available; keep the instructions for future reference.
+
+---
+
+## Key Architectural Patterns
+
+Card Snap UI follows clean architecture principles with clear separation of concerns:
+
+- **Factory Pattern**: `AdaptiveWidgetFactory` creates platform-specific UI components (Material/Cupertino/Web) based on runtime detection
+- **Repository Pattern**: Abstracts data access with `CardRepository` interface and concrete implementations
+- **Use Cases Pattern**: Encapsulates business logic in dedicated use case classes
+- **Dependency Injection**: Domain layer depends on abstractions (interfaces) rather than concrete implementations
+
+See [ARCHITECTURE.md](ARCHITECTURE.md) for detailed pattern documentation.
 
 ---
 

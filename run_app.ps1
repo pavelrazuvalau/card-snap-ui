@@ -17,9 +17,9 @@ try {
 
 Write-Host ""
 Write-Host "Available launch options:" -ForegroundColor Yellow
-Write-Host "1. Chrome (hot reload)" -ForegroundColor White
-Write-Host "2. Edge (native Windows browser)" -ForegroundColor White
-Write-Host "3. Build static web files" -ForegroundColor White
+Write-Host "1. Chrome (hot reload) - RECOMMENDED" -ForegroundColor White
+Write-Host "2. Edge (hot reload)" -ForegroundColor White
+Write-Host "3. Build static files for Firefox" -ForegroundColor White
 Write-Host "4. Run tests" -ForegroundColor White
 Write-Host "5. Check Flutter setup" -ForegroundColor White
 Write-Host ""
@@ -36,13 +36,12 @@ switch ($choice) {
         flutter run -d edge
     }
     "3" {
-        Write-Host "Building static web files..." -ForegroundColor Blue
+        Write-Host "Building static web files for Firefox..." -ForegroundColor Blue
         flutter build web
         Write-Host ""
         Write-Host "Build complete!" -ForegroundColor Green
         Write-Host "Files are in build/web/" -ForegroundColor Yellow
-        Write-Host "Opening build/web/index.html..." -ForegroundColor Yellow
-        Start-Process "build/web/index.html"
+        Write-Host "Open build/web/index.html in Firefox" -ForegroundColor Yellow
     }
     "4" {
         Write-Host "Running tests..." -ForegroundColor Blue

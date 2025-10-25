@@ -1,16 +1,16 @@
 /// 🔶 Main Application Entry Point
-/// 
+///
 /// Bootstrap the Card Snap Wallet application with dependency injection.
 /// Similar to Angular's main.ts but using Flutter's app initialization.
-/// 
+///
 /// In Angular, you'd have:
 /// ```typescript
 /// import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 /// import { AppModule } from './app/app.module';
-/// 
+///
 /// platformBrowserDynamic().bootstrapModule(AppModule);
 /// ```
-/// 
+///
 /// In Flutter/Dart, we use main() function with dependency injection.
 library main;
 
@@ -19,11 +19,7 @@ import 'package:flutter/material.dart';
 // Core imports
 import 'core/constants/app_constants.dart';
 
-// Domain imports
-import 'domain/repositories/card_repository.dart';
-
 // Data imports
-import 'data/repositories/local_card_repository.dart';
 import 'data/datasources/local_card_datasource.dart';
 
 // Presentation imports
@@ -35,10 +31,10 @@ import 'presentation/pages/card_list_page.dart';
 void main() async {
   // Ensure Flutter binding is initialized
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   // Initialize dependencies
   await _initializeDependencies();
-  
+
   // Run the application
   runApp(const CardSnapApp());
 }
@@ -50,7 +46,7 @@ Future<void> _initializeDependencies() async {
   // Initialize local data source
   final localDataSource = LocalCardDataSource();
   await localDataSource.initialize();
-  
+
   // TODO: Register with dependency injection container when get_it is added
   // For now, we'll pass dependencies directly
 }
@@ -60,7 +56,7 @@ Future<void> _initializeDependencies() async {
 /// 🔹 Similar to Angular's AppComponent
 class CardSnapApp extends StatelessWidget {
   const CardSnapApp({super.key});
-  
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -75,7 +71,7 @@ class CardSnapApp extends StatelessWidget {
       // },
     );
   }
-  
+
   /// Build application theme
   /// 🔹 Material Design theme configuration with Windows-style elements
   /// 🧠 Consistent with offline-first, security-focused design
@@ -95,7 +91,9 @@ class CardSnapApp extends StatelessWidget {
       cardTheme: const CardThemeData(
         elevation: 2,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(8)), // Windows-style rounded corners
+          borderRadius: BorderRadius.all(
+            Radius.circular(8),
+          ), // Windows-style rounded corners
         ),
         color: Color(0xFFFFFFFF), // Pure white cards
       ),

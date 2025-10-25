@@ -27,6 +27,7 @@ This architecture ensures consistency in code, commits, and documentation across
 |-----------|-------------|
 | **Clean Architecture** | Separation of concerns across `core`, `data`, `domain`, and `presentation`. |
 | **SOLID** | Modular, testable, and extensible code. |
+| **Design Patterns** | Factory, Repository, Use Cases patterns for modularity and testability. |
 | **Reactive by Design** | Streams and observable state, mirroring RxJS mental models. |
 | **Transparency** | Each file explains intent, syntax, and trade-offs. |
 | **Self-Documentation** | Comments and docs remain the living source of truth. |
@@ -62,21 +63,89 @@ Use this mapping when writing comments so Angular developers can build Dart intu
 
 ---
 
-## 5. Project Structure
+## 5. Architecture & Design Patterns
+
+### 5.1 Adaptive Widget Factory
+
+The application uses adaptive widget factory for cross-platform UI adaptation, similar to Angular's platform detection service.
+
+```dart
+/// 🔶 Adaptive Widget Factory: Platform-Specific UI Adaptation
+/// Similar to Angular's platform detection service that adapts components
+/// based on browser/device capabilities and user preferences.
+class AdaptiveWidgetFactory {
+  static PlatformTheme getCurrentTheme() {
+    try {
+      if (Platform.isIOS) return PlatformTheme.cupertino;
+      if (Platform.isAndroid) return PlatformTheme.material;
+    } catch (e) {
+      // Web platform fallback
+      return PlatformTheme.material;
+    }
+    return PlatformTheme.material;
+  }
+  
+  static Widget createCardTile({
+    required LoyaltyCard card,
+    required VoidCallback onTap,
+  }) {
+    final theme = getCurrentTheme();
+    switch (theme) {
+      case PlatformTheme.cupertino:
+        return CupertinoCardTile(card: card, onTap: onTap);
+      case PlatformTheme.material:
+      default:
+        return MaterialCardTile(card: card, onTap: onTap);
+    }
+  }
+}
+```
+
+### 5.2 Key Design Patterns Applied
+
+**Factory Pattern** - `AdaptiveWidgetFactory` creates platform-specific UI components based on runtime detection. Each widget type (scaffold, card, button) has its own factory for modularity.
+
+**Repository Pattern** - Abstracts data access layer with `CardRepository` interface and implementations. Similar to Angular's service layer that abstracts HTTP calls.
+
+**Use Cases Pattern** - Encapsulates business logic in dedicated use case classes. Similar to Angular's service methods that coordinate between services and components.
+
+**Dependency Injection** - Domain layer depends on abstractions (repository interfaces) rather than concrete implementations, ensuring loose coupling.
+
+---
+
+## 6. Project Structure
 
 ```bash
 lib/
- ├── core/               # DI, config, logging, error handling
- ├── data/               # Data sources, API clients, local storage abstractions
- ├── domain/             # Business logic, models, use cases
- ├── presentation/       # UI, state management, widgets
- └── main.dart
+ ├── core/                    # DI, config, logging, error handling
+ │   ├── constants/           # App-wide constants
+ │   ├── errors/             # Error handling and exceptions
+ │   └── platform/           # Platform detection and adapters
+ ├── data/                    # Data sources, API clients, local storage abstractions
+ │   ├── datasources/        # Data source implementations
+ │   ├── models/             # Data models and DTOs
+ │   └── repositories/       # Repository implementations
+ ├── domain/                  # Business logic, models, use cases
+ │   ├── entities/           # Domain entities
+ │   ├── repositories/       # Repository interfaces
+ │   └── usecases/           # Use case implementations
+ ├── presentation/           # UI, state management, widgets
+ │   ├── pages/              # Screen/page widgets
+ │   ├── widgets/            # Reusable UI components
+ │   │   └── adaptive/       # Cross-platform adaptive widgets
+ │   └── viewmodels/          # View models and state management
+ └── main.dart               # Application entry point
 
-test/                    # Unit & widget tests
-integration_test/        # E2E flows with mock backend
-infra/                   # CI/CD, fastlane, observability scripts
-docs/                    # Markdown + generated documentation
-.github/workflows/       # CI pipelines
+test/                        # Unit & widget tests
+ ├── unit/                   # Unit tests for domain logic
+ ├── widget/                 # Widget tests
+ ├── integration/            # Integration tests
+ └── mocks/                  # Mock implementations
+
+integration_test/            # E2E flows with mock backend
+infra/                      # CI/CD, fastlane, observability scripts
+docs/                       # Markdown + generated documentation
+.github/workflows/           # CI pipelines
 ```
 
 > Keep the folder structure stable. Prototype architecture ideas in feature branches or feature flags rather than reshuffling directories.
@@ -149,28 +218,56 @@ Card Snap UI must deliver identical learning and runtime value on **Android** an
 ## 8. Domain Layer Principles & Documentation
 
 - Domain layer stays **pure Dart** (no Flutter imports).
-- Depends solely on **abstract repositories** (Dependency Inversion).
+- Depends solely on **abstract repositories** and **strategy interfaces** (Dependency Inversion).
 - Favor **loose coupling**: inject interfaces into use cases, keep constructors lightweight, and avoid depending on framework-specific classes.
+- Use **Strategy pattern** for business logic: different implementations can be swapped based on requirements (Local, API, Hybrid).
+- Implement **Command pattern** for user actions: commands are executable, undoable, and easily testable.
 - Design each use case with **flexibility in mind**, allowing multiple repository implementations (API, LocalDB, Hybrid) to be swapped without rewriting business logic.
 - Each use case is **unit-testable**, thoroughly commented, and explains how it maps back to Angular patterns.
 - Documentation within the file states purpose, inputs, outputs, and collaborating layers.
 
 ```dart
-/// 🔶 Use Case: RegisterDevice
-/// Defines how a device is registered to user account.
-/// Input: Device info, auth token
+/// 🔶 Use Case: RegisterDevice (Strategy Pattern Implementation)
+/// Defines how a device is registered to user account using different strategies.
+/// Input: Device info, auth token, strategy type
 /// Output: Device model with backend-assigned ID.
 /// Related layers:
-/// - Data: DeviceRepository
+/// - Domain: DeviceRegistrationStrategy interface
+/// - Data: DeviceRepository implementations
 /// - Presentation: DeviceRegistrationForm
 class RegisterDevice {
-  final DeviceRepository repository;
-  RegisterDevice(this.repository);
+  final DeviceRegistrationStrategy strategy;
+  
+  RegisterDevice(this.strategy);
 
-  /// Executes the use case by delegating to the repository.
+  /// Executes the use case by delegating to the selected strategy.
   /// 🧠 Pure domain logic: no networking or UI references.
+  /// 🧠 Strategy pattern allows different implementations (Local, API, Hybrid).
   Future<Device> execute(DeviceRegistration payload) async =>
-      repository.register(payload);
+      strategy.register(payload);
+}
+
+/// 🔶 Command Pattern: Device Registration Command
+/// Encapsulates device registration as an executable command.
+/// Similar to Angular's command pattern for user interactions.
+class RegisterDeviceCommand implements Command {
+  final RegisterDevice useCase;
+  final DeviceRegistration payload;
+  
+  RegisterDeviceCommand(this.useCase, this.payload);
+  
+  @override
+  Future<void> execute() async {
+    await useCase.execute(payload);
+  }
+  
+  @override
+  Future<void> undo() async {
+    // Implementation for undo (e.g., unregister device)
+  }
+  
+  @override
+  String get description => 'Register device: ${payload.deviceName}';
 }
 ```
 
@@ -178,35 +275,53 @@ Feature narratives (e.g., device management) should outline end-to-end flows and
 
 ---
 
-## 9. Repository Patterns (API, LocalDB, Hybrid)
+## 9. Repository Patterns & Strategy Implementation
 
-**Goal:** Teach how different data sources interact through the same interface.
+**Goal:** Teach how different data sources interact through the same interface using Strategy pattern.
 
 | Pattern | Description | Lesson |
 |---------|-------------|--------|
-| API | Remote data via Dio/HTTP | Separate domain decisions from I/O details. |
-| LocalDB | Hive/SQLite persistence | Offline-first and caching patterns. |
-| Hybrid | API + Local cache | Resilience and graceful degradation. |
+| API Strategy | Remote data via Dio/HTTP | Separate domain decisions from I/O details. |
+| Local Strategy | Hive/SQLite persistence | Offline-first and caching patterns. |
+| Hybrid Strategy | API + Local cache | Resilience and graceful degradation. |
 
 ```dart
-/// 🔷 Hybrid Repository teaches resilience and fallback patterns.
-class CachedDeviceRepository implements DeviceRepository {
-  final ApiDeviceRepository api;
-  final LocalDeviceRepository cache;
+/// 🔷 Strategy Pattern Implementation teaches resilience and fallback patterns.
+/// Similar to Angular's service strategies that can be injected based on configuration.
+abstract class CardManagementStrategy {
+  Future<Result<List<LoyaltyCard>>> getAllCards();
+  Future<Result<LoyaltyCard>> addCard(CardData data);
+  Future<Result<void>> deleteCard(String cardId);
+}
 
-  CachedDeviceRepository(this.api, this.cache);
-
+class LocalCardStrategy implements CardManagementStrategy {
+  final LocalCardRepository repository;
+  LocalCardStrategy(this.repository);
+  
   @override
-  Future<List<Device>> getAll() async {
+  Future<Result<List<LoyaltyCard>>> getAllCards() async {
+    // 🧠 Local-only implementation: fast, offline-capable
+    return repository.getAllCards();
+  }
+}
+
+class HybridCardStrategy implements CardManagementStrategy {
+  final ApiCardRepository api;
+  final LocalCardRepository cache;
+  
+  HybridCardStrategy(this.api, this.cache);
+  
+  @override
+  Future<Result<List<LoyaltyCard>>> getAllCards() async {
     try {
-      final remote = await api.getAll();
-      for (final d in remote) {
-        await cache.save(d);
+      final remote = await api.getAllCards();
+      for (final card in remote.dataOrNull!) {
+        await cache.saveCard(card);
       }
       return remote;
     } catch (_) {
       // 🧠 Offline fallback: highlight resilience and UX.
-      return cache.getAll();
+      return cache.getAllCards();
     }
   }
 }

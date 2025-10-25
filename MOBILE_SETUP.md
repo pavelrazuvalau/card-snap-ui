@@ -72,8 +72,11 @@ run_web.bat
 # Linux/Mac
 ./run_web.sh
 
-# Manual
-flutter run -d chrome
+# Manual - choose your browser
+flutter run -d chrome     # Chrome (all platforms)
+flutter run -d firefox    # Firefox (all platforms)
+flutter run -d safari     # Safari (macOS only)
+flutter run -d edge       # Edge (Windows/macOS)
 ```
 
 ### Build Web

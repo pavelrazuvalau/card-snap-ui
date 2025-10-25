@@ -1,8 +1,8 @@
 /// 🔶 Data Model: LoyaltyCardModel
-/// 
+///
 /// Data Transfer Object for card serialization and API communication.
 /// Similar to Angular's DTOs but with JSON serialization annotations.
-/// 
+///
 /// In Angular, you'd have:
 /// ```typescript
 /// export interface CardDto {
@@ -15,7 +15,7 @@
 ///   updated_at: string;
 /// }
 /// ```
-/// 
+///
 /// In Flutter/Dart, we use data models with JSON serialization.
 library data.models;
 
@@ -36,7 +36,7 @@ class LoyaltyCardModel {
   final String? colorHex;
   final String? notes;
   final bool isArchived;
-  
+
   const LoyaltyCardModel({
     required this.id,
     required this.name,
@@ -50,7 +50,7 @@ class LoyaltyCardModel {
     this.notes,
     this.isArchived = false,
   });
-  
+
   /// Convert to JSON map
   /// 🔹 Simple serialization for data persistence
   Map<String, dynamic> toJson() {
@@ -68,7 +68,7 @@ class LoyaltyCardModel {
       'is_archived': isArchived,
     };
   }
-  
+
   /// Create from JSON map
   /// 🔹 Simple deserialization from data persistence
   factory LoyaltyCardModel.fromJson(Map<String, dynamic> json) {
@@ -86,7 +86,7 @@ class LoyaltyCardModel {
       isArchived: json['is_archived'] as bool? ?? false,
     );
   }
-  
+
   /// Convert from domain entity
   /// 🔹 Domain → Data mapping
   factory LoyaltyCardModel.fromDomain(LoyaltyCard card) {
@@ -104,7 +104,7 @@ class LoyaltyCardModel {
       isArchived: card.isArchived,
     );
   }
-  
+
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
@@ -121,7 +121,7 @@ class LoyaltyCardModel {
         other.notes == notes &&
         other.isArchived == isArchived;
   }
-  
+
   @override
   int get hashCode {
     return Object.hash(
@@ -138,7 +138,7 @@ class LoyaltyCardModel {
       isArchived,
     );
   }
-  
+
   @override
   String toString() {
     return 'LoyaltyCardModel(id: $id, name: $name, storeName: $storeName)';

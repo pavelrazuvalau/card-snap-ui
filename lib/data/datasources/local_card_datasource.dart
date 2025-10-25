@@ -1,8 +1,8 @@
 /// 🔶 Data Source: Local Card Storage
-/// 
+///
 /// Local database implementation for offline-first card storage.
 /// Similar to Angular's LocalStorageService but with encrypted persistence.
-/// 
+///
 /// In Angular, you'd have:
 /// ```typescript
 /// @Injectable()
@@ -15,7 +15,7 @@
 ///   }
 /// }
 /// ```
-/// 
+///
 /// In Flutter/Dart, we use simple in-memory storage for minimal startup.
 library data.datasources;
 
@@ -27,17 +27,17 @@ import '../../core/errors/app_exceptions.dart';
 /// 🔹 TODO: Replace with Hive database when dependencies are added
 class LocalCardDataSource {
   static const String _storageKey = 'cards';
-  
+
   // Simple in-memory storage
   final List<LoyaltyCardModel> _cards = [];
   bool _isInitialized = false;
-  
+
   /// Initialize the local storage
   /// 🔹 Must be called before any operations
   /// 🧠 Simple initialization for minimal startup
   Future<void> initialize() async {
     if (_isInitialized) return;
-    
+
     try {
       // TODO: Initialize Hive database here
       // For now, just mark as initialized
@@ -49,13 +49,13 @@ class LocalCardDataSource {
       );
     }
   }
-  
+
   /// Get all cards from local storage
   /// 🔹 Returns cached data for offline operation
   Future<Result<List<LoyaltyCardModel>>> getAllCards() async {
     try {
       await _ensureInitialized();
-      
+
       return Result.success(List.from(_cards));
     } catch (e) {
       return Result.failure(
@@ -66,13 +66,13 @@ class LocalCardDataSource {
       );
     }
   }
-  
+
   /// Get card by ID from local storage
   /// 🔹 Nullable return for optional data
   Future<Result<LoyaltyCardModel?>> getCardById(String id) async {
     try {
       await _ensureInitialized();
-      
+
       final card = _cards.firstWhere(
         (card) => card.id == id,
         orElse: () => throw StateError('Card not found'),
@@ -90,19 +90,19 @@ class LocalCardDataSource {
       );
     }
   }
-  
+
   /// Save card to local storage
   /// 🔹 Persists card data with encryption
   Future<Result<void>> saveCard(LoyaltyCardModel card) async {
     try {
       await _ensureInitialized();
-      
+
       // Remove existing card with same ID
       _cards.removeWhere((c) => c.id == card.id);
-      
+
       // Add new card
       _cards.add(card);
-      
+
       return Result.success(null);
     } catch (e) {
       return Result.failure(
@@ -113,13 +113,13 @@ class LocalCardDataSource {
       );
     }
   }
-  
+
   /// Delete card from local storage
   /// 🔹 Soft delete - marks as archived
   Future<Result<void>> deleteCard(String id) async {
     try {
       await _ensureInitialized();
-      
+
       final cardIndex = _cards.indexWhere((card) => card.id == id);
       if (cardIndex != -1) {
         final card = _cards[cardIndex];
@@ -138,7 +138,7 @@ class LocalCardDataSource {
         );
         _cards[cardIndex] = archivedCard;
       }
-      
+
       return Result.success(null);
     } catch (e) {
       return Result.failure(
@@ -149,19 +149,19 @@ class LocalCardDataSource {
       );
     }
   }
-  
+
   /// Search cards in local storage
   /// 🔹 Offline search capability
   Future<Result<List<LoyaltyCardModel>>> searchCards(String query) async {
     try {
       await _ensureInitialized();
-      
+
       final filteredCards = _cards.where((card) {
         final searchQuery = query.toLowerCase();
         return card.name.toLowerCase().contains(searchQuery) ||
-               card.storeName.toLowerCase().contains(searchQuery);
+            card.storeName.toLowerCase().contains(searchQuery);
       }).toList();
-      
+
       return Result.success(filteredCards);
     } catch (e) {
       return Result.failure(
@@ -172,48 +172,44 @@ class LocalCardDataSource {
       );
     }
   }
-  
+
   /// Export all cards as encrypted JSON
   /// 🔹 User-initiated backup functionality
   Future<Result<String>> exportCards() async {
     try {
       await _ensureInitialized();
-      
+
       final jsonData = _cards.map((card) => card.toJson()).toList();
-      
+
       // TODO: Implement encryption for export
       // For now, return JSON string
       final jsonString = jsonData.toString();
       return Result.success(jsonString);
     } catch (e) {
       return Result.failure(
-        DataException(
-          'Failed to export cards',
-          technicalDetails: e.toString(),
-        ),
+        DataException('Failed to export cards', technicalDetails: e.toString()),
       );
     }
   }
-  
+
   /// Import cards from encrypted JSON
   /// 🔹 User-initiated restore functionality
-  Future<Result<List<LoyaltyCardModel>>> importCards(String encryptedData) async {
+  Future<Result<List<LoyaltyCardModel>>> importCards(
+    String encryptedData,
+  ) async {
     try {
       await _ensureInitialized();
-      
+
       // TODO: Implement decryption for import
       // For now, return empty list
       return Result.success([]);
     } catch (e) {
       return Result.failure(
-        DataException(
-          'Failed to import cards',
-          technicalDetails: e.toString(),
-        ),
+        DataException('Failed to import cards', technicalDetails: e.toString()),
       );
     }
   }
-  
+
   /// Ensure storage is initialized
   /// 🔹 Helper method for initialization check
   Future<void> _ensureInitialized() async {
@@ -221,7 +217,7 @@ class LocalCardDataSource {
       await initialize();
     }
   }
-  
+
   /// Close the storage
   /// 🔹 Cleanup method
   Future<void> close() async {

@@ -19,6 +19,8 @@ Operate as a confident senior mobile developer and patient mentor. Explain every
 - **Educational mission:** outlined in `ARCHITECTURE.md` sections 1–3.
 - **Comment taxonomy:** `///` docs, `//` syntax notes, `// 🧠` deep insights (see `ARCHITECTURE.md` §13). Preserve and extend.
 - **Mentor persona:** senior Flutter developer fluent in Angular/TypeScript concepts; always connect explanations to Angular analogies when teaching.
+- **Language:** keep every code comment in English so the shared curriculum stays consistent for all collaborators.
+- **Documentation review:** whenever you add or update docs (Markdown or inline Dart comments), verify they satisfy the learning requirements in `ARCHITECTURE.md` §13 and reference Angular analogies where helpful.
 
 Before editing, review the applicable sections of `ARCHITECTURE.md` and diff your working context to confirm alignment. Use `README.md` for navigation hints only.
 
@@ -37,18 +39,41 @@ Pause and surface uncertainties; do not invent data or skip validation.
 
 ## 3. Architecture Alignment Checklist
 
-- Respect the layered layout (`core`, `data`, `domain`, `presentation`) as documented in `ARCHITECTURE.md` §5 and §8–9.
+- Respect the layered layout (`core`, `data`, `domain`, `presentation`) as documented in `ARCHITECTURE.md` §6 and §8–9.
 - Keep the domain layer pure Dart—no Flutter imports or platform calls.
 - Enforce cross-platform parity per `ARCHITECTURE.md` §7; document and review any platform-specific branches or dependencies.
+- **Focus on Widget Architecture**: Use `AdaptiveWidgetFactory` for cross-platform UI adaptation instead of complex design patterns.
+- **Repository Pattern**: Apply repository patterns consistently; explain caching or fallback logic using the educational comment style (`ARCHITECTURE.md` §9).
 - Favor loose coupling in domain use cases (`ARCHITECTURE.md` §8); depend on abstractions and keep constructors interface-driven.
-- Apply repository patterns (API, LocalDB, Hybrid) consistently; explain caching or fallback logic using the educational comment style (`ARCHITECTURE.md` §9).
 - Follow release governance (`ARCHITECTURE.md` §20): validate SemVer bumps, ensure `CHANGELOG.md` updates, and only ship via the release workflow.
 - For UI work, emphasize state management decisions and avoid business logic inside widgets; push behavior into view models/use cases.
 - Reconcile every meaningful change against the architecture described in `ARCHITECTURE.md`; escalate mismatches to the human collaborator.
 
 ---
 
-## 4. Coding Standards
+## 4. Architecture Guidelines
+
+### 4.1 Adaptive Widget Factory
+- **Purpose**: Create platform-specific UI components with consistent interfaces using Factory pattern
+- **Location**: `lib/presentation/widgets/adaptive/`
+- **Angular Analogy**: Similar to Angular's platform detection service that adapts components based on browser/device
+- **Implementation**: `AdaptiveWidgetFactory` with separate factories for each widget type (scaffold, card, button)
+
+### 4.2 Repository Pattern
+- **Purpose**: Abstract data access and provide consistent interface for data operations
+- **Location**: `lib/domain/repositories/` and `lib/data/repositories/`
+- **Angular Analogy**: Similar to Angular's service layer that abstracts HTTP calls and data management
+- **Implementation**: Abstract repository interfaces with concrete implementations (Local, API, Hybrid)
+
+### 4.3 Use Cases Pattern
+- **Purpose**: Encapsulate business logic and orchestrate data flow
+- **Location**: `lib/domain/usecases/`
+- **Angular Analogy**: Similar to Angular's service methods that handle business logic
+- **Implementation**: Use case classes that coordinate between repositories and presentation layer
+
+---
+
+## 5. Coding Standards
 
 **Effective Dart & Flutter**
 
@@ -59,6 +84,9 @@ Pause and surface uncertainties; do not invent data or skip validation.
 
 - Honor the educational comment taxonomy; add context when new concepts appear (`ARCHITECTURE.md` §13).
 - Treat comment preservation as the primary deliverable—never remove learning content without human approval (`ARCHITECTURE.md` §§12–13, 20).
+- **Architecture**: Apply Factory pattern via `AdaptiveWidgetFactory` for cross-platform adaptation. Implement Repository and Use Cases patterns in domain layer.
+- **Modular Architecture**: Create clean separation between data, domain, and presentation layers.
+- **Cross-Platform Compliance**: Ensure all UI components use adaptive abstractions for platform-specific behavior.
 - When preparing a release or version bump, compare against the latest tag and propose a SemVer-compliant increment; update `CHANGELOG.md` and release notes (`ARCHITECTURE.md` §20).
 - Favor immutable models (`freezed`, `built_value`, or hand-written) to support unidirectional data flow.
 - Write tests and doc updates alongside behavior changes; add assertions that explain what and why.

@@ -3,9 +3,9 @@ echo Card Snap Wallet - Web Development Server
 echo =============================================
 echo.
 echo Available commands:
-echo 1. Run in Chrome (hot reload)
-echo 2. Run in Edge
-echo 3. Build static files
+echo 1. Run in Chrome (hot reload) - RECOMMENDED
+echo 2. Run in Edge (hot reload)
+echo 3. Build static files for Firefox
 echo 4. Run tests
 echo.
 set /p choice="Choose option (1-4): "
@@ -17,7 +17,7 @@ if "%choice%"=="4" goto test
 goto default
 
 :chrome
-echo Starting in Chrome with hot reload...
+echo Starting in Chrome...
 flutter run -d chrome
 goto end
 
@@ -27,11 +27,11 @@ flutter run -d edge
 goto end
 
 :build
-echo Building static web files...
+echo Building static web files for Firefox...
 flutter build web
 echo.
 echo Build complete! Files are in build/web/
-echo Open build/web/index.html in your browser
+echo Open build/web/index.html in Firefox
 goto end
 
 :test

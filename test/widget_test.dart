@@ -5,7 +5,6 @@
 // gestures. You can also use WidgetTester to find child widgets in the widget
 // tree, read text, and verify that the values of widget properties are correct.
 
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:card_snap_ui/main.dart';
@@ -23,6 +22,9 @@ void main() {
 
     // Verify that the empty state is shown when no cards exist.
     expect(find.text('No cards yet'), findsOneWidget);
-    expect(find.text('Add your first loyalty card by scanning a QR code or barcode'), findsOneWidget);
+    expect(
+      find.text('Add your first loyalty card by scanning a QR code or barcode'),
+      findsOneWidget,
+    );
   });
 }

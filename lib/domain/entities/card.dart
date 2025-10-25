@@ -1,8 +1,8 @@
 /// 🔶 Domain Entity: LoyaltyCard
-/// 
+///
 /// Core business model representing a loyalty/discount card.
 /// Similar to Angular's domain models but pure Dart (no framework dependencies).
-/// 
+///
 /// In Angular, you'd have:
 /// ```typescript
 /// export interface Card {
@@ -13,7 +13,7 @@
 ///   createdAt: Date;
 /// }
 /// ```
-/// 
+///
 /// In Flutter/Dart, we use immutable classes with value semantics.
 library domain.entities;
 
@@ -23,37 +23,37 @@ library domain.entities;
 class LoyaltyCard {
   /// Unique identifier for the card
   final String id;
-  
+
   /// User-friendly name for the card
   final String name;
-  
+
   /// Store or brand name
   final String storeName;
-  
+
   /// Barcode/QR code data
   final String barcodeData;
-  
+
   /// Barcode format (QR, Code128, EAN13, etc.)
   final BarcodeFormat format;
-  
+
   /// Card creation timestamp
   final DateTime createdAt;
-  
+
   /// Last modification timestamp
   final DateTime updatedAt;
-  
+
   /// Optional card image/logo URL
   final String? imageUrl;
-  
+
   /// Optional card color for UI theming
   final String? colorHex;
-  
+
   /// Optional notes from user
   final String? notes;
-  
+
   /// Whether card is archived (soft delete)
   final bool isArchived;
-  
+
   const LoyaltyCard({
     required this.id,
     required this.name,
@@ -67,7 +67,7 @@ class LoyaltyCard {
     this.notes,
     this.isArchived = false,
   });
-  
+
   /// Create a copy with updated fields
   /// 🔹 Immutable update pattern
   LoyaltyCard copyWith({
@@ -97,7 +97,7 @@ class LoyaltyCard {
       isArchived: isArchived ?? this.isArchived,
     );
   }
-  
+
   /// Convert to JSON map
   /// 🔹 Simple serialization for data persistence
   Map<String, dynamic> toJson() {
@@ -115,7 +115,7 @@ class LoyaltyCard {
       'isArchived': isArchived,
     };
   }
-  
+
   /// Create from JSON map
   /// 🔹 Simple deserialization from data persistence
   factory LoyaltyCard.fromJson(Map<String, dynamic> json) {
@@ -136,7 +136,7 @@ class LoyaltyCard {
       isArchived: json['isArchived'] as bool? ?? false,
     );
   }
-  
+
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
@@ -153,7 +153,7 @@ class LoyaltyCard {
         other.notes == notes &&
         other.isArchived == isArchived;
   }
-  
+
   @override
   int get hashCode {
     return Object.hash(
@@ -170,7 +170,7 @@ class LoyaltyCard {
       isArchived,
     );
   }
-  
+
   @override
   String toString() {
     return 'LoyaltyCard(id: $id, name: $name, storeName: $storeName)';
@@ -182,19 +182,19 @@ class LoyaltyCard {
 enum BarcodeFormat {
   /// QR Code (2D matrix)
   qrCode,
-  
+
   /// Code 128 (1D linear)
   code128,
-  
+
   /// EAN-13 (European Article Number)
   ean13,
-  
+
   /// UPC-A (Universal Product Code)
   upcA,
-  
+
   /// Code 39 (1D linear)
   code39,
-  
+
   /// PDF417 (2D stacked)
   pdf417,
 }
@@ -212,7 +212,7 @@ extension LoyaltyCardValidation on LoyaltyCard {
     if (updatedAt.isBefore(createdAt)) return false;
     return true;
   }
-  
+
   /// Get display-friendly format name
   /// 🔹 UI helper method (domain layer can have pure UI helpers)
   String get formatDisplayName {
