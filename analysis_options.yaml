@@ -1,0 +1,72 @@
+# Card Snap Wallet - Analysis Options
+# 
+# Educational configuration for Flutter development with Angular/TypeScript background.
+# This file configures Dart analyzer rules and linting for the project.
+# 
+# Similar to Angular's tsconfig.json and ESLint configuration.
+
+include: package:flutter_lints/flutter.yaml
+
+# Additional rules for educational purposes
+linter:
+  rules:
+    # Error prevention
+    avoid_print: true
+    avoid_unnecessary_containers: true
+    avoid_web_libraries_in_flutter: true
+    
+    # Code style (similar to Angular/TypeScript conventions)
+    prefer_const_constructors: true
+    prefer_const_literals_to_create_immutables: true
+    prefer_final_fields: true
+    prefer_final_locals: true
+    
+    # Documentation (educational focus)
+    public_member_api_docs: false  # TODO: Enable when ready for full documentation
+    require_trailing_commas: true
+    
+    # Performance
+    avoid_function_literals_in_foreach_calls: true
+    prefer_for_elements_to_map_fromIterable: true
+    
+    # Security (important for offline wallet)
+    avoid_dynamic_calls: true
+    avoid_renaming_method_parameters: true
+
+# Analyzer configuration
+analyzer:
+  exclude:
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
+    - "**/*.mocks.dart"
+    - "build/**"
+    - "lib/generated/**"
+  
+  # Language features
+  language:
+    strict-casts: true
+    strict-inference: true
+    strict-raw-types: true
+  
+  # Additional checks
+  strong-mode:
+    implicit-casts: false
+    implicit-dynamic: false
+
+# TODO: Enable additional analysis options when ready
+# 
+# For production-ready analysis, consider:
+# 1. Enable very_good_analysis package
+# 2. Add custom rules for business logic validation
+# 3. Configure security-specific rules for encryption handling
+# 4. Add performance monitoring rules
+# 
+# Example advanced configuration:
+# include: package:very_good_analysis/analysis_options.yaml
+# 
+# analyzer:
+#   plugins:
+#     - dart_code_metrics
+#   errors:
+#     invalid_annotation_target: error
+#     missing_required_param: error

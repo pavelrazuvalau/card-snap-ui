@@ -30,11 +30,36 @@ Depth of understanding comes before delivery speed. Clarity, commentary, and rep
 
 ## Quick Start
 
+### Web Development (Local Testing)
 ```bash
-flutter pub get
-flutter test
-flutter run
+# Windows
+run_web.bat
+
+# Linux/Mac  
+./run_web.sh
+
+# Manual
+flutter run -d chrome
 ```
+
+### Mobile Development (iOS/Android)
+```bash
+# Check setup
+flutter doctor
+
+# Run on connected device
+flutter run -d <device-id>
+
+# Build for production
+flutter build apk --release    # Android
+flutter build ios --release    # iOS
+```
+
+### Prerequisites
+- **Flutter SDK** 3.9.2+
+- **Android Studio** (for Android development)
+- **Xcode** (for iOS development, macOS only)
+- **Chrome/Edge** (for web development)
 
 Use `flutter test integration_test` for end-to-end suites when changes cross layers. See `ARCHITECTURE.md` for architecture-specific testing guidance.
 
