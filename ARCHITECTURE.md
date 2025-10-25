@@ -105,11 +105,32 @@ class AdaptiveWidgetFactory {
 
 **Factory Pattern** - `AdaptiveWidgetFactory` creates platform-specific UI components based on runtime detection. Each widget type (scaffold, card, button) has its own factory for modularity.
 
+**Strategy Pattern** - Platform-specific implementations are encapsulated in strategy classes. Each widget has its own strategy file (`button_strategy.dart`, `card_strategy.dart`, etc.) living alongside its factory in the same folder. This follows co-location principle and improves maintainability.
+
 **Repository Pattern** - Abstracts data access layer with `CardRepository` interface and implementations. Similar to Angular's service layer that abstracts HTTP calls.
 
 **Use Cases Pattern** - Encapsulates business logic in dedicated use case classes. Similar to Angular's service methods that coordinate between services and components.
 
 **Dependency Injection** - Domain layer depends on abstractions (repository interfaces) rather than concrete implementations, ensuring loose coupling.
+
+**Best Practices Applied**
+
+- **YAGNI (You Aren't Gonna Need It)**: Only add patterns when actually needed, start simple.
+- **DRY (Don't Repeat Yourself)**: Extract common logic, but only when duplication occurs more than twice.
+- **KISS (Keep It Simple, Stupid)**: Prefer simple solutions that both humans and AI can understand.
+- **SOLID Principles**: Apply Single Responsibility, Open/Closed, and Dependency Inversion in architecture decisions.
+- **Occam's Razor**: When multiple solutions exist, choose the simplest one.
+- **Avoid Premature Optimization**: Focus on correctness first, optimize when profiling shows issues.
+
+**File Organization**
+- **Co-location**: Keep related files together. Strategies live with their factories in the same folder.
+- **Meaningful Names**: File names should describe their purpose clearly.
+- **Shared Utilities**: Place common code in `common/` subdirectory.
+
+**SOLID Compliance**
+- **Open/Closed Principle**: Each widget factory is self-contained. To add a new widget, create a new folder with factory + strategy. No central registry needs modification.
+- **Single Responsibility**: Each factory creates only one widget type, each strategy implements only one platform variant.
+- **Dependency Inversion**: Factories depend on strategy interfaces, not concrete implementations.
 
 ---
 
@@ -133,6 +154,10 @@ lib/
  │   ├── pages/              # Screen/page widgets
  │   ├── widgets/            # Reusable UI components
  │   │   └── adaptive/       # Cross-platform adaptive widgets
+ │   │       ├── button/     # Button factory + strategy
+ │   │       ├── card/       # Card factory + strategy
+ │   │       ├── scaffold/   # Scaffold factory + strategy
+ │   │       └── common/     # Shared platform types
  │   └── viewmodels/          # View models and state management
  └── main.dart               # Application entry point
 

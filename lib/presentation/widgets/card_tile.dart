@@ -113,11 +113,7 @@ class CardTile extends StatelessWidget {
         color: _getCardColor(),
         borderRadius: BorderRadius.circular(8),
       ),
-      child: Icon(
-        _getCreditCardIcon(),
-        color: Colors.white,
-        size: 24,
-      ),
+      child: Icon(_getCreditCardIcon(), color: Colors.white, size: 24),
     );
   }
 

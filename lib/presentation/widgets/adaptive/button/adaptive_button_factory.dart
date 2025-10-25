@@ -1,15 +1,6 @@
-/// 🔶 Adaptive Button Widget
-///
-/// Platform-adaptive button implementation that provides different
-/// button styles based on the current platform.
-///
-/// Similar to Angular's button components that adapt to different
-/// design systems (Material, Cupertino).
-library presentation.widgets.adaptive.button;
-
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
 import '../common/platform_types.dart';
+import 'button_strategy_factory.dart';
 
 /// 🔶 Adaptive Button Factory
 ///
@@ -19,7 +10,7 @@ import '../common/platform_types.dart';
 class AdaptiveButtonFactory {
   /// Create adaptive button based on platform
   /// 🔹 Returns platform-appropriate button widget
-  /// 🧠 iOS uses CupertinoButton with different styling and press effects
+  /// 🧠 Self-contained factory that doesn't depend on central registry
   static Widget createButton({
     required Widget child,
     required VoidCallback? onPressed,
@@ -27,21 +18,13 @@ class AdaptiveButtonFactory {
     EdgeInsetsGeometry? padding,
   }) {
     final theme = PlatformDetector.getCurrentTheme();
+    final strategy = ButtonStrategyFactory.getStrategy(theme);
 
-    switch (theme) {
-      case PlatformTheme.cupertino:
-        return CupertinoButton(
-          onPressed: onPressed,
-          padding: padding,
-          child: child,
-        );
-      case PlatformTheme.material:
-      case PlatformTheme.web:
-        return ElevatedButton(
-          onPressed: onPressed,
-          style: style,
-          child: child,
-        );
-    }
+    return strategy.createButton(
+      child: child,
+      onPressed: onPressed,
+      style: style,
+      padding: padding,
+    );
   }
 }

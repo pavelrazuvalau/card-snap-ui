@@ -53,11 +53,7 @@ class OfflineIndicator extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            _getOfflineIcon(),
-            color: _getOfflineColor(),
-            size: 16,
-          ),
+          Icon(_getOfflineIcon(), color: _getOfflineColor(), size: 16),
           const SizedBox(width: 4),
           Text(
             'Offline',

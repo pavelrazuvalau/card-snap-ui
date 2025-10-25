@@ -1,15 +1,7 @@
-/// 🔶 Adaptive Scaffold Widget
-///
-/// Platform-adaptive scaffold implementation that provides different
-/// scaffold types based on the current platform.
-///
-/// Similar to Angular's layout components that adapt to different
-/// screen sizes and platforms.
-library presentation.widgets.adaptive.scaffold;
-
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
 import '../common/platform_types.dart';
+import 'scaffold_strategy_interface.dart';
+import 'scaffold_strategy_factory.dart';
 
 /// 🔶 Adaptive Scaffold Factory
 ///
@@ -19,7 +11,7 @@ import '../common/platform_types.dart';
 class AdaptiveScaffoldFactory {
   /// Create adaptive scaffold based on platform
   /// 🔹 Returns platform-appropriate scaffold widget
-  /// 🧠 iOS uses CupertinoPageScaffold, others use Material Scaffold
+  /// 🧠 Self-contained factory that doesn't depend on central registry
   static Widget createScaffold({
     required Widget body,
     PreferredSizeWidget? appBar,
@@ -28,44 +20,14 @@ class AdaptiveScaffoldFactory {
     Color? backgroundColor,
   }) {
     final theme = PlatformDetector.getCurrentTheme();
+    final strategy = ScaffoldStrategyFactory.getStrategy(theme);
 
-    switch (theme) {
-      case PlatformTheme.cupertino:
-        return CupertinoPageScaffold(
-          navigationBar: appBar != null
-              ? _convertToCupertinoNavBar(appBar)
-              : null,
-          child: body,
-          backgroundColor: backgroundColor,
-        );
-      case PlatformTheme.material:
-      case PlatformTheme.web:
-        return Scaffold(
-          appBar: appBar,
-          body: body,
-          floatingActionButton: floatingActionButton,
-          bottomNavigationBar: bottomNavigationBar,
-          backgroundColor: backgroundColor,
-        );
-    }
-  }
-
-  /// Convert Material AppBar to CupertinoNavigationBar
-  /// 🔹 Helper method for scaffold conversion
-  /// 🧠 Handles the differences between Material and Cupertino navigation
-  static CupertinoNavigationBar? _convertToCupertinoNavBar(
-    PreferredSizeWidget appBar,
-  ) {
-    if (appBar is AppBar) {
-      return CupertinoNavigationBar(
-        middle: appBar.title,
-        trailing: appBar.actions != null && appBar.actions!.isNotEmpty
-            ? Row(mainAxisSize: MainAxisSize.min, children: appBar.actions!)
-            : null,
-        leading: appBar.leading,
-        automaticallyImplyLeading: appBar.automaticallyImplyLeading,
-      );
-    }
-    return null;
+    return strategy.createScaffold(
+      body: body,
+      appBar: appBar,
+      floatingActionButton: floatingActionButton,
+      bottomNavigationBar: bottomNavigationBar,
+      backgroundColor: backgroundColor,
+    );
   }
 }

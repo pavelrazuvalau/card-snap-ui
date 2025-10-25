@@ -20,13 +20,32 @@ import 'scaffold/adaptive_scaffold_factory.dart';
 import 'card/adaptive_card_factory.dart';
 import 'button/adaptive_button_factory.dart';
 
-// Export common types
+// Export common types and selectors
 export 'common/platform_types.dart';
+export 'common/strategy_selector.dart';
 
 // Export factories
 export 'scaffold/adaptive_scaffold_factory.dart';
 export 'card/adaptive_card_factory.dart';
 export 'button/adaptive_button_factory.dart';
+
+// Export strategies - all components now use separate files for flexibility
+export 'scaffold/scaffold_strategy_interface.dart';
+export 'scaffold/material_scaffold_strategy.dart';
+export 'scaffold/cupertino_scaffold_strategy.dart';
+export 'scaffold/scaffold_strategy_factory.dart';
+
+export 'card/card_strategy_interface.dart';
+export 'card/material_card_strategy.dart';
+export 'card/cupertino_card_strategy.dart';
+export 'card/card_strategy_factory.dart';
+
+export 'button/button_strategy_interface.dart';
+export 'button/material_button_strategy.dart';
+export 'button/cupertino_button_strategy.dart';
+export 'button/button_strategy_factory.dart';
+
+// All widget components now follow flexibility-first approach with separate files
 
 /// 🔶 Adaptive Widget Factory - Main Facade
 ///
