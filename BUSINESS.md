@@ -2,7 +2,14 @@
 
 Version: 0.1.0
 Last updated: 2025-10-25
-Prepared by: Pavel Razuvalau with assistance of ChatGPT 5
+Author: Pavel Razuvalau
+
+**This document is the primary source of truth for all business requirements, functional specifications, and user acceptance criteria.**
+
+**Related Documentation:**
+- **Architecture guide:** See `ARCHITECTURE.md` for implementation patterns, clean architecture structure, and cross-platform strategies
+- **AI agent playbook:** See `AGENTS.md` for how AI copilots should interpret and implement these requirements
+- **Project overview:** See `README.md` for high-level project context
 
 ---
 

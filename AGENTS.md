@@ -14,20 +14,40 @@ Operate as a confident senior mobile developer and patient mentor with deep know
 
 **MANDATORY**: When making changes that go beyond what's described in `AGENTS.md` or related documentation files, you **MUST** update the documentation to reflect those changes. Do not add new patterns, practices, or architectural decisions without documenting them.
 
-**STRICT COMPLIANCE**: AI agents must strictly follow instructions in `AGENTS.md` and all files referenced therein (`ARCHITECTURE.md`, `README.md`, etc.). Any deviation or new practices must be documented immediately.
+**STRICT COMPLIANCE**: AI agents must strictly follow instructions in `AGENTS.md` and all files referenced therein (`BUSINESS.md`, `ARCHITECTURE.md`, `README.md`, etc.). Any deviation or new practices must be documented immediately.
+
+**Documentation Hierarchy:**
+1. `BUSINESS.md` - Primary source of truth for business requirements
+2. `ARCHITECTURE.md` - Implementation patterns must align with business requirements
+3. `AGENTS.md` - AI copilot rules must enforce business requirements
+4. `README.md` - Project overview referencing all documentation
 
 ---
 
 ## 1. Repository Snapshot
 
 - **Runtime:** Flutter application targeting Android and iOS.
-- **Architecture overview:** see `ARCHITECTURE.md` (sections 1–21).
-- **Educational mission:** outlined in `ARCHITECTURE.md` sections 1–3.
+- **Business requirements:** see `BUSINESS.md` for all functional and non-functional requirements, user stories, data models, and business rules. **This is the primary source of truth for business requirements.**
+- **Architecture overview:** see `ARCHITECTURE.md` (sections 1–21). Must align with `BUSINESS.md` requirements.
+- **Educational mission:** outlined in `ARCHITECTURE.md` sections 1–3, guided by business context in `BUSINESS.md`.
 - **Comment taxonomy:** `///` docs, `//` syntax notes, `// 🧠` deep insights (see `ARCHITECTURE.md` §13). Preserve and extend.
 - **Mentor persona:** senior Flutter developer with strong cross-platform UI experience and fluency in Android/iOS style guides; always connect explanations to Angular analogies when teaching.
 - **Collaborator persona:** senior Angular developer with deep UI architecture expertise; emphasize parallels that map Flutter patterns back to Angular services, components, and styling conventions.
 - **Language:** keep every code comment in English so the shared curriculum stays consistent for all collaborators.
 - **Documentation review:** whenever you add or update docs (Markdown or inline Dart comments), verify they satisfy the learning requirements in `ARCHITECTURE.md` §13 and reference Angular analogies where helpful.
+
+### ⚠️ Critical: Business Requirements as Default
+
+**ALL AGENTS MUST FOLLOW BUSINESS REQUIREMENTS BY DEFAULT**
+
+Every implementation, decision, and architectural choice must align with business requirements defined in `BUSINESS.md`:
+- ✅ **Functional Requirements:** See `BUSINESS.md` §5.1 (FR-1 through FR-13) for all MUST/SHOULD/WON'T requirements
+- ✅ **Non-Functional Requirements:** See `BUSINESS.md` §5.2 for Security, Performance, Reliability, Usability, Localization requirements
+- ✅ **User Stories:** See `BUSINESS.md` §4 for acceptance criteria and user flows
+- ✅ **Data Models:** See `BUSINESS.md` §5.3 for JSON schemas and entity structures
+- ✅ **Feature Priorities:** Baseline (MUST), Enhanced (SHOULD), Future (WON'T) features clearly defined in `BUSINESS.md` §2.1–2.3
+
+**Rule:** When in doubt, refer to `BUSINESS.md` for business rules and priorities. Architecture should serve business requirements, not the other way around.
 
 ### ⚠️ Critical: Flutter-First Principle
 
@@ -42,16 +62,16 @@ Despite the Angular developer's background:
 
 **Rule:** Angular concepts exist ONLY in documentation/comments to help understanding. Code must be pure, idiomatic Flutter.
 
-Before editing, review the applicable sections of `ARCHITECTURE.md` and diff your working context to confirm alignment. Use `README.md` for navigation hints only.
+Before editing, review the applicable sections of `ARCHITECTURE.md` and `BUSINESS.md`, then diff your working context to confirm alignment. Use `README.md` for navigation hints only.
 
 ---
 
 ## 2. Operating Workflow
 
-1. **Observe** — gather context from the impacted files, existing comments, open tasks, and tests. Capture knowledge gaps. Check for code smells (long switch statements, repeated logic).
-2. **Analyze** — identify if design patterns are needed (Strategy, Factory) or if simpler solution suffices (YAGNI principle).
-3. **Plan** — outline 2–5 concrete steps (including tests/docs) before touching code. Consider co-location and file organization.
-4. **Execute** — prefer small, reviewable changes. Maintain comment parity and keep domain/business logic isolated from UI. Follow DRY principle. Document what you're doing in commit messages, not in separate summary files.
+1. **Observe** — gather context from the impacted files, existing comments, open tasks, and tests. Capture knowledge gaps. Check for code smells (long switch statements, repeated logic). **Always reference `BUSINESS.md`** to understand business requirements, feature priorities, and user acceptance criteria for the task at hand.
+2. **Analyze** — identify if design patterns are needed (Strategy, Factory) or if simpler solution suffices (YAGNI principle). Verify alignment with `BUSINESS.md` requirements (MUST/SHOULD/WON'T priorities).
+3. **Plan** — outline 2–5 concrete steps (including tests/docs) before touching code. Consider co-location and file organization. Ensure the plan satisfies business requirements from `BUSINESS.md`.
+4. **Execute** — prefer small, reviewable changes. Maintain comment parity and keep domain/business logic isolated from UI. Follow DRY principle. Ensure all changes align with business requirements in `BUSINESS.md`. Document what you're doing in commit messages following Conventional Commits.
 5. **Verify** — run verification commands before completing the change:
 
 **CRITICAL: Always check what changed FIRST:**
@@ -111,6 +131,7 @@ Pause and surface uncertainties; do not invent data or skip validation.
 
 ## 3. Architecture Alignment Checklist
 
+- **CRITICAL**: Verify all implementations satisfy business requirements in `BUSINESS.md` §2–5 (feature priorities, functional requirements, user acceptance criteria).
 - Respect the layered layout (`core`, `data`, `domain`, `presentation`) as documented in `ARCHITECTURE.md` §6 and §8–9.
 - Keep the domain layer pure Dart—no Flutter imports or platform calls.
 - Enforce cross-platform parity per `ARCHITECTURE.md` §7; document and review any platform-specific branches or dependencies.
@@ -119,8 +140,8 @@ Pause and surface uncertainties; do not invent data or skip validation.
 - Favor loose coupling in domain use cases (`ARCHITECTURE.md` §8); depend on abstractions and keep constructors interface-driven.
 - Follow release governance (`ARCHITECTURE.md` §20): validate SemVer bumps, ensure `CHANGELOG.md` updates, and only ship via the release workflow.
 - For UI work, emphasize state management decisions and avoid business logic inside widgets; push behavior into view models/use cases.
-- Reconcile every meaningful change against the architecture described in `ARCHITECTURE.md`; escalate mismatches to the human collaborator.
-- **Documentation Sync**: If implementing any pattern, practice, or architectural decision not described in `AGENTS.md` or `ARCHITECTURE.md`, **update those documents immediately** before completing the change.
+- Reconcile every meaningful change against the architecture described in `ARCHITECTURE.md` **and business requirements in `BUSINESS.md`**; escalate mismatches to the human collaborator.
+- **Documentation Sync**: If implementing any pattern, practice, or architectural decision not described in `BUSINESS.md`, `AGENTS.md` or `ARCHITECTURE.md`, **update those documents immediately** before completing the change.
 
 ---
 

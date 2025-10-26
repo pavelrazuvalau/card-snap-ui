@@ -11,21 +11,22 @@ The repository is engineered as a self-guided tutorial where every module, test,
 
 This repository serves two primary purposes:
 
-1. **Build Card Snap Wallet** — A production-ready, offline-first mobile application for managing loyalty and discount cards
+1. **Build Card Snap Wallet** — A production-ready, offline-first mobile application for managing loyalty and discount cards. All features must satisfy business requirements defined in `BUSINESS.md`.
 2. **Educational Platform** — A comprehensive learning resource that:
    - translates familiar Angular patterns into idiomatic Dart/Flutter
    - documents *why* architectural choices exist, not just *what* the code does
    - pairs human curiosity with AI explanations so the project functions like a textbook
+   - ensures business requirements guide all architectural decisions
 
-Depth of understanding comes before delivery speed. Clarity, commentary, and reproducibility are the default success metrics.
+Depth of understanding comes before delivery speed. Clarity, commentary, and reproducibility are the default success metrics. **All implementations must align with business requirements in `BUSINESS.md`.**
 
 ---
 
 ## Where to Go Next
 
-- **Architecture & detailed patterns:** [ARCHITECTURE.md](ARCHITECTURE.md)
-- **Business requirements & SRS baseline:** [BUSINESS.md](BUSINESS.md)
-- **AI copilot operating rules:** [AGENTS.md](AGENTS.md)
+- **🔴 CRITICAL: Business requirements & SRS baseline:** [BUSINESS.md](BUSINESS.md) - **Primary source of truth** for all business rules, functional requirements, user stories, and feature priorities
+- **Architecture & detailed patterns:** [ARCHITECTURE.md](ARCHITECTURE.md) - Must align with `BUSINESS.md` requirements
+- **AI copilot operating rules:** [AGENTS.md](AGENTS.md) - Agents must follow `BUSINESS.md` by default
 - **Automation & infrastructure:** [infra/](infra/)
 - **Narrative docs & guides:** [docs/](docs/)
 - **Release process & changelog:** [ARCHITECTURE.md](ARCHITECTURE.md) §20, [CHANGELOG.md](CHANGELOG.md)
@@ -207,4 +208,10 @@ Comments are part of the architecture. Preserve and extend them when making chan
 
 ## Collaborating with AI
 
-Cursor, GitKraken MCP, and other copilots must follow the playbook in `AGENTS.md`. The playbook defines identity, guardrails, workflow, and communication style so every automated change remains faithful to the project’s teaching mission.
+Cursor, GitKraken MCP, and other copilots must follow the playbook in `AGENTS.md`. The playbook defines identity, guardrails, workflow, and communication style so every automated change remains faithful to the project's teaching mission and business requirements.
+
+**AI agents must:**
+- Follow business requirements in `BUSINESS.md` by default
+- Align architectural decisions with `ARCHITECTURE.md` patterns
+- Reference functional specifications and acceptance criteria from `BUSINESS.md` during implementation
+- Ensure all features satisfy MUST/SHOULD/WON'T priorities defined in `BUSINESS.md` §2

@@ -17,7 +17,8 @@ This architecture ensures consistency in code, commits, and documentation across
 - Repository and version-control policies (GitFlow, Conventional Commits).
 - Observability and traceability practices.
 
-> **Guiding principle:** Depth of understanding outweighs speed. Every file, comment, and commit should teach humans *and* AI.
+> **Guiding principle:** Depth of understanding outweighs speed. Every file, comment, and commit should teach humans *and* AI.  
+> **Critical reference:** All business requirements, functional specifications, user stories, data models, and feature priorities are defined in `BUSINESS.md`. This document serves as the **primary source of truth** for business rules. Architecture decisions must align with business requirements outlined in `BUSINESS.md`.
 
 ---
 
@@ -51,12 +52,13 @@ This architecture ensures consistency in code, commits, and documentation across
 
 ## 3. Core Architectural Goals
 
-- Ship a maintainable Android + iOS Flutter application.
+- Ship a maintainable Android + iOS Flutter application **that fulfills all business requirements defined in `BUSINESS.md`**.
 - Keep design clean, reactive, testable, and loosely coupled.
 - Automate CI/CD from linting to store-ready builds.
 - Provide structured logging and observability from day one.
 - Maintain flexibility for experiments without disrupting learning flow.
 - Prefer **loose coupling over tight coupling**, especially in domain use cases; depend on abstractions to keep the architecture adaptable.
+- **Ensure all feature implementations satisfy acceptance criteria and business rules from `BUSINESS.md` §§4–5.**
 
 ---
 
@@ -79,35 +81,62 @@ Use this mapping when writing comments so Angular developers can build Dart intu
 
 ### 5.1 Adaptive Widget Factory
 
-The application uses adaptive widget factory for cross-platform UI adaptation, similar to Angular's platform detection service.
+The application uses adaptive widget factory for cross-platform UI adaptation, similar to Angular's platform detection service. The implementation uses a **Facade pattern** that delegates to specialized factories for each widget type.
+
+**Architecture:** `AdaptiveWidgetFactory` (facade) → `AdaptiveCardFactory` (specialized) → `StrategyFactory` → `Strategy` (platform-specific)
 
 ```dart
 /// 🔶 Adaptive Widget Factory: Platform-Specific UI Adaptation
+/// Main facade that delegates to specialized factories for each widget type.
 /// Similar to Angular's platform detection service that adapts components
 /// based on browser/device capabilities and user preferences.
+///
+/// 🧠 Uses Facade pattern: delegates to specialized factories (AdaptiveCardFactory, 
+/// AdaptiveScaffoldFactory, etc.) rather than implementing logic inline.
 class AdaptiveWidgetFactory {
+  /// Get the current platform theme
+  /// 🔹 Delegates to PlatformDetector for centralized platform detection
+  /// 🧠 Web platform uses Material by default but can be customized
+  static PlatformTheme getCurrentTheme() {
+    return PlatformDetector.getCurrentTheme();
+  }
+  
+  /// Create adaptive card widget based on platform
+  /// 🔹 Delegates to AdaptiveCardFactory which uses Strategy pattern internally
+  /// 🧠 Self-contained factory that doesn't depend on central registry
+  static Widget createCard({
+    required Widget child,
+    EdgeInsetsGeometry? margin,
+    EdgeInsetsGeometry? padding,
+    Color? color,
+    double? elevation,
+    ShapeBorder? shape,
+  }) {
+    return AdaptiveCardFactory.createCard(
+      child: child,
+      margin: margin,
+      padding: padding,
+      color: color,
+      elevation: elevation,
+      shape: shape,
+    );
+  }
+  
+  // Other methods delegate to similar specialized factories...
+}
+
+/// 🔶 Platform Detection
+/// Centralized platform detection logic reused by all factories.
+class PlatformDetector {
   static PlatformTheme getCurrentTheme() {
     try {
       if (Platform.isIOS) return PlatformTheme.cupertino;
       if (Platform.isAndroid) return PlatformTheme.material;
+      // Web platform - default to Material
+      return PlatformTheme.material;
     } catch (e) {
       // Web platform fallback
       return PlatformTheme.material;
-    }
-    return PlatformTheme.material;
-  }
-  
-  static Widget createCardTile({
-    required LoyaltyCard card,
-    required VoidCallback onTap,
-  }) {
-    final theme = getCurrentTheme();
-    switch (theme) {
-      case PlatformTheme.cupertino:
-        return CupertinoCardTile(card: card, onTap: onTap);
-      case PlatformTheme.material:
-      default:
-        return MaterialCardTile(card: card, onTap: onTap);
     }
   }
 }
@@ -115,9 +144,11 @@ class AdaptiveWidgetFactory {
 
 ### 5.2 Key Design Patterns Applied
 
-**Factory Pattern** - `AdaptiveWidgetFactory` creates platform-specific UI components based on runtime detection. Each widget type (scaffold, card, button) has its own factory for modularity.
+**Facade Pattern** - `AdaptiveWidgetFactory` serves as a unified interface (facade) for creating adaptive widgets. It delegates to specialized factories (`AdaptiveCardFactory`, `AdaptiveScaffoldFactory`, etc.) without exposing the complexity of the underlying implementation.
 
-**Strategy Pattern** - Platform-specific implementations are encapsulated in strategy classes. Each widget has its own strategy file (`button_strategy.dart`, `card_strategy.dart`, etc.) living alongside its factory in the same folder. This follows co-location principle and improves maintainability.
+**Factory Pattern** - Each widget type has its own specialized factory (`AdaptiveCardFactory`, `AdaptiveScaffoldFactory`, `AdaptiveButtonFactory`, etc.) that creates platform-specific components. These factories are self-contained and don't depend on a central registry.
+
+**Strategy Pattern** - Platform-specific implementations are encapsulated in strategy classes (`MaterialCardStrategy`, `CupertinoCardStrategy`, etc.). Each widget has its own strategy files living alongside its factory in the same folder. This follows co-location principle and improves maintainability. The strategy selection happens via `StrategyFactory.getStrategy(theme)` which uses a map-based approach for flexibility.
 
 **Style Guide Compliance** - All strategy implementations must follow official platform design guidelines:
 
@@ -405,30 +436,43 @@ Card Snap UI must deliver identical learning and runtime value on **Android** an
 - Depends solely on **abstract repositories** and **strategy interfaces** (Dependency Inversion).
 - Favor **loose coupling**: inject interfaces into use cases, keep constructors lightweight, and avoid depending on framework-specific classes.
 - Use **Strategy pattern** for business logic: different implementations can be swapped based on requirements (Local, API, Hybrid).
-- Implement **Command pattern** for user actions: commands are executable, undoable, and easily testable.
 - Design each use case with **flexibility in mind**, allowing multiple repository implementations (API, LocalDB, Hybrid) to be swapped without rewriting business logic.
 - Each use case is **unit-testable**, thoroughly commented, and explains how it maps back to Angular patterns.
 - Documentation within the file states purpose, inputs, outputs, and collaborating layers.
 
 ```dart
-/// 🔶 Use Case: RegisterDevice (Strategy Pattern Implementation)
-/// Defines how a device is registered to user account using different strategies.
-/// Input: Device info, auth token, strategy type
-/// Output: Device model with backend-assigned ID.
+/// 🔶 Use Case: AddCard
+/// Business operation for adding a new loyalty card.
+/// Similar to Angular service methods but focused on single business operations.
+/// Input: AddCardRequest with card data
+/// Output: Result<LoyaltyCard> with success or failure
 /// Related layers:
-/// - Domain: DeviceRegistrationStrategy interface
-/// - Data: DeviceRepository implementations
-/// - Presentation: DeviceRegistrationForm
-class RegisterDevice {
-  final DeviceRegistrationStrategy strategy;
+/// - Domain: CardRepository interface
+/// - Data: LocalCardRepository implementation
+/// - Presentation: AddCardForm widgets
+class AddCard {
+  final CardRepository repository;
   
-  RegisterDevice(this.strategy);
+  AddCard(this.repository);
 
-  /// Executes the use case by delegating to the selected strategy.
+  /// Executes the use case with business validation.
   /// 🧠 Pure domain logic: no networking or UI references.
-  /// 🧠 Strategy pattern allows different implementations (Local, API, Hybrid).
-  Future<Device> execute(DeviceRegistration payload) async =>
-      strategy.register(payload);
+  /// 🧠 Offline-first: works without network connectivity.
+  /// 🧠 Validates data and prevents duplicates before persisting.
+  Future<Result<LoyaltyCard>> execute(AddCardRequest request) async {
+    // Business validation
+    if (!request.isValid) {
+      return const Result.failure(DomainException('Invalid card data'));
+    }
+    
+    // Check for duplicates
+    final existingCards = await repository.getAllCards();
+    // ... validation logic ...
+    
+    // Create and persist
+    final card = LoyaltyCard(/* ... */);
+    return await repository.addCard(card);
+  }
 }
 
 ### 9.1 Dependency Injection in Flutter
@@ -448,32 +492,9 @@ class RegisterDevice {
 - `get_it` - Service locator (recommended for large apps)
 - `provider` - State management + DI (good for smaller apps)
 - `riverpod` - Modern alternative with compile-time safety
-
-/// 🔶 Command Pattern: Device Registration Command
-/// Encapsulates device registration as an executable command.
-/// Similar to Angular's command pattern for user interactions.
-class RegisterDeviceCommand implements Command {
-  final RegisterDevice useCase;
-  final DeviceRegistration payload;
-  
-  RegisterDeviceCommand(this.useCase, this.payload);
-  
-  @override
-  Future<void> execute() async {
-    await useCase.execute(payload);
-  }
-  
-  @override
-  Future<void> undo() async {
-    // Implementation for undo (e.g., unregister device)
-  }
-  
-  @override
-  String get description => 'Register device: ${payload.deviceName}';
-}
 ```
 
-Feature narratives (e.g., device management) should outline end-to-end flows and highlight caching/offline strategies.
+Feature narratives should outline end-to-end flows and highlight caching/offline strategies. Refer to `BUSINESS.md` for specific user stories and acceptance criteria.
 
 ---
 
