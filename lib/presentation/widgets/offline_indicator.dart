@@ -25,7 +25,6 @@
 library presentation.widgets;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
 import 'adaptive/adaptive_widget_module.dart';
 
 /// Widget indicating offline status with platform-specific styling
@@ -75,31 +74,15 @@ class OfflineIndicator extends StatelessWidget {
 
   /// Get platform-appropriate offline icon
   /// 🔹 Returns platform-specific icons
-  /// 🧠 iOS uses Cupertino icons, Material uses Material icons
+  /// 🧠 Uses map-based resolution via IconStrategyFactory
   IconData _getOfflineIcon() {
     final theme = AdaptiveWidgetFactory.getCurrentTheme();
-
-    switch (theme) {
-      case PlatformTheme.cupertino:
-        return CupertinoIcons.wifi_slash;
-      case PlatformTheme.material:
-      case PlatformTheme.web:
-        return Icons.wifi_off;
-    }
+    final strategy = IconStrategyFactory.getStrategy(theme);
+    return strategy.getOfflineIcon();
   }
 
   /// Get platform-appropriate offline color
   /// 🔹 Returns platform-specific colors
-  /// 🧠 iOS uses Cupertino colors, Material uses Material colors
-  Color _getOfflineColor() {
-    final theme = AdaptiveWidgetFactory.getCurrentTheme();
-
-    switch (theme) {
-      case PlatformTheme.cupertino:
-        return CupertinoColors.white;
-      case PlatformTheme.material:
-      case PlatformTheme.web:
-        return Colors.white;
-    }
-  }
+  /// 🧠 White color for consistency across platforms
+  Color _getOfflineColor() => Colors.white;
 }

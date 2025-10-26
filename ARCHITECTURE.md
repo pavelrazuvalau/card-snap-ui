@@ -514,6 +514,30 @@ Document why a pattern is chosen and how it improves the learner’s understandi
 
 > Production-grade coverage = Unit + Widget + E2E. Each test includes educational assertions and comments that explain what is being verified and why.
 
+### 11.1 Test Coverage Requirements
+
+Card Snap UI enforces minimum test coverage thresholds per architectural layer:
+
+| Layer | Minimum Coverage | Rationale |
+|-------|------------------|-----------|
+| **Domain** | 90%+ | Business logic must be bulletproof—this is the core of the application. Pure Dart code with no external dependencies makes it highly testable. |
+| **Data** | 80%+ | Data operations are critical for offline-first architecture. Repository implementations must be thoroughly validated. |
+| **Presentation** | 70%+ | UI behavior and state management require validation. Widget tests ensure proper rendering and user interactions. |
+| **Core** | 85%+ | Cross-cutting concerns (platform detection, error handling, constants) must be reliable. |
+
+**Verification Process:**
+1. Run `flutter test --coverage` to generate coverage report
+2. Review `coverage/lcov.info` for layer-specific coverage
+3. Ensure minimum thresholds are met before committing
+4. CI/CD pipeline enforces these thresholds (build fails if not met)
+
+**Coverage Reporting:**
+- **Local**: `coverage/lcov.info` generated after tests
+- **CI/CD**: Uploaded to Codecov for tracking and visualization
+- **Thresholds**: Enforced via CI pipeline—fail build if coverage drops below targets
+
+See `test/README.md` for detailed testing strategy and coverage tracking methods.
+
 ---
 
 ## 12. CI/CD & AI Automation

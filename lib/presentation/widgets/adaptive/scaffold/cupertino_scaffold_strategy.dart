@@ -11,7 +11,7 @@
 ///
 /// Angular analogy: iOS-native page layout with HIG compliance.
 
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' show AppBar, MainAxisSize, Row, Widget;
 import 'package:flutter/cupertino.dart';
 import 'scaffold_strategy_interface.dart';
 

@@ -27,9 +27,13 @@
 library presentation.widgets;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
 import '../../domain/entities/card.dart';
 import 'adaptive/adaptive_widget_module.dart';
+
+// Note: This widget is a domain-specific presentation widget that displays loyalty cards.
+// It uses adaptive infrastructure (adaptive_widget_module.dart) but is NOT part of the
+// adaptive infrastructure itself. The adaptive/ folder contains reusable platform-agnostic
+// UI components, while this widget is specific to the Card Snap domain.
 
 /// Reusable widget for displaying a single card
 /// 🔹 Stateless widget for performance
@@ -119,74 +123,43 @@ class CardTile extends StatelessWidget {
 
   /// Get platform-appropriate credit card icon
   /// 🔹 Returns platform-specific icons
-  /// 🧠 iOS uses Cupertino icons, Material uses Material icons
+  /// 🧠 Uses map-based resolution via IconStrategyFactory
   IconData _getCreditCardIcon() {
     final theme = AdaptiveWidgetFactory.getCurrentTheme();
-
-    switch (theme) {
-      case PlatformTheme.cupertino:
-        return CupertinoIcons.creditcard;
-      case PlatformTheme.material:
-      case PlatformTheme.web:
-        return Icons.credit_card;
-    }
+    final strategy = IconStrategyFactory.getStrategy(theme);
+    return strategy.getCreditCardIcon();
   }
 
   /// Build trailing actions (edit, delete)
-  /// 🔹 Adaptive popup menu for actions
-  /// 🧠 iOS uses CupertinoActionSheet, Material uses PopupMenuButton
+  /// 🔹 Uses Material PopupMenuButton (platform-agnostic)
+  /// 🧠 Material UI provides consistent cross-platform behavior
   Widget _buildTrailingActions() {
-    final theme = AdaptiveWidgetFactory.getCurrentTheme();
-
-    switch (theme) {
-      case PlatformTheme.cupertino:
-        return CupertinoButton(
-          padding: EdgeInsets.zero,
-          onPressed: () => _showCupertinoActionSheet(),
-          child: const Icon(CupertinoIcons.ellipsis),
-        );
-      case PlatformTheme.material:
-      case PlatformTheme.web:
-        return PopupMenuButton<String>(
-          onSelected: (value) {
-            switch (value) {
-              case 'edit':
-                onEdit?.call();
-                break;
-              case 'delete':
-                onDelete?.call();
-                break;
-            }
-          },
-          itemBuilder: (context) => [
-            const PopupMenuItem(
-              value: 'edit',
-              child: Row(
-                children: [Icon(Icons.edit), SizedBox(width: 8), Text('Edit')],
-              ),
-            ),
-            const PopupMenuItem(
-              value: 'delete',
-              child: Row(
-                children: [
-                  Icon(Icons.delete),
-                  SizedBox(width: 8),
-                  Text('Delete'),
-                ],
-              ),
-            ),
-          ],
-        );
-    }
-  }
-
-  /// Show Cupertino action sheet for iOS
-  /// 🧠 iOS-specific interaction pattern using action sheets
-  void _showCupertinoActionSheet() {
-    // This would be implemented with proper context access
-    // For now, we'll use the callbacks directly
-    // In a real implementation, you'd use showCupertinoModalPopup
-    onEdit?.call();
+    return PopupMenuButton<String>(
+      onSelected: (value) {
+        switch (value) {
+          case 'edit':
+            onEdit?.call();
+            break;
+          case 'delete':
+            onDelete?.call();
+            break;
+        }
+      },
+      itemBuilder: (context) => [
+        const PopupMenuItem(
+          value: 'edit',
+          child: Row(
+            children: [Icon(Icons.edit), SizedBox(width: 8), Text('Edit')],
+          ),
+        ),
+        const PopupMenuItem(
+          value: 'delete',
+          child: Row(
+            children: [Icon(Icons.delete), SizedBox(width: 8), Text('Delete')],
+          ),
+        ),
+      ],
+    );
   }
 
   /// Get card color for theming
@@ -213,16 +186,10 @@ class CardTile extends StatelessWidget {
 
   /// Get platform-appropriate subtitle color
   /// 🔹 Returns platform-specific subtitle colors
-  /// 🧠 iOS uses system grey, Material uses theme-based grey
+  /// 🧠 Uses map-based resolution via IconStrategyFactory
   Color _getSubtitleColor() {
     final theme = AdaptiveWidgetFactory.getCurrentTheme();
-
-    switch (theme) {
-      case PlatformTheme.cupertino:
-        return CupertinoColors.systemGrey;
-      case PlatformTheme.material:
-      case PlatformTheme.web:
-        return Colors.grey[600]!;
-    }
+    final strategy = IconStrategyFactory.getStrategy(theme);
+    return strategy.getSubtitleColor();
   }
 }

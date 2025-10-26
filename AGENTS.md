@@ -36,21 +36,57 @@ Before editing, review the applicable sections of `ARCHITECTURE.md` and diff you
 ## 2. Operating Workflow
 
 1. **Observe** — gather context from the impacted files, existing comments, open tasks, and tests. Capture knowledge gaps. Check for code smells (long switch statements, repeated logic).
-2. **Analyze** — identify if design patterns are needed (Strategy, Factory) or if simpler solution suffices (YAGNI principle). 
+2. **Analyze** — identify if design patterns are needed (Strategy, Factory) or if simpler solution suffices (YAGNI principle).
 3. **Plan** — outline 2–5 concrete steps (including tests/docs) before touching code. Consider co-location and file organization.
-4. **Execute** — prefer small, reviewable changes. Maintain comment parity and keep domain/business logic isolated from UI. Follow DRY principle.
+4. **Execute** — prefer small, reviewable changes. Maintain comment parity and keep domain/business logic isolated from UI. Follow DRY principle. Document what you're doing in commit messages, not in separate summary files.
 5. **Verify** — run verification commands before completing the change:
-   - `flutter analyze` - Check for linting errors and warnings
-   - `flutter test` - Ensure all tests pass
-   - `dart format .` - Verify code formatting
-   - Optionally: `flutter build web` - Validate successful build
+
+**CRITICAL: Always check what changed FIRST:**
+```bash
+# Check what files were modified
+git diff --name-only HEAD
+
+# Count Dart files
+git diff --name-only | grep -E "\.dart$" | wc -l
+```
+
+**Then follow Conditional Testing Logic based on file types:**
+
+- **If changes in Dart files** (`.dart`, `.dart.html`, `.g.dart`, `.freezed.dart`):
+  - `flutter analyze` - Check for linting errors and warnings
+  - `flutter test --coverage` - Run tests and generate coverage report
+  - `dart format .` - Verify code formatting
+  - Check coverage thresholds meet requirements (see ARCHITECTURE.md §11.1)
+  - Optionally: `flutter build web` - Validate successful build
+
+- **If changes in Markdown files ONLY** (`.md` with NO `.dart` files):
+  - **CRITICAL**: Do NOT run `flutter test`, `flutter analyze`, or `dart format`
+  - **CRITICAL**: These commands are for Dart files, not documentation
+  - Review Markdown files - Check for formatting issues, broken links
+  - Manually verify heading hierarchy, code blocks, spacing
+  - Run `markdownlint` (if Node.js available) or manual review
+  - Verify all internal links work
+
+- **If changes in both Dart AND Markdown**:
+  - Run all verification steps for Dart files
+  - Review all Markdown files per checklist below
+
+**Markdown File Review Checklist:**
+- ✅ **Automated check** (if available): `markdownlint` (Node.js) or `mdformat` (Python)
+- ✅ **Manual checks required**:
+  - Check for proper heading hierarchy (no skipped levels)
+  - Verify all internal links work (`[text](./path/to/file.md)`)
+  - Ensure consistent formatting (spaces, line breaks)
+  - Validate code blocks are properly formatted
+  - Check for orphaned content or incomplete sections
+  - Verify consistent use of emojis (if used in project)
 6. **Commit & Push** — when user approves changes:
    - Stage changes: `git add .`
    - Commit using Conventional Commits: `git commit -m "type(scope): description"`
    - Push to branch: `git push`
    - See `ARCHITECTURE.md` §18 for commit type guidelines
 7. **Review** — inspect diffs, restate intent, highlight risks, and list recommended verification commands. Ensure consistency with existing patterns and validate that the updates comply with Android/iOS style guides.
-8. **Document** — if any changes go beyond current documentation in `AGENTS.md` or `ARCHITECTURE.md`, **update those files immediately** to reflect new patterns, practices, or architectural decisions.
+8. **Document** — if any changes go beyond current documentation in `AGENTS.md` or `ARCHITECTURE.md`, **update those files immediately** to reflect new patterns, practices, or architectural decisions. **Do NOT create separate summary files**—document changes in commit messages using Conventional Commits format.
 
 If any linting, formatting, test, or validation command fails at step 5 (or later), fix the underlying issues, run the appropriate formatter (`dart format .` / `flutter format`), and re-run the failing checks until they pass—never leave failed stages unresolved.
 
@@ -236,16 +272,61 @@ AI agents must ensure all UI implementations comply with official platform style
 | `flutter test --coverage` | Run tests and generate coverage report. |
 | `flutter test integration_test` | Execute integration flows when changes cross layers. |
 | `flutter build web` | Build web version for verification. |
-| `dart format .` | Format code according to Dart style guide. |
+| `dart format .` | Format code according to Dart style guide. **Note**: Do NOT format `.md` files with `dart format`. |
+| `markdownlint` | Check and fix Markdown file formatting (Node.js). Usage: `markdownlint "**/*.md" --fix`. Configuration in `.markdownlint.json`. |
+| `mdformat` | Python-based Markdown formatter. Usage: `pip install mdformat mdformat-myst && mdformat .` |
+| Manual review | Check MD files manually using checklist in Step 5. No extra tools needed. |
 | `dart doc` / `mkdocs serve` | Regenerate documentation when comments or guides change. |
 | `flutter create card_snap_ui` | Bootstrap a fresh Flutter project if the repository needs to be regenerated from scratch (follow the setup checklist below to align with architecture guidelines). |
 
+**Important Formatting Notes:**
+- ✅ `dart format .` formats Dart files only (`.dart` extensions)
+- ❌ Do NOT use `dart format` on Markdown files (`.md` extensions)
+- ❌ Do NOT create separate summary `.md` files documenting recent changes
+- ✅ Document changes in commit messages following Conventional Commits format
+- ✅ Include detailed explanations in code comments (`///`, `//`, `// 🧠`)
+- ✅ **Source of Truth**: Code comments + documentation files + commit history
+- ✅ Verify MD files with markdown linters (or manual review if tools unavailable)
+- ✅ **No external dependencies required**: Manual review always works, automated tools are optional
+
 **Verification Workflow:**
-Before committing changes, agents must verify:
+Before committing changes, agents must verify based on file types changed:
+
+**For Dart file changes** (`.dart`, generated files):
 1. `flutter analyze` - No errors or warnings
-2. `flutter test` - All tests pass
-3. `dart format .` - Code properly formatted
-4. `flutter build web` - Build succeeds (optional verification)
+2. `flutter test --coverage` - All tests pass and coverage report generated
+3. `dart format .` - Code properly formatted (**Note**: Only formats `.dart` files)
+4. Check coverage thresholds:
+   - Domain Layer: 90%+ minimum
+   - Data Layer: 80%+ minimum
+   - Presentation Layer: 70%+ minimum
+   - Core Layer: 85%+ minimum
+5. Optionally: `flutter build web` - Build succeeds
+
+**For Markdown file changes** (`.md`):
+1. **IMPORTANT**: Check if ANY Dart files were also changed using `git diff --name-only`
+2. **If ONLY Markdown files changed** (no `.dart` files in diff):
+   - **DO NOT RUN** `flutter test`, `flutter analyze`, or `dart format`
+   - These commands waste time on MD-only changes
+3. **Then choose one:**
+   - **If Node.js is available**: Run `markdownlint "**/*.md"` and `markdownlint "**/*.md" --fix`
+   - **If Node.js is NOT available**: Use alternatives:
+     - Manual review using the checklist below (recommended)
+     - Python-based tools: `pip install mdformat mdformat-myst` then `mdformat .`
+     - Use IDE's built-in Markdown linter (VS Code, IntelliJ, etc.)
+     - Online tools: paste MD content to markdownlint.herokuapp.com
+4. Manually review Markdown files for formatting issues
+5. Check heading hierarchy, links, code blocks
+6. Verify style consistency
+
+**Documentation Policy:**
+- ✅ Document changes in git commit messages (Conventional Commits format)
+- ✅ Add detailed comments in code files (`///`, `//`, `// 🧠`)
+- ✅ Update existing architecture docs (AGENTS.md, ARCHITECTURE.md) if patterns change
+- ❌ Do NOT create separate summary files (e.g., `REFACTORING_SUMMARY.md`, `CHANGE_LOG_today.md`)
+- ✅ **Source of Truth**: Code comments + existing documentation files + commit history (triple redundancy)
+- ✅ At any step, you can pause to review documentation and gather context
+- ✅ Verify and fix Markdown files: check for formatting issues, broken links, style consistency
 
 Use development servers/emulators for manual verification; avoid production builds unless explicitly requested by the human.
 
@@ -264,11 +345,38 @@ After verification passes, commit and push changes:
 4. Optionally create PR if not on main branch
 
 **Mandatory Steps Before Push:**
-- ✅ Run `flutter analyze` (must have 0 errors, 0 warnings)
-- ✅ Run `flutter test` (all tests must pass)
-- ✅ Run `dart format .` (code must be formatted)
-- ✅ Follow Conventional Commits standard (see `ARCHITECTURE.md` §18)
-- ✅ Update documentation if architecture changes (AGENTS.md, ARCHITECTURE.md)
+
+**STEP 1: ALWAYS check what changed using git FIRST:**
+```bash
+# Check modified files
+git diff --name-only HEAD
+
+# Check if there are any .dart files changed
+if git diff --name-only HEAD | grep -q "\.dart$"; then
+  echo "Dart files changed - run Flutter commands"
+else
+  echo "NO Dart files - DO NOT run Flutter commands"
+fi
+```
+
+**STEP 2: Conditional workflow based on changed files:**
+- **Dart files changed** (any `.dart`, `.dart.html`, `.g.dart` files):
+  - ✅ Run `flutter analyze` (must have 0 errors, 0 warnings)
+  - ✅ Run `flutter test --coverage` (all tests must pass, coverage report generated)
+  - ✅ Verify coverage thresholds meet minimum requirements (see `test/README.md`)
+  - ✅ Run `dart format .` (code must be formatted for Dart files only)
+  - ✅ Review and fix Markdown files (formatting, broken links, style consistency)
+  - ✅ Follow Conventional Commits standard (see `ARCHITECTURE.md` §18)
+  - ✅ Update documentation if architecture changes (AGENTS.md, ARCHITECTURE.md)
+
+- **Markdown files ONLY** (NO `.dart` files in git diff):
+  - **CRITICAL**: Do NOT run `flutter test`, `flutter analyze`, or `dart format`
+  - ✅ Run `markdownlint` to check for formatting issues (if Node.js available)
+  - ✅ Alternative: Use `mdformat` (Python) or IDE linting
+  - ✅ Alternative: Manual review using checklist
+  - ✅ Manually review Markdown files (formatting, links, consistency)
+  - ✅ Follow Conventional Commits standard
+  - ✅ Commit documentation changes
 
 ---
 

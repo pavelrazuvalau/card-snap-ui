@@ -80,26 +80,54 @@ class CardTile extends StatelessWidget {
 When adding a new adaptive widget type:
 
 1. Create a new folder (e.g., `dialog/`)
-2. Create the factory file (e.g., `adaptive_dialog_factory.dart`)
-3. Import common types: `import '../common/platform_types.dart'`
-4. Implement platform-specific rendering in switch statement
-5. Export from `adaptive_widget_module.dart`
-6. Add convenience method to `AdaptiveWidgetFactory`
+2. Create the interface file (e.g., `dialog_strategy_interface.dart`)
+3. Create Material implementation (e.g., `material_dialog_strategy.dart`)
+4. Create Cupertino implementation (e.g., `cupertino_dialog_strategy.dart`)
+5. Create strategy factory (e.g., `dialog_strategy_factory.dart`)
+6. Create adaptive factory (e.g., `adaptive_dialog_factory.dart`)
+7. Export from `adaptive_widget_module.dart`
+8. Add convenience method to `AdaptiveWidgetFactory`
 
 Example:
 ```dart
+// lib/presentation/widgets/adaptive/dialog/dialog_strategy_interface.dart
+abstract class DialogStrategy {
+  Widget createDialog({required String title});
+}
+
+// lib/presentation/widgets/adaptive/dialog/material_dialog_strategy.dart
+class MaterialDialogStrategy implements DialogStrategy {
+  @override
+  Widget createDialog({required String title}) {
+    return AlertDialog(title: Text(title));
+  }
+}
+
+// lib/presentation/widgets/adaptive/dialog/cupertino_dialog_strategy.dart
+class CupertinoDialogStrategy implements DialogStrategy {
+  @override
+  Widget createDialog({required String title}) {
+    return CupertinoAlertDialog(title: Text(title));
+  }
+}
+
+// lib/presentation/widgets/adaptive/dialog/dialog_strategy_factory.dart
+class DialogStrategyFactory {
+  static DialogStrategy getStrategy(PlatformTheme theme) {
+    return StrategySelector.getStrategyForTheme(
+      theme,
+      () => CupertinoDialogStrategy(),
+      () => MaterialDialogStrategy(),
+    );
+  }
+}
+
 // lib/presentation/widgets/adaptive/dialog/adaptive_dialog_factory.dart
 class AdaptiveDialogFactory {
   static Widget createDialog({required String title}) {
     final theme = PlatformDetector.getCurrentTheme();
-    
-    switch (theme) {
-      case PlatformTheme.cupertino:
-        return CupertinoAlertDialog(...);
-      case PlatformTheme.material:
-      case PlatformTheme.web:
-        return AlertDialog(...);
-    }
+    final strategy = DialogStrategyFactory.getStrategy(theme);
+    return strategy.createDialog(title: title);
   }
 }
 ```

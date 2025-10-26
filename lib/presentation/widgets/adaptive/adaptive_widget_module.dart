@@ -10,7 +10,6 @@
 library presentation.widgets.adaptive;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
 
 // Import common types
 import 'common/platform_types.dart';
@@ -19,6 +18,11 @@ import 'common/platform_types.dart';
 import 'scaffold/adaptive_scaffold_factory.dart';
 import 'card/adaptive_card_factory.dart';
 import 'button/adaptive_button_factory.dart';
+import 'app_bar/adaptive_app_bar_factory.dart';
+import 'list_tile/adaptive_list_tile_factory.dart';
+import 'progress_indicator/adaptive_progress_indicator_factory.dart';
+import 'dialog/adaptive_dialog_factory.dart';
+import 'theme_config/theme_config_strategy_factory.dart';
 
 // Export common types and selectors
 export 'common/platform_types.dart';
@@ -28,6 +32,10 @@ export 'common/strategy_selector.dart';
 export 'scaffold/adaptive_scaffold_factory.dart';
 export 'card/adaptive_card_factory.dart';
 export 'button/adaptive_button_factory.dart';
+export 'app_bar/adaptive_app_bar_factory.dart';
+export 'list_tile/adaptive_list_tile_factory.dart';
+export 'progress_indicator/adaptive_progress_indicator_factory.dart';
+export 'dialog/adaptive_dialog_factory.dart';
 
 // Export strategies - all components now use separate files for flexibility
 export 'scaffold/scaffold_strategy_interface.dart';
@@ -44,6 +52,36 @@ export 'button/button_strategy_interface.dart';
 export 'button/material_button_strategy.dart';
 export 'button/cupertino_button_strategy.dart';
 export 'button/button_strategy_factory.dart';
+
+export 'app_bar/app_bar_strategy_interface.dart';
+export 'app_bar/material_app_bar_strategy.dart';
+export 'app_bar/cupertino_app_bar_strategy.dart';
+export 'app_bar/app_bar_strategy_factory.dart';
+
+export 'list_tile/list_tile_strategy_interface.dart';
+export 'list_tile/material_list_tile_strategy.dart';
+export 'list_tile/cupertino_list_tile_strategy.dart';
+export 'list_tile/list_tile_strategy_factory.dart';
+
+export 'progress_indicator/progress_indicator_strategy_interface.dart';
+export 'progress_indicator/material_progress_indicator_strategy.dart';
+export 'progress_indicator/cupertino_progress_indicator_strategy.dart';
+export 'progress_indicator/progress_indicator_strategy_factory.dart';
+
+export 'dialog/dialog_strategy_interface.dart';
+export 'dialog/material_dialog_strategy.dart';
+export 'dialog/cupertino_dialog_strategy.dart';
+export 'dialog/dialog_strategy_factory.dart';
+
+export 'theme_config/theme_config_strategy_interface.dart';
+export 'theme_config/material_theme_config_strategy.dart';
+export 'theme_config/cupertino_theme_config_strategy.dart';
+export 'theme_config/theme_config_strategy_factory.dart';
+
+export 'icon_strategy/icon_strategy_interface.dart';
+export 'icon_strategy/material_icon_strategy.dart';
+export 'icon_strategy/cupertino_icon_strategy.dart';
+export 'icon_strategy/icon_strategy_factory.dart';
 
 // All widget components now follow flexibility-first approach with separate files
 
@@ -82,33 +120,19 @@ class AdaptiveWidgetFactory {
   /// Create adaptive app bar based on platform
   /// 🔹 Returns platform-appropriate app bar widget
   /// 🧠 iOS uses CupertinoNavigationBar with different styling
+  /// 🧠 Uses map-based resolution via AdaptiveAppBarFactory
   static Widget createAppBar({
     required String title,
     List<Widget>? actions,
     Widget? leading,
     bool automaticallyImplyLeading = true,
   }) {
-    final theme = getCurrentTheme();
-
-    switch (theme) {
-      case PlatformTheme.cupertino:
-        return CupertinoNavigationBar(
-          middle: Text(title),
-          trailing: actions != null && actions.isNotEmpty
-              ? Row(mainAxisSize: MainAxisSize.min, children: actions)
-              : null,
-          leading: leading,
-          automaticallyImplyLeading: automaticallyImplyLeading,
-        );
-      case PlatformTheme.material:
-      case PlatformTheme.web:
-        return AppBar(
-          title: Text(title),
-          actions: actions,
-          leading: leading,
-          automaticallyImplyLeading: automaticallyImplyLeading,
-        );
-    }
+    return AdaptiveAppBarFactory.createAppBar(
+      title: title,
+      actions: actions,
+      leading: leading,
+      automaticallyImplyLeading: automaticallyImplyLeading,
+    );
   }
 
   /// Create adaptive card widget based on platform
@@ -135,6 +159,7 @@ class AdaptiveWidgetFactory {
   /// Create adaptive list tile based on platform
   /// 🔹 Returns platform-appropriate list tile widget
   /// 🧠 iOS uses CupertinoListTile with different interaction patterns
+  /// 🧠 Uses map-based resolution via AdaptiveListTileFactory
   static Widget createListTile({
     Widget? leading,
     Widget? title,
@@ -143,28 +168,14 @@ class AdaptiveWidgetFactory {
     VoidCallback? onTap,
     bool enabled = true,
   }) {
-    final theme = getCurrentTheme();
-
-    switch (theme) {
-      case PlatformTheme.cupertino:
-        return CupertinoListTile(
-          leading: leading,
-          title: title ?? const SizedBox.shrink(),
-          subtitle: subtitle,
-          trailing: trailing,
-          onTap: enabled ? onTap : null,
-        );
-      case PlatformTheme.material:
-      case PlatformTheme.web:
-        return ListTile(
-          leading: leading,
-          title: title,
-          subtitle: subtitle,
-          trailing: trailing,
-          onTap: enabled ? onTap : null,
-          enabled: enabled,
-        );
-    }
+    return AdaptiveListTileFactory.createListTile(
+      leading: leading,
+      title: title,
+      subtitle: subtitle,
+      trailing: trailing,
+      onTap: onTap,
+      enabled: enabled,
+    );
   }
 
   /// Create adaptive button based on platform
@@ -187,43 +198,25 @@ class AdaptiveWidgetFactory {
   /// Create adaptive progress indicator based on platform
   /// 🔹 Returns platform-appropriate progress indicator
   /// 🧠 iOS uses CupertinoActivityIndicator with different animation
+  /// 🧠 Uses map-based resolution via AdaptiveProgressIndicatorFactory
   static Widget createProgressIndicator() {
-    final theme = getCurrentTheme();
-
-    switch (theme) {
-      case PlatformTheme.cupertino:
-        return const CupertinoActivityIndicator();
-      case PlatformTheme.material:
-      case PlatformTheme.web:
-        return const CircularProgressIndicator();
-    }
+    return AdaptiveProgressIndicatorFactory.createProgressIndicator();
   }
 
   /// Create adaptive dialog based on platform
   /// 🔹 Returns platform-appropriate dialog widget
   /// 🧠 iOS uses CupertinoAlertDialog with different styling
+  /// 🧠 Uses map-based resolution via AdaptiveDialogFactory
   static Widget createDialog({
     required String title,
     required String content,
     required List<Widget> actions,
   }) {
-    final theme = getCurrentTheme();
-
-    switch (theme) {
-      case PlatformTheme.cupertino:
-        return CupertinoAlertDialog(
-          title: Text(title),
-          content: Text(content),
-          actions: actions,
-        );
-      case PlatformTheme.material:
-      case PlatformTheme.web:
-        return AlertDialog(
-          title: Text(title),
-          content: Text(content),
-          actions: actions,
-        );
-    }
+    return AdaptiveDialogFactory.createDialog(
+      title: title,
+      content: content,
+      actions: actions,
+    );
   }
 }
 
@@ -236,45 +229,30 @@ class AdaptiveThemeConfig {
   /// Get platform-appropriate primary color
   /// 🔹 Returns platform-specific primary colors
   /// 🧠 iOS uses system blue, Material uses theme primary color
+  /// 🧠 Uses map-based resolution via ThemeConfigStrategyFactory
   static Color getPrimaryColor(BuildContext context) {
     final theme = AdaptiveWidgetFactory.getCurrentTheme();
-
-    switch (theme) {
-      case PlatformTheme.cupertino:
-        return CupertinoColors.systemBlue;
-      case PlatformTheme.material:
-      case PlatformTheme.web:
-        return Theme.of(context).primaryColor;
-    }
+    final strategy = ThemeConfigStrategyFactory.getStrategy(theme);
+    return strategy.getPrimaryColor(context);
   }
 
   /// Get platform-appropriate text theme
   /// 🔹 Returns platform-specific text styles
   /// 🧠 iOS uses Cupertino text styles, Material uses Material text styles
+  /// 🧠 Uses map-based resolution via ThemeConfigStrategyFactory
   static TextTheme getTextTheme(BuildContext context) {
     final theme = AdaptiveWidgetFactory.getCurrentTheme();
-
-    switch (theme) {
-      case PlatformTheme.cupertino:
-        return Theme.of(context).textTheme; // Use Material text theme for now
-      case PlatformTheme.material:
-      case PlatformTheme.web:
-        return Theme.of(context).textTheme;
-    }
+    final strategy = ThemeConfigStrategyFactory.getStrategy(theme);
+    return strategy.getTextTheme(context);
   }
 
   /// Get platform-appropriate icon theme
   /// 🔹 Returns platform-specific icon styles
   /// 🧠 iOS uses Cupertino icons, Material uses Material icons
+  /// 🧠 Uses map-based resolution via ThemeConfigStrategyFactory
   static IconThemeData getIconTheme(BuildContext context) {
     final theme = AdaptiveWidgetFactory.getCurrentTheme();
-
-    switch (theme) {
-      case PlatformTheme.cupertino:
-        return const CupertinoIconThemeData();
-      case PlatformTheme.material:
-      case PlatformTheme.web:
-        return Theme.of(context).iconTheme;
-    }
+    final strategy = ThemeConfigStrategyFactory.getStrategy(theme);
+    return strategy.getIconTheme(context);
   }
 }
