@@ -30,7 +30,14 @@ import 'dialog/adaptive_dialog_factory.dart';
 export 'common/platform_types.dart';
 export 'common/strategy_selector.dart';
 
-// Export factories
+// Export app factories
+export 'app/adaptive_app_factory.dart';
+export 'app/app_strategy_interface.dart';
+export 'app/material_app_strategy.dart';
+export 'app/cupertino_app_strategy.dart';
+export 'app/app_strategy_factory.dart';
+
+// Export widget factories
 export 'scaffold/adaptive_scaffold_factory.dart';
 export 'card/adaptive_card_factory.dart';
 export 'button/adaptive_button_factory.dart';
@@ -39,47 +46,55 @@ export 'list_tile/adaptive_list_tile_factory.dart';
 export 'progress_indicator/adaptive_progress_indicator_factory.dart';
 export 'dialog/adaptive_dialog_factory.dart';
 
-// Export strategies - all components now use separate files for flexibility
+// Export scaffold strategies
 export 'scaffold/scaffold_strategy_interface.dart';
 export 'scaffold/material_scaffold_strategy.dart';
 export 'scaffold/cupertino_scaffold_strategy.dart';
 export 'scaffold/scaffold_strategy_factory.dart';
 
+// Export card strategies
 export 'card/card_strategy_interface.dart';
 export 'card/material_card_strategy.dart';
 export 'card/cupertino_card_strategy.dart';
 export 'card/card_strategy_factory.dart';
 
+// Export button strategies
 export 'button/button_strategy_interface.dart';
 export 'button/material_button_strategy.dart';
 export 'button/cupertino_button_strategy.dart';
 export 'button/button_strategy_factory.dart';
 
+// Export app bar strategies
 export 'app_bar/app_bar_strategy_interface.dart';
 export 'app_bar/material_app_bar_strategy.dart';
 export 'app_bar/cupertino_app_bar_strategy.dart';
 export 'app_bar/app_bar_strategy_factory.dart';
 
+// Export list tile strategies
 export 'list_tile/list_tile_strategy_interface.dart';
 export 'list_tile/material_list_tile_strategy.dart';
 export 'list_tile/cupertino_list_tile_strategy.dart';
 export 'list_tile/list_tile_strategy_factory.dart';
 
+// Export progress indicator strategies
 export 'progress_indicator/progress_indicator_strategy_interface.dart';
 export 'progress_indicator/material_progress_indicator_strategy.dart';
 export 'progress_indicator/cupertino_progress_indicator_strategy.dart';
 export 'progress_indicator/progress_indicator_strategy_factory.dart';
 
+// Export dialog strategies
 export 'dialog/dialog_strategy_interface.dart';
 export 'dialog/material_dialog_strategy.dart';
 export 'dialog/cupertino_dialog_strategy.dart';
 export 'dialog/dialog_strategy_factory.dart';
 
+// Export theme configuration strategies
 export 'theme_config/theme_config_strategy_interface.dart';
 export 'theme_config/material_theme_config_strategy.dart';
 export 'theme_config/cupertino_theme_config_strategy.dart';
 export 'theme_config/theme_config_strategy_factory.dart';
 
+// Export icon strategies
 export 'icon_strategy/icon_strategy_interface.dart';
 export 'icon_strategy/material_icon_strategy.dart';
 export 'icon_strategy/cupertino_icon_strategy.dart';

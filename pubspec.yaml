@@ -39,11 +39,14 @@ dependencies:
   # Uncomment these dependencies when ready to implement features:
   
   # State Management (choose one)
-  # flutter_bloc: ^8.1.0        # BLoC pattern (recommended)
+  flutter_bloc: ^8.1.0        # BLoC pattern (recommended)
   # flutter_riverpod: ^2.4.0     # Riverpod alternative
   
+  # State comparison (for BLoC)
+  equatable: ^2.0.5
+  
   # Dependency Injection
-  # get_it: ^7.6.0
+  get_it: ^7.6.0
   
   # HTTP Client
   # dio: ^5.4.0
@@ -97,6 +100,7 @@ dev_dependencies:
   
   # Testing
   mocktail: ^1.0.0
+  bloc_test: ^9.1.5
   # integration_test:
   #   sdk: flutter
   

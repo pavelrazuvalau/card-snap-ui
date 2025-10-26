@@ -150,6 +150,23 @@ class PlatformDetector {
 
 **Strategy Pattern** - Platform-specific implementations are encapsulated in strategy classes (`MaterialCardStrategy`, `CupertinoCardStrategy`, etc.). Each widget has its own strategy files living alongside its factory in the same folder. This follows co-location principle and improves maintainability. The strategy selection happens via `StrategyFactory.getStrategy(theme)` which uses a map-based approach for flexibility.
 
+**Adaptive Root App Widget** - The application root uses adaptive app factory to switch between MaterialApp and CupertinoApp based on platform. This ensures native look-and-feel on each platform without platform-specific code in main.dart.
+
+```dart
+/// 🔶 Adaptive App Factory
+/// Creates platform-appropriate root app widget.
+/// Strategies create their own themes internally - complete encapsulation.
+return AdaptiveAppFactory.createApp(
+  title: AppConstants.appName,
+  home: const CardListPage(),
+);
+```
+
+**Key Points:**
+- **Encapsulation:** Themes are created within strategies, not passed from main.dart
+- **Platform Detection:** Automatic selection between Material and Cupertino based on runtime platform
+- **Zero Configuration:** main.dart doesn't need to know about themes at all
+
 **Style Guide Compliance** - All strategy implementations must follow official platform design guidelines:
 
 - **Material Design 3** ([https://m3.material.io/](https://m3.material.io/)) for Android/Web (elevation 1dp, padding 16dp, 12dp border radius)

@@ -62,6 +62,26 @@ Despite the Angular developer's background:
 
 **Rule:** Angular concepts exist ONLY in documentation/comments to help understanding. Code must be pure, idiomatic Flutter.
 
+### ⚠️ Critical: AI Mentor Responsibility for Flutter Best Practices
+
+**AI AGENTS MUST VERIFY AND ENFORCE FLUTTER BEST PRACTICES**
+
+Given that the human collaborator is an Angular developer without extensive Flutter experience:
+- ✅ **Role:** AI agents act as mentors and verifiers of Flutter best practices
+- ✅ **Verify:** Cross-check all proposed implementations against established Flutter enterprise patterns
+- ✅ **Research:** When in doubt, search for and reference production Flutter enterprise practices
+- ✅ **Question:** Challenge proposed patterns that might be Angular-influenced rather than Flutter-native
+- ✅ **Educate:** Explain WHY Flutter patterns differ from Angular, not just HOW to implement them
+
+**When user requests implementations:**
+1. **Always check** if the approach aligns with Flutter best practices, not Angular patterns
+2. **Always verify** against production enterprise Flutter projects when patterns seem unusual
+3. **Always explain** Flutter-specific reasons for architectural decisions
+4. **Always question** patterns that might be over-abstracting or over-engineering
+5. **Always suggest** simpler Flutter-idiomatic solutions when appropriate
+
+**Rule:** AI agents must be vigilant gatekeepers of Flutter best practices. When user suggests patterns, verify they follow Flutter conventions, not Angular mental models.
+
 Before editing, review the applicable sections of `ARCHITECTURE.md` and `BUSINESS.md`, then diff your working context to confirm alignment. Use `README.md` for navigation hints only.
 
 ---
@@ -72,7 +92,7 @@ Before editing, review the applicable sections of `ARCHITECTURE.md` and `BUSINES
 2. **Analyze** — identify if design patterns are needed (Strategy, Factory) or if simpler solution suffices (YAGNI principle). Verify alignment with `BUSINESS.md` requirements (MUST/SHOULD/WON'T priorities).
 3. **Plan** — outline 2–5 concrete steps (including tests/docs) before touching code. Consider co-location and file organization. Ensure the plan satisfies business requirements from `BUSINESS.md`.
 4. **Execute** — prefer small, reviewable changes. Maintain comment parity and keep domain/business logic isolated from UI. Follow DRY principle. Ensure all changes align with business requirements in `BUSINESS.md`. Document what you're doing in commit messages following Conventional Commits.
-5. **Verify** — run verification commands before completing the change:
+5. **Verify** — run verification commands AND enterprise standards compliance check before completing the change:
 
 **CRITICAL: Always check what changed FIRST:**
 ```bash
@@ -105,27 +125,120 @@ git diff --name-only | grep -E "\.dart$" | wc -l
   - Review all Markdown files per checklist below
 
 **Markdown File Review Checklist:**
-- ✅ **Automated check** (if available): `markdownlint` (Node.js) or `mdformat` (Python)
-- ✅ **Manual checks required**:
-  - Check for proper heading hierarchy (no skipped levels)
-  - Verify all internal links work (`[text](./path/to/file.md)`)
-  - Ensure consistent formatting (spaces, line breaks)
-  - Validate code blocks are properly formatted
-  - Check for orphaned content or incomplete sections
-  - Verify consistent use of emojis (if used in project)
-6. **Commit & Push** — when user approves changes:
+
+**Step 1: Automated Linting** (preferred, if tools available):
+```bash
+# Option 1: markdownlint (Node.js) - recommended
+npx markdownlint-cli "**/*.md" 
+npx markdownlint-cli "**/*.md" --fix
+
+# Option 2: markdownlint (if installed globally)
+markdownlint "**/*.md"
+markdownlint "**/*.md" --fix
+
+# Option 3: mdformat (Python)
+pip install mdformat mdformat-myst
+mdformat .
+```
+
+**Step 2: Manual checks** (always required, even after automated tools):
+- Check for proper heading hierarchy (no skipped levels: h1 → h2 → h3)
+- Verify all internal links work (`[text](./path/to/file.md)`)
+- Ensure consistent formatting (spaces, line breaks, indentation)
+- Validate code blocks are properly formatted (triple backticks with language tags)
+- Check for orphaned content or incomplete sections
+- Verify consistent use of emojis (if used in project)
+- Check for broken external links (if referenced)
+- Verify table formatting (consistent alignment)
+
+6. **Compliance Check** — **MANDATORY**: Run enterprise standards compliance check:
+   - Execute all automated checks (flutter analyze, flutter test --coverage, dart format)
+   - Verify coverage thresholds are met
+   - Review code against Enterprise Standards Checklist (see below)
+   - Fix any issues found before proceeding
+   - **NO EXCEPTIONS** (except Markdown-only changes per Exception Rule)
+7. **Commit & Push** — when user explicitly approves changes and requests commit:
    - Stage changes: `git add .`
    - Commit using Conventional Commits: `git commit -m "type(scope): description"`
    - Push to branch: `git push`
-   - See `ARCHITECTURE.md` §18 for commit type guidelines
-7. **Review** — inspect diffs, restate intent, highlight risks, and list recommended verification commands. Ensure consistency with existing patterns and validate that the updates comply with Android/iOS style guides.
-8. **Document** — if any changes go beyond current documentation in `AGENTS.md` or `ARCHITECTURE.md`, **update those files immediately** to reflect new patterns, practices, or architectural decisions. **Do NOT create separate summary files**—document changes in commit messages using Conventional Commits format.
+   - See `ARCHITECTURE.md` §19 for Conventional Commits format and §20 for GitFlow strategy
+   - **IMPORTANT**: Never commit or push automatically. Only commit when user explicitly requests it.
+8. **Review** — inspect diffs, restate intent, highlight risks, and list recommended verification commands. Ensure consistency with existing patterns and validate that the updates comply with Android/iOS style guides.
+9. **Document** — if any changes go beyond current documentation in `AGENTS.md` or `ARCHITECTURE.md`, **update those files immediately** to reflect new patterns, practices, or architectural decisions. **Do NOT create separate summary files**—document changes in commit messages using Conventional Commits format.
 
 If any linting, formatting, test, or validation command fails at step 5 (or later), fix the underlying issues, run the appropriate formatter (`dart format .` / `flutter format`), and re-run the failing checks until they pass—never leave failed stages unresolved.
 
 **Critical**: Before making any architectural changes, check if they're documented. If not, document them first. All agents must strictly follow documented practices.
 
 Pause and surface uncertainties; do not invent data or skip validation.
+
+**CRITICAL: Automatic Enterprise Standards Compliance Check**
+
+AI agents MUST automatically verify enterprise Flutter standards compliance in the following scenarios:
+
+**When to Run Compliance Check:**
+- ✅ **Always** before committing any code changes
+- ✅ **Always** after modifying Dart files (`.dart`)
+- ✅ **Always** after completing a feature implementation
+- ✅ **Always** when refactoring code
+- ✅ **Always** when adding new dependencies
+- ✅ **Always** when creating new widgets or BLoCs
+- ✅ **Always** after receiving user feedback or code review
+
+**Compliance Check Commands (Run when appropriate based on file types):**
+
+```bash
+# 1. Check for linting issues
+flutter analyze
+
+# 2. Run tests with coverage
+flutter test --coverage
+
+# 3. Format code
+dart format .
+
+# 4. Verify coverage thresholds
+# Review coverage/lcov.info to ensure:
+# - Domain Layer: 90%+ minimum
+# - Data Layer: 80%+ minimum  
+# - Presentation Layer: 70%+ minimum
+# - Core Layer: 85%+ minimum
+```
+
+**Enterprise Standards Checklist (Verify Automatically):**
+- ✅ Code follows Flutter best practices (not Angular patterns)
+- ✅ Uses proper state management (BLoC, Riverpod, etc.)
+- ✅ Implements Clean Architecture (domain/data/presentation separation)
+- ✅ Cross-platform compatibility (Material + Cupertino strategies)
+- ✅ Proper error handling with Result pattern
+- ✅ Dependency injection (get_it or provider)
+- ✅ Tests written and passing
+- ✅ Documentation includes educational comments
+- ✅ No platform-specific hardcoding
+- ✅ Follows SOLID principles
+
+**Automated Checks Required:**
+Agents MUST run these checks before any commit:
+1. `flutter analyze` - Must show "No issues found"
+2. `flutter test --coverage` - All tests must pass
+3. `dart format .` - No formatting issues
+4. Coverage report reviewed for threshold compliance
+5. Manual review for architectural compliance
+
+**Failure Handling:**
+- If ANY check fails, agents MUST fix issues before proceeding
+- Agents MUST NOT skip checks or proceed with failing code
+- All lint warnings must be resolved (not ignored)
+- All tests must pass (100% pass rate required)
+- Code formatting must be applied
+
+**Exception Rule:**
+The ONLY exception to skipping compliance checks is when:
+- Only Markdown files (`.md`) were modified with NO Dart files changed
+- In this case, skip `flutter analyze`, `flutter test`, and `dart format`
+- But still manually review Markdown for formatting issues
+
+Agents are responsible for ensuring code quality. Compliance checking is NOT optional—it's MANDATORY.
 
 ---
 
@@ -145,9 +258,74 @@ Pause and surface uncertainties; do not invent data or skip validation.
 
 ---
 
-## 4. Architecture Guidelines
+## 4. Git Workflow & Commit Guidelines
 
-### 4.1 Adaptive Widget Factory & Strategy Pattern
+### 4.1 Conventional Commits Format
+
+**ALL commits MUST follow** [Conventional Commits 1.0.0](https://www.conventionalcommits.org/en/v1.0.0/):
+
+```
+<type>[optional scope]: <description>
+```
+
+**Commit Types:**
+- `feat(scope): description` - New features
+- `fix(scope): description` - Bug fixes
+- `docs(scope): description` - Documentation updates
+- `style(scope): description` - Formatting changes (no logic change)
+- `refactor(scope): description` - Code restructuring (no behavior change)
+- `test(scope): description` - Test additions/updates
+- `chore(scope): description` - Tooling, dependencies, maintenance
+
+**Examples:**
+```bash
+feat(auth): add token refresh on login
+fix(card-list): prevent crash when card id is null
+docs(architecture): explain device sync use case
+refactor(ui): simplify dashboard rebuild logic
+test(bloc): add coverage for card list states
+chore(deps): update flutter_bloc to 8.1.6
+```
+
+**CRITICAL:** 
+- Commit messages MUST be descriptive
+- Scope SHOULD match module/feature name
+- Description MUST start with lowercase verb (add, fix, update, etc.)
+- NEVER skip commit message
+- See `ARCHITECTURE.md` §19 for full specification
+
+### 4.2 Branching Strategy (GitFlow)
+
+The repository follows **GitFlow** for branch management:
+
+| Branch | Purpose | Merge Target |
+|--------|---------|--------------|
+| `main` | Stable production releases only | None (deploy) |
+| `develop` | Active development (feature merges) | main |
+| `feature/*` | One feature or task per branch | develop |
+| `release/*` | Pre-release stabilization | main + develop |
+| `hotfix/*` | Urgent fixes against production | main + develop |
+
+**Workflow:**
+1. Create feature branch: `feature/feature-name`
+2. Develop & commit using Conventional Commits
+3. Open PR to `develop` (CI must pass)
+4. After approval, merge to `develop`
+5. For release: create `release/v1.0.0` → merge to `main` → tag
+
+**Protected Branches:** `main`, `develop` require code review and CI passing.
+
+**CRITICAL:**
+- NEVER commit directly to `main`
+- NEVER commit to `develop` without PR
+- ALWAYS use Conventional Commits
+- See `ARCHITECTURE.md` §18-20 for detailed workflow
+
+---
+
+## 5. Architecture Guidelines
+
+### 5.1 Adaptive Widget Factory & Strategy Pattern
 - **Purpose**: Create platform-specific UI components with consistent interfaces using Factory + Strategy patterns
 - **Location**: `lib/presentation/widgets/adaptive/`
 - **Structure**: Each widget has its own folder containing both factory and strategy:
@@ -159,13 +337,13 @@ Pause and surface uncertainties; do not invent data or skip validation.
 - **Angular Analogy**: Similar to Angular's platform detection service + strategy injection pattern
 - **Implementation**: `AdaptiveWidgetFactory` delegates to strategy classes (Material vs Cupertino implementations)
 
-### 4.2 Repository Pattern
+### 5.2 Repository Pattern
 - **Purpose**: Abstract data access and provide consistent interface for data operations
 - **Location**: `lib/domain/repositories/` and `lib/data/repositories/`
 - **Angular Analogy**: Similar to Angular's service layer that abstracts HTTP calls and data management
 - **Implementation**: Abstract repository interfaces with concrete implementations (Local, API, Hybrid)
 
-### 4.3 Use Cases Pattern
+### 5.3 Use Cases Pattern
 - **Purpose**: Encapsulate business logic and orchestrate data flow
 - **Location**: `lib/domain/usecases/`
 - **Angular Analogy**: Similar to Angular's service methods that handle business logic
@@ -173,7 +351,7 @@ Pause and surface uncertainties; do not invent data or skip validation.
 
 ---
 
-## 5. Coding Standards
+## 6. Coding Standards
 
 **Effective Dart & Flutter**
 
@@ -340,7 +518,7 @@ AI agents must ensure all UI implementations comply with official platform style
 
 ---
 
-## 5. Tooling & Commands
+## 7. Tooling & Commands
 
 | Command | Purpose |
 |---------|---------|
@@ -351,11 +529,18 @@ AI agents must ensure all UI implementations comply with official platform style
 | `flutter test integration_test` | Execute integration flows when changes cross layers. |
 | `flutter build web` | Build web version for verification. |
 | `dart format .` | Format code according to Dart style guide. **Note**: Do NOT format `.md` files with `dart format`. |
-| `markdownlint` | Check and fix Markdown file formatting (Node.js). Usage: `markdownlint "**/*.md" --fix`. Configuration in `.markdownlint.json`. |
+| `markdownlint` | Check Markdown file formatting (Node.js). Usage: `markdownlint "**/*.md"` or `markdownlint "**/*.md" --fix`. Configuration in `.markdownlint.json`. |
+| `npx markdownlint-cli` | Alternative: Use npx to run markdownlint without global install. |
 | `mdformat` | Python-based Markdown formatter. Usage: `pip install mdformat mdformat-myst && mdformat .` |
 | Manual review | Check MD files manually using checklist in Step 5. No extra tools needed. |
 | `dart doc` / `mkdocs serve` | Regenerate documentation when comments or guides change. |
 | `flutter create card_snap_ui` | Bootstrap a fresh Flutter project if the repository needs to be regenerated from scratch (follow the setup checklist below to align with architecture guidelines). |
+
+**Markdown Linting Priority:**
+1. **Try `markdownlint` first** - Run `markdownlint "**/*.md"` to check files, then `markdownlint "**/*.md" --fix` to auto-fix
+2. **If Node.js unavailable** - Use `mdformat` (Python) or `npx markdownlint-cli` (no install needed)
+3. **If all tools unavailable** - Use manual review checklist (always available, no dependencies)
+4. **Never skip** - Markdown files must be reviewed for formatting issues before commit
 
 **Important Formatting Notes:**
 - ✅ `dart format .` formats Dart files only (`.dart` extensions)
@@ -409,9 +594,11 @@ Before committing changes, agents must verify based on file types changed:
 Use development servers/emulators for manual verification; avoid production builds unless explicitly requested by the human.
 
 **Commit & Push Workflow:**
-After verification passes, commit and push changes:
+⚠️ **IMPORTANT**: Follow this workflow ONLY when user explicitly requests to commit and push changes.
+
+When user requests to commit changes:
 1. Stage all changes: `git add .`
-2. Commit with Conventional Commits format (see `ARCHITECTURE.md` §18):
+2. Commit with Conventional Commits format (see `ARCHITECTURE.md` §19):
    - `feat(scope): description` - New features
    - `fix(scope): description` - Bug fixes
    - `docs(scope): description` - Documentation updates
@@ -421,6 +608,8 @@ After verification passes, commit and push changes:
    - `chore(scope): description` - Tooling/maintenance
 3. Push to current branch: `git push`
 4. Optionally create PR if not on main branch
+
+**CRITICAL**: Never commit or push without explicit user request. Only execute these steps when user explicitly says "commit", "push", "ready to commit", or similar.
 
 **Mandatory Steps Before Push:**
 
@@ -444,7 +633,7 @@ fi
   - ✅ Verify coverage thresholds meet minimum requirements (see `test/README.md`)
   - ✅ Run `dart format .` (code must be formatted for Dart files only)
   - ✅ Review and fix Markdown files (formatting, broken links, style consistency)
-  - ✅ Follow Conventional Commits standard (see `ARCHITECTURE.md` §18)
+  - ✅ Follow Conventional Commits standard (see `ARCHITECTURE.md` §19)
   - ✅ Update documentation if architecture changes (AGENTS.md, ARCHITECTURE.md)
 
 - **Markdown files ONLY** (NO `.dart` files in git diff):
@@ -458,7 +647,7 @@ fi
 
 ---
 
-## 6. Bootstrap Checklist (Empty Repository Scenario)
+## 8. Bootstrap Checklist (Empty Repository Scenario)
 
 1. **Initialize project:** run `flutter create card_snap_ui` in an empty workspace (do not run automatically unless the human confirms Flutter is installed).
 2. **Restructure folders:** conform to `ARCHITECTURE.md` §5 by organizing `lib/` into `core/`, `data/`, `domain/`, `presentation/`, and moving CI/docs scaffolding into place.
@@ -469,7 +658,7 @@ fi
 
 ---
 
-## 7. Communication Protocol
+## 9. Communication Protocol
 
 - Lead with findings, risks, or blockers; follow with implementation details.
 - Reference files and line numbers (`path/to/file.dart:42`) when discussing code.
@@ -478,7 +667,7 @@ fi
 
 ---
 
-## 8. Quick Reference
+## 10. Quick Reference
 
 - Architecture deep dive & learning goals: `ARCHITECTURE.md`
 - Business requirements & SRS baseline: `BUSINESS.md`

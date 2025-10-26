@@ -134,21 +134,21 @@ void main() {
       test('should create failure result', () {
         // 🔹 Test Result.failure factory constructor
         const error = DomainException('Validation failed');
-        final result = Result.failure(error);
+        const result = Result<String>.failure(error);
         expect(result.isSuccess, isFalse);
         expect(result.isFailure, isTrue);
       });
 
       test('should return error for failure result', () {
         const error = DataException('Database error');
-        final result = Result.failure(error);
+        const result = Result<String>.failure(error);
         expect(result.dataOrNull, isNull);
         expect(result.errorOrNull, error);
       });
 
       test('should handle different exception types', () {
         const securityError = SecurityException('Encryption failed');
-        final result = Result.failure(securityError);
+        const result = Result<String>.failure(securityError);
         expect(result.errorOrNull, securityError);
         expect(result.errorOrNull?.message, 'Encryption failed');
       });
@@ -161,7 +161,7 @@ void main() {
       });
 
       test('isSuccess should be false for failure', () {
-        const result = Result.failure(const DomainException('Error'));
+        const result = Result<String>.failure(const DomainException('Error'));
         expect(result.isSuccess, isFalse);
       });
 
@@ -171,7 +171,7 @@ void main() {
       });
 
       test('isFailure should be true for failure', () {
-        const result = Result.failure(const DomainException('Error'));
+        const result = Result<String>.failure(const DomainException('Error'));
         expect(result.isFailure, isTrue);
       });
 
@@ -181,7 +181,7 @@ void main() {
       });
 
       test('dataOrNull should return null for failure', () {
-        const result = Result.failure(const DomainException('Error'));
+        const result = Result<String>.failure(const DomainException('Error'));
         expect(result.dataOrNull, isNull);
       });
 
@@ -192,7 +192,7 @@ void main() {
 
       test('errorOrNull should return error for failure', () {
         const error = DomainException('Validation failed');
-        final result = Result.failure(error);
+        const result = Result<String>.failure(error);
         expect(result.errorOrNull, error);
       });
     });
