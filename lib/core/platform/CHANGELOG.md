@@ -1,6 +1,6 @@
 # Platform Layer Changelog
 
-## [0.1.0] - 2025-01-XX
+## [0.0.1] - 2025-10-26
 
 ### Added
 - **Browser Launcher Abstraction** (`browser_launcher.dart`)

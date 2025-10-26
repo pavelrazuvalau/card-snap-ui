@@ -22,7 +22,7 @@ class AppConstants {
   static const String appName = 'Card Snap Wallet';
 
   /// Application version - follows SemVer (see ARCHITECTURE.md §20)
-  static const String appVersion = '0.1.0';
+  static const String appVersion = '0.0.1';
 
   /// Minimum supported Android API level
   /// 🧠 Android API 23+ = Android 6.0+ (covers 95%+ of devices)
@@ -52,7 +52,7 @@ class SecurityConstants {
 /// 🔹 Primary languages: ru/en/uk/pl (from BUSINESS.md §1)
 /// 🔹 Extended languages: de/fr/es/it/nl/sv
 class LocalizationConstants {
-  /// Primary supported languages (must-have for v0.1.0)
+  /// Primary supported languages (must-have for v0.0.1)
   static const List<String> primaryLanguages = ['ru', 'en', 'uk', 'pl'];
 
   /// Extended supported languages (nice-to-have)
