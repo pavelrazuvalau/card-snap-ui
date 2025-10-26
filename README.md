@@ -122,7 +122,28 @@ flutter build ios --release    # iOS
 
 > **Note:** Flutter's web support currently provides hot reload for Chrome and Edge only. For Firefox, use `flutter build web` then open `build/web/index.html` in the browser.
 
-Use `flutter test integration_test` for end-to-end suites when changes cross layers. See `ARCHITECTURE.md` for architecture-specific testing guidance.
+### Verification & Testing
+
+Before committing changes, verify the project:
+
+```bash
+# 1. Run linter (must pass with no errors or warnings)
+flutter analyze
+
+# 2. Run tests (all tests must pass)
+flutter test
+
+# 3. Run tests with coverage
+flutter test --coverage
+
+# 4. Format code
+dart format .
+
+# 5. Verify build (optional but recommended)
+flutter build web
+```
+
+See `test/README.md` for detailed testing strategy and coverage requirements. Use `flutter test integration_test` for end-to-end suites when changes cross layers. See `ARCHITECTURE.md` for architecture-specific testing guidance.
 
 ---
 

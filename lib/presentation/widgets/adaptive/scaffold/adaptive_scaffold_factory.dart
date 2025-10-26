@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../common/platform_types.dart';
-import 'scaffold_strategy_interface.dart';
 import 'scaffold_strategy_factory.dart';
 
 /// 🔶 Adaptive Scaffold Factory

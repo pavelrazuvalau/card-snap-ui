@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../common/platform_types.dart';
-import 'card_strategy_interface.dart';
 import 'card_strategy_factory.dart';
 
 /// 🔶 Adaptive Card Factory

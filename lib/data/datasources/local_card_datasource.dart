@@ -26,7 +26,8 @@ import '../../core/errors/app_exceptions.dart';
 /// 🔹 Simple in-memory storage for minimal startup
 /// 🔹 TODO: Replace with Hive database when dependencies are added
 class LocalCardDataSource {
-  static const String _storageKey = 'cards';
+  // Keep for future database implementation
+  // static const String _storageKey = 'cards';
 
   // Simple in-memory storage
   final List<LoyaltyCardModel> _cards = [];

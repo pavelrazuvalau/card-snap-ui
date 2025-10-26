@@ -107,6 +107,11 @@ class AdaptiveWidgetFactory {
 
 **Strategy Pattern** - Platform-specific implementations are encapsulated in strategy classes. Each widget has its own strategy file (`button_strategy.dart`, `card_strategy.dart`, etc.) living alongside its factory in the same folder. This follows co-location principle and improves maintainability.
 
+**Style Guide Compliance** - All strategy implementations must follow official platform design guidelines:
+
+- **Material Design 3** ([https://m3.material.io/](https://m3.material.io/)) for Android/Web (elevation 1dp, padding 16dp, 12dp border radius)
+- **iOS Human Interface Guidelines** ([https://developer.apple.com/design/human-interface-guidelines](https://developer.apple.com/design/human-interface-guidelines)) for iOS (shadows instead of elevation, padding 16pt, 44pt minimum touch target)
+
 **Repository Pattern** - Abstracts data access layer with `CardRepository` interface and implementations. Similar to Angular's service layer that abstracts HTTP calls.
 
 **Use Cases Pattern** - Encapsulates business logic in dedicated use case classes. Similar to Angular's service methods that coordinate between services and components.
@@ -235,8 +240,37 @@ Card Snap UI must deliver identical learning and runtime value on **Android** an
 | **Device Testing** | Run widget tests for both platform themes (Material + Cupertino) when UI diverges. Run integration tests on Android emulator + iOS simulator before release. | Ensures consistent UX and surfaces platform quirks early. |
 | **Build & Release** | CI/CD provides artifacts for both platforms; fastlane (or equivalent) scripts belong in `infra/`. | Reinforces the production-ready objective and keeps release steps reproducible. |
 | **Dependencies** | Avoid platform-only packages unless there is no Flutter-first alternative; when required, wrap them behind abstractions and document trade-offs. | Maintains educational focus on shared architecture patterns. |
+| **Style Guide Compliance** | All UI components must follow [Material Design 3](https://m3.material.io/) (Android) and [iOS Human Interface Guidelines](https://developer.apple.com/design/human-interface-guidelines) (iOS). Document specific values (padding, colors, elevation) with style guide references. | Ensures platform-native look and feel, improves user experience, maintains design consistency. |
 
 > When introducing new features, include a note in the PR/commit describing cross-platform considerations (UI, permissions, native integrations) and reference relevant tests or platform adapters.
+
+### 7.1 Platform Style Guides
+
+**Material Design 3 (Android/Web)**
+- **Reference:** [Material Design 3 Guidelines](https://m3.material.io/)
+- **Components:** [Cards](https://m3.material.io/components/cards), [Buttons](https://m3.material.io/components/buttons)
+- **Default Values:**
+  - Elevation: 1dp for cards, 3dp for elevated components
+  - Padding: 16dp (standard spacing)
+  - Border radius: 12dp (default for cards)
+  - Minimum touch target: 40dp × 40dp
+- **Implementation:** All Material strategy files in `lib/presentation/widgets/adaptive/*/material_*_strategy.dart` must reference specific Material Design sections and explain chosen values.
+
+**iOS Human Interface Guidelines (HIG)**
+- **Reference:** [iOS Human Interface Guidelines](https://developer.apple.com/design/human-interface-guidelines)
+- **Components:** [Cards](https://developer.apple.com/design/human-interface-guidelines/components/content-views/cards), [Buttons](https://developer.apple.com/design/human-interface-guidelines/components/selection-and-input/buttons)
+- **Default Values:**
+  - No Material elevation - use subtle shadows with 8pt blur, 2pt offset
+  - Border radius: 12pt (standard for cards)
+  - Padding: 16pt (content inset standard)
+  - Minimum touch target: 44pt × 44pt (accessibility requirement)
+- **Implementation:** All Cupertino strategy files in `lib/presentation/widgets/adaptive/*/cupertino_*_strategy.dart` must reference specific iOS HIG sections and explain differences from Material (e.g., "iOS uses shadows instead of elevation").
+
+**Documentation Requirements:**
+- Every platform-specific strategy file MUST include style guide references in top-level documentation comments
+- Comments must explain WHY specific values were chosen (e.g., "16dp ensures proper content breathing room per Material guidelines")
+- Use educational comment taxonomy: `/// 🔶` for architecture, `// 🔹` for syntax, `// 🧠` for deep insights
+- Include Angular analogies when explaining style guide compliance (e.g., "Similar to Angular Material Card with Material Design 3 styling")
 
 ---
 

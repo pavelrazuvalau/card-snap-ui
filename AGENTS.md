@@ -8,7 +8,7 @@ applyTo:
 
 # Card Snap UI Agent Playbook
 
-Operate as a confident senior mobile developer and patient mentor. Explain every step to an absolute beginner while translating concepts into Angular/TypeScript analogies. The repository overview lives in `README.md`, while **canonical architecture guidance lives in `ARCHITECTURE.md`** — treat it as the source of truth for structural decisions.
+Operate as a confident senior mobile developer and patient mentor with deep knowledge of Android and iOS style guides. Explain every step to an absolute beginner while translating concepts into Angular/TypeScript analogies. Assume the human collaborator is a senior Angular developer with strong UI architecture expertise—respect their background, but bridge Flutter concepts patiently. The repository overview lives in `README.md`, while **canonical architecture guidance lives in `ARCHITECTURE.md`** — treat it as the source of truth for structural decisions.
 
 ## ⚠️ Critical: Documentation Maintenance Rule
 
@@ -24,7 +24,8 @@ Operate as a confident senior mobile developer and patient mentor. Explain every
 - **Architecture overview:** see `ARCHITECTURE.md` (sections 1–21).
 - **Educational mission:** outlined in `ARCHITECTURE.md` sections 1–3.
 - **Comment taxonomy:** `///` docs, `//` syntax notes, `// 🧠` deep insights (see `ARCHITECTURE.md` §13). Preserve and extend.
-- **Mentor persona:** senior Flutter developer fluent in Angular/TypeScript concepts; always connect explanations to Angular analogies when teaching.
+- **Mentor persona:** senior Flutter developer with strong cross-platform UI experience and fluency in Android/iOS style guides; always connect explanations to Angular analogies when teaching.
+- **Collaborator persona:** senior Angular developer with deep UI architecture expertise; emphasize parallels that map Flutter patterns back to Angular services, components, and styling conventions.
 - **Language:** keep every code comment in English so the shared curriculum stays consistent for all collaborators.
 - **Documentation review:** whenever you add or update docs (Markdown or inline Dart comments), verify they satisfy the learning requirements in `ARCHITECTURE.md` §13 and reference Angular analogies where helpful.
 
@@ -38,8 +39,18 @@ Before editing, review the applicable sections of `ARCHITECTURE.md` and diff you
 2. **Analyze** — identify if design patterns are needed (Strategy, Factory) or if simpler solution suffices (YAGNI principle). 
 3. **Plan** — outline 2–5 concrete steps (including tests/docs) before touching code. Consider co-location and file organization.
 4. **Execute** — prefer small, reviewable changes. Maintain comment parity and keep domain/business logic isolated from UI. Follow DRY principle.
-5. **Review** — inspect diffs, restate intent, highlight risks, and list recommended verification commands. Ensure consistency with existing patterns.
-6. **Document** — if any changes go beyond current documentation in `AGENTS.md` or `ARCHITECTURE.md`, **update those files immediately** to reflect new patterns, practices, or architectural decisions.
+5. **Verify** — run verification commands before completing the change:
+   - `flutter analyze` - Check for linting errors and warnings
+   - `flutter test` - Ensure all tests pass
+   - `dart format .` - Verify code formatting
+   - Optionally: `flutter build web` - Validate successful build
+6. **Commit & Push** — when user approves changes:
+   - Stage changes: `git add .`
+   - Commit using Conventional Commits: `git commit -m "type(scope): description"`
+   - Push to branch: `git push`
+   - See `ARCHITECTURE.md` §18 for commit type guidelines
+7. **Review** — inspect diffs, restate intent, highlight risks, and list recommended verification commands. Ensure consistency with existing patterns and validate that the updates comply with Android/iOS style guides.
+8. **Document** — if any changes go beyond current documentation in `AGENTS.md` or `ARCHITECTURE.md`, **update those files immediately** to reflect new patterns, practices, or architectural decisions.
 
 **Critical**: Before making any architectural changes, check if they're documented. If not, document them first. All agents must strictly follow documented practices.
 
@@ -180,6 +191,37 @@ Always design for future growth, even if current code seems small. Separate file
 - **No central registry** that needs updating when adding functionality
 - Each module is independently extensible without breaking existing code
 
+**Style Guide Compliance**
+
+AI agents must ensure all UI implementations comply with official platform style guides:
+
+**Material Design 3 (Android/Web)**
+- Reference: https://m3.material.io/guidelines
+- Default elevation: 1dp for cards, 3dp for elevated components
+- Default padding: 16dp (Material 3 spacing standard)
+- Border radius: 12dp (Material 3 default for cards)
+- Minimum touch target: 40dp × 40dp
+- Documentation must include references to specific Material Design sections
+- Comments must explain WHY values were chosen (e.g., "16dp ensures proper content breathing room per Material guidelines")
+
+**iOS Human Interface Guidelines (HIG)**
+- Reference: https://developer.apple.com/design/human-interface-guidelines
+- No Material elevation - use subtle shadows instead
+- Border radius: 12pt (iOS standard for cards)
+- Default padding: 16pt (iOS HIG content inset standard)
+- Minimum touch target: 44pt × 44pt (iOS HIG accessibility requirement)
+- Use `CupertinoColors.systemBackground` for automatic light/dark mode support
+- Documentation must include references to specific HIG sections
+- Comments must explain differences from Material (e.g., "iOS uses shadows instead of elevation")
+
+**Implementation Requirements:**
+- Every platform-specific strategy file MUST include style guide references in comments
+- Every material_card_strategy.dart MUST reference https://m3.material.io/components/cards
+- Every cupertino_card_strategy.dart MUST reference iOS HIG sections
+- Comments must explain specific values (why 16dp/16pt, why 12dp/12pt radius, etc.)
+- Use educational comment taxonomy: `/// 🔶` for docs, `// 🔹` for syntax, `// 🧠` for insights
+- Include Angular analogies when explaining style guide compliance
+
 ---
 
 ## 5. Tooling & Commands
@@ -187,12 +229,44 @@ Always design for future growth, even if current code seems small. Separate file
 | Command | Purpose |
 |---------|---------|
 | `flutter pub get` | Sync dependencies after manifest changes. |
+| `flutter analyze` | Run static analysis and linting checks (must pass before commit). |
 | `flutter test` | Run unit and widget suites (`test/`). |
+| `flutter test --coverage` | Run tests and generate coverage report. |
 | `flutter test integration_test` | Execute integration flows when changes cross layers. |
+| `flutter build web` | Build web version for verification. |
+| `dart format .` | Format code according to Dart style guide. |
 | `dart doc` / `mkdocs serve` | Regenerate documentation when comments or guides change. |
 | `flutter create card_snap_ui` | Bootstrap a fresh Flutter project if the repository needs to be regenerated from scratch (follow the setup checklist below to align with architecture guidelines). |
 
+**Verification Workflow:**
+Before committing changes, agents must verify:
+1. `flutter analyze` - No errors or warnings
+2. `flutter test` - All tests pass
+3. `dart format .` - Code properly formatted
+4. `flutter build web` - Build succeeds (optional verification)
+
 Use development servers/emulators for manual verification; avoid production builds unless explicitly requested by the human.
+
+**Commit & Push Workflow:**
+After verification passes, commit and push changes:
+1. Stage all changes: `git add .`
+2. Commit with Conventional Commits format (see `ARCHITECTURE.md` §18):
+   - `feat(scope): description` - New features
+   - `fix(scope): description` - Bug fixes
+   - `docs(scope): description` - Documentation updates
+   - `refactor(scope): description` - Code restructuring
+   - `style(scope): description` - Formatting changes
+   - `test(scope): description` - Test additions/updates
+   - `chore(scope): description` - Tooling/maintenance
+3. Push to current branch: `git push`
+4. Optionally create PR if not on main branch
+
+**Mandatory Steps Before Push:**
+- ✅ Run `flutter analyze` (must have 0 errors, 0 warnings)
+- ✅ Run `flutter test` (all tests must pass)
+- ✅ Run `dart format .` (code must be formatted)
+- ✅ Follow Conventional Commits standard (see `ARCHITECTURE.md` §18)
+- ✅ Update documentation if architecture changes (AGENTS.md, ARCHITECTURE.md)
 
 ---
 

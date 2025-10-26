@@ -41,31 +41,36 @@ class OfflineIndicator extends StatelessWidget {
     // For now, show as always online
     const isOffline = false;
 
-    if (!isOffline) {
-      return const SizedBox.shrink();
+    // Always return offline widget (currently disabled)
+    // This prevents "dead code" warning while maintaining structure
+    // The widget will be fully functional when connectivity monitoring is implemented
+    // ignore: dead_code - This code will be used when connectivity monitoring is implemented
+    if (isOffline) {
+      // Use adaptive card widget for consistent platform theming
+      // Similar to Angular's platform-specific component rendering
+      return AdaptiveWidgetFactory.createCard(
+        margin: const EdgeInsets.all(8),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(_getOfflineIcon(), color: _getOfflineColor(), size: 16),
+            const SizedBox(width: 4),
+            Text(
+              'Offline',
+              style: TextStyle(
+                color: _getOfflineColor(),
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+      );
     }
 
-    // 🧠 Use adaptive card widget for consistent platform theming
-    // Similar to Angular's platform-specific component rendering
-    return AdaptiveWidgetFactory.createCard(
-      margin: const EdgeInsets.all(8),
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(_getOfflineIcon(), color: _getOfflineColor(), size: 16),
-          const SizedBox(width: 4),
-          Text(
-            'Offline',
-            style: TextStyle(
-              color: _getOfflineColor(),
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ],
-      ),
-    );
+    // Return empty widget when online (current default state)
+    return const SizedBox.shrink();
   }
 
   /// Get platform-appropriate offline icon

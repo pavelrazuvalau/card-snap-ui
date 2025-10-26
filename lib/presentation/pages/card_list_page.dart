@@ -356,31 +356,41 @@ class _CardListPageState extends State<CardListPage> {
 
   /// Perform the actual delete operation
   /// 🔹 Delete card from repository
+  /// 🧠 Uses mounted check to prevent BuildContext usage after async operations
   Future<void> _performDelete(String cardId) async {
     try {
       final result = await _cardRepository.deleteCard(cardId);
 
+      // Check if widget is still mounted before using BuildContext
+      if (!mounted) return;
+
       if (result.isFailure) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'Failed to delete card: ${result.errorOrNull!.message}',
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'Failed to delete card: ${result.errorOrNull!.message}',
+              ),
             ),
-          ),
-        );
+          );
+        }
         return;
       }
 
       // Reload cards to reflect changes
       await _loadCards();
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Card deleted successfully')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Card deleted successfully')),
+        );
+      }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to delete card: ${e.toString()}')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to delete card: ${e.toString()}')),
+        );
+      }
     }
   }
 }

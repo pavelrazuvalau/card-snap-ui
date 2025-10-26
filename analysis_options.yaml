@@ -14,24 +14,35 @@ linter:
     avoid_print: true
     avoid_unnecessary_containers: true
     avoid_web_libraries_in_flutter: true
+    use_build_context_synchronously: true  # Prevent async gaps with BuildContext
+    use_super_parameters: true  # Prefer super parameters (Dart 2.17+)
     
     # Code style (similar to Angular/TypeScript conventions)
     prefer_const_constructors: true
     prefer_const_literals_to_create_immutables: true
     prefer_final_fields: true
     prefer_final_locals: true
+    prefer_const_declarations: true  # Use const for variables
+    avoid_redundant_argument_values: true  # Omit defaults when same as default
     
     # Documentation (educational focus)
     public_member_api_docs: false  # TODO: Enable when ready for full documentation
-    require_trailing_commas: true
+    require_trailing_commas: true  # Trailing commas for cleaner diffs
     
     # Performance
     avoid_function_literals_in_foreach_calls: true
     prefer_for_elements_to_map_fromIterable: true
+    avoid_unnecessary_type_assertions: true  # Unnecessary type checks
+    
+    # Code quality
+    unnecessary_library_names: false  # Allow library names for documentation
+    unnecessary_const: false  # Allow const optimization warnings
+    unused_field: warn  # Warn about unused fields (for educational projects)
     
     # Security (important for offline wallet)
     avoid_dynamic_calls: true
     avoid_renaming_method_parameters: true
+    cast_nullable_to_non_nullable: warn  # Warn about unsafe casts
 
 # Analyzer configuration
 analyzer:
@@ -52,6 +63,21 @@ analyzer:
   strong-mode:
     implicit-casts: false
     implicit-dynamic: false
+  
+  # Error severity configuration
+  errors:
+    # Critical issues - treat as warnings
+    use_build_context_synchronously: warning  # Important for Flutter apps
+    avoid_dynamic_calls: warning
+    cast_nullable_to_non_nullable: warning
+    
+    # Code quality - informational for educational projects
+    prefer_const_constructors: info  # Informational only (performance optimization)
+    unnecessary_library_name: info  # Allow for documentation clarity
+    unused_field: warning  # Warn about potentially dead code
+    
+    # Allow intentional use cases (with justification in comments)
+    avoid_print: info  # May be used intentionally in educational context
 
 # TODO: Enable additional analysis options when ready
 # 
