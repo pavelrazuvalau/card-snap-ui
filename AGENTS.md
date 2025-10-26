@@ -29,6 +29,19 @@ Operate as a confident senior mobile developer and patient mentor with deep know
 - **Language:** keep every code comment in English so the shared curriculum stays consistent for all collaborators.
 - **Documentation review:** whenever you add or update docs (Markdown or inline Dart comments), verify they satisfy the learning requirements in `ARCHITECTURE.md` §13 and reference Angular analogies where helpful.
 
+### ⚠️ Critical: Flutter-First Principle
+
+**CODE MUST FOLLOW FLUTTER PRACTICES ONLY**
+
+Despite the Angular developer's background:
+- ✅ **Code:** Use ONLY Flutter-idiomatic patterns (Factory, Strategy, Repository, etc.)
+- ✅ **Documentation:** Use Angular analogies for explanations (`/// 🔶 Similar to Angular's...`)
+- ✅ **Comments:** Translate Flutter concepts to Angular mental models (`// 🧠 Like Angular's DI...`)
+- ❌ **Never:** Import Angular patterns (DI containers, tokens, registries) into Flutter code
+- ❌ **Never:** Create Angular-like abstractions in code (use Flutter-native patterns instead)
+
+**Rule:** Angular concepts exist ONLY in documentation/comments to help understanding. Code must be pure, idiomatic Flutter.
+
 Before editing, review the applicable sections of `ARCHITECTURE.md` and diff your working context to confirm alignment. Use `README.md` for navigation hints only.
 
 ---
@@ -148,6 +161,7 @@ Pause and surface uncertainties; do not invent data or skip validation.
 
 **Project-Specific Requirements**
 
+- **FLUTTER-FIRST PRINCIPLE**: Code MUST follow Flutter idiomatic practices only. Angular concepts are teaching tools in documentation/comments, NOT architectural patterns.
 - Honor the educational comment taxonomy; add context when new concepts appear (`ARCHITECTURE.md` §13).
 - Treat comment preservation as the primary deliverable—never remove learning content without human approval (`ARCHITECTURE.md` §§12–13, 20).
 - **Architecture**: Apply Factory and Strategy patterns for cross-platform adaptation. Each widget component has its own factory and strategies.
@@ -157,6 +171,7 @@ Pause and surface uncertainties; do not invent data or skip validation.
 - Favor immutable models (`freezed`, `built_value`, or hand-written) to support unidirectional data flow.
 - Write tests and doc updates alongside behavior changes; add assertions that explain what and why.
 - Run `dart format` and applicable linters before completion; document deviations.
+- **Never import Angular patterns**: No DI containers, token-based registries, or Angular-specific abstractions in Flutter code. Use Flutter-native Factory + Strategy patterns instead.
 
 **Best Practices - Core Principles**
 

@@ -11,7 +11,8 @@
 
 library presentation.widgets.adaptive.icon_strategy.cupertino;
 
-import 'package:flutter/cupertino.dart' show Color, CupertinoColors, CupertinoIcons, IconData;
+import 'package:flutter/cupertino.dart'
+    show Color, CupertinoColors, CupertinoIcons, IconData;
 import 'icon_strategy_interface.dart';
 
 /// Cupertino (iOS) icon strategy implementation

@@ -8,22 +8,30 @@ This module provides **cross-platform adaptive UI components** that automaticall
 
 Similar to Angular's platform detection and component adaptation:
 - **Platform Detection Service** → `PlatformDetector.getCurrentTheme()`
-- **Component Factory Pattern** → `AdaptiveWidgetFactory`
-- **Platform-specific Templates** → Different UI based on platform
+- **Component Factory Pattern** → `AdaptiveWidgetFactory` with helper methods
+- **Platform-specific Templates** → Material/Cupertino strategies
+- **Strategy Pattern** → Platform-specific implementations encapsulated
 
 ## Architecture
 
 ```
 adaptive/
 ├── common/
-│   └── platform_types.dart          # Shared types and platform detection
-├── scaffold/
-│   └── adaptive_scaffold_factory.dart  # Adaptive page scaffold factory
+│   ├── platform_types.dart          # Shared types and platform detection
+│   └── strategy_selector.dart        # Centralized platform selection
+├── scaffold/                         # Platform-specific strategies
+│   ├── scaffold_strategy_interface.dart
+│   ├── material_scaffold_strategy.dart
+│   ├── cupertino_scaffold_strategy.dart
+│   ├── scaffold_strategy_factory.dart
+│   └── adaptive_scaffold_factory.dart
 ├── card/
-│   └── adaptive_card_factory.dart      # Adaptive card factory
 ├── button/
-│   └── adaptive_button_factory.dart    # Adaptive button factory
-└── adaptive_widget_module.dart         # Main facade exporting all factories
+├── app_bar/
+├── list_tile/
+├── progress_indicator/
+├── dialog/
+└── adaptive_widget_module.dart       # Main facade with helper methods
 ```
 
 ## Key Components
@@ -37,6 +45,7 @@ final theme = PlatformDetector.getCurrentTheme();
 
 ### AdaptiveWidgetFactory
 Main facade providing convenient access to all adaptive widgets.
+
 ```dart
 // Create platform-appropriate scaffold
 AdaptiveWidgetFactory.createScaffold(
@@ -52,7 +61,7 @@ AdaptiveWidgetFactory.createCard(
 // Create platform-appropriate button
 AdaptiveWidgetFactory.createButton(
   child: Text("Click me"),
-),
+  onPressed: () {},
 );
 ```
 
@@ -61,6 +70,8 @@ AdaptiveWidgetFactory.createButton(
 **DO** - Use adaptive widgets in your app widgets:
 ```dart
 // lib/presentation/widgets/card_tile.dart
+import 'adaptive/adaptive_widget_module.dart';
+
 class CardTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -77,60 +88,27 @@ class CardTile extends StatelessWidget {
 
 ## Adding New Adaptive Widgets
 
-When adding a new adaptive widget type:
+When adding a new adaptive widget type (e.g., Switch):
 
-1. Create a new folder (e.g., `dialog/`)
-2. Create the interface file (e.g., `dialog_strategy_interface.dart`)
-3. Create Material implementation (e.g., `material_dialog_strategy.dart`)
-4. Create Cupertino implementation (e.g., `cupertino_dialog_strategy.dart`)
-5. Create strategy factory (e.g., `dialog_strategy_factory.dart`)
-6. Create adaptive factory (e.g., `adaptive_dialog_factory.dart`)
-7. Export from `adaptive_widget_module.dart`
-8. Add convenience method to `AdaptiveWidgetFactory`
-
-Example:
-```dart
-// lib/presentation/widgets/adaptive/dialog/dialog_strategy_interface.dart
-abstract class DialogStrategy {
-  Widget createDialog({required String title});
-}
-
-// lib/presentation/widgets/adaptive/dialog/material_dialog_strategy.dart
-class MaterialDialogStrategy implements DialogStrategy {
-  @override
-  Widget createDialog({required String title}) {
-    return AlertDialog(title: Text(title));
-  }
-}
-
-// lib/presentation/widgets/adaptive/dialog/cupertino_dialog_strategy.dart
-class CupertinoDialogStrategy implements DialogStrategy {
-  @override
-  Widget createDialog({required String title}) {
-    return CupertinoAlertDialog(title: Text(title));
-  }
-}
-
-// lib/presentation/widgets/adaptive/dialog/dialog_strategy_factory.dart
-class DialogStrategyFactory {
-  static DialogStrategy getStrategy(PlatformTheme theme) {
-    return StrategySelector.getStrategyForTheme(
-      theme,
-      () => CupertinoDialogStrategy(),
-      () => MaterialDialogStrategy(),
-    );
-  }
-}
-
-// lib/presentation/widgets/adaptive/dialog/adaptive_dialog_factory.dart
-class AdaptiveDialogFactory {
-  static Widget createDialog({required String title}) {
-    final theme = PlatformDetector.getCurrentTheme();
-    final strategy = DialogStrategyFactory.getStrategy(theme);
-    return strategy.createDialog(title: title);
-  }
-}
-```
+1. **Create a new folder** (e.g., `switch/`)
+2. **Create strategy interface** (`switch_strategy_interface.dart`)
+3. **Create Material implementation** (`material_switch_strategy.dart`)
+4. **Create Cupertino implementation** (`cupertino_switch_strategy.dart`)
+5. **Create strategy factory** (`switch_strategy_factory.dart`)
+6. **Create adaptive factory** (`adaptive_switch_factory.dart`)
+7. **Add helper method** to `AdaptiveWidgetFactory`:
+   ```dart
+   static Widget createSwitch({
+     required bool value,
+     required ValueChanged<bool> onChanged,
+   }) {
+     return AdaptiveSwitchFactory.createSwitch(
+       value: value,
+       onChanged: onChanged,
+     );
+   }
+   ```
+8. **Export from module** in `adaptive_widget_module.dart`
 
 ## Benefits
 
@@ -139,3 +117,19 @@ class AdaptiveDialogFactory {
 3. **Reusability** - Write once, works everywhere
 4. **Type Safety** - Platform detection is type-safe and predictable
 5. **Future-proof** - Easy to add new platforms or modify existing ones
+
+## Flutter vs Angular
+
+This implementation uses **Flutter-idiomatic** Factory + Strategy pattern:
+
+**Flutter approach:**
+- Direct factory methods: `AdaptiveWidgetFactory.createX()`
+- Strategy pattern for platform-specific implementations
+- Simple, clean, easy to understand
+
+**Angular concepts (educational):**
+- Factory Pattern (Angular: component factory)
+- Platform Detection (Angular: platform detection service)
+- Strategy Pattern (Angular: platform-specific templates)
+
+**Key difference:** In Flutter, we don't need dependency injection - we use factory methods directly. Angular concepts are used here only for **educational purposes** to help Angular developers understand Flutter patterns.

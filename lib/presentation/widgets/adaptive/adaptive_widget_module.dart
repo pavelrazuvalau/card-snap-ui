@@ -15,6 +15,9 @@ import 'package:flutter/material.dart';
 import 'common/platform_types.dart';
 
 // Import factories
+import 'theme_config/theme_config_strategy_factory.dart';
+
+// Import factories for direct usage
 import 'scaffold/adaptive_scaffold_factory.dart';
 import 'card/adaptive_card_factory.dart';
 import 'button/adaptive_button_factory.dart';
@@ -22,7 +25,6 @@ import 'app_bar/adaptive_app_bar_factory.dart';
 import 'list_tile/adaptive_list_tile_factory.dart';
 import 'progress_indicator/adaptive_progress_indicator_factory.dart';
 import 'dialog/adaptive_dialog_factory.dart';
-import 'theme_config/theme_config_strategy_factory.dart';
 
 // Export common types and selectors
 export 'common/platform_types.dart';
@@ -36,6 +38,7 @@ export 'app_bar/adaptive_app_bar_factory.dart';
 export 'list_tile/adaptive_list_tile_factory.dart';
 export 'progress_indicator/adaptive_progress_indicator_factory.dart';
 export 'dialog/adaptive_dialog_factory.dart';
+
 
 // Export strategies - all components now use separate files for flexibility
 export 'scaffold/scaffold_strategy_interface.dart';
@@ -90,6 +93,9 @@ export 'icon_strategy/icon_strategy_factory.dart';
 /// Main factory class that provides convenient access to all adaptive widgets.
 /// Similar to Angular's component factory that creates different
 /// implementations based on the target platform.
+///
+/// 🧠 Uses Flutter-idiomatic Factory pattern with Strategy for platform adaptation.
+/// Each method delegates to platform-specific factories (Material/Cupertino strategies).
 class AdaptiveWidgetFactory {
   /// Get the current platform theme
   /// 🔹 Determines UI theme based on platform detection
@@ -120,7 +126,6 @@ class AdaptiveWidgetFactory {
   /// Create adaptive app bar based on platform
   /// 🔹 Returns platform-appropriate app bar widget
   /// 🧠 iOS uses CupertinoNavigationBar with different styling
-  /// 🧠 Uses map-based resolution via AdaptiveAppBarFactory
   static Widget createAppBar({
     required String title,
     List<Widget>? actions,
@@ -159,7 +164,6 @@ class AdaptiveWidgetFactory {
   /// Create adaptive list tile based on platform
   /// 🔹 Returns platform-appropriate list tile widget
   /// 🧠 iOS uses CupertinoListTile with different interaction patterns
-  /// 🧠 Uses map-based resolution via AdaptiveListTileFactory
   static Widget createListTile({
     Widget? leading,
     Widget? title,
@@ -198,7 +202,6 @@ class AdaptiveWidgetFactory {
   /// Create adaptive progress indicator based on platform
   /// 🔹 Returns platform-appropriate progress indicator
   /// 🧠 iOS uses CupertinoActivityIndicator with different animation
-  /// 🧠 Uses map-based resolution via AdaptiveProgressIndicatorFactory
   static Widget createProgressIndicator() {
     return AdaptiveProgressIndicatorFactory.createProgressIndicator();
   }
@@ -206,7 +209,6 @@ class AdaptiveWidgetFactory {
   /// Create adaptive dialog based on platform
   /// 🔹 Returns platform-appropriate dialog widget
   /// 🧠 iOS uses CupertinoAlertDialog with different styling
-  /// 🧠 Uses map-based resolution via AdaptiveDialogFactory
   static Widget createDialog({
     required String title,
     required String content,

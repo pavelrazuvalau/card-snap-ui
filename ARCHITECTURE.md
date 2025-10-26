@@ -34,6 +34,18 @@ This architecture ensures consistency in code, commits, and documentation across
 | **Cross-Ecosystem Learning** | Dart patterns explained using TypeScript/Angular analogies. |
 | **DocOps Approach** | Documentation is part of the delivery lifecycle (dartdoc + mkdocs). |
 | **AI-Assisted Workflow** | Cursor + GitKraken MCP manage code, docs, and Git in tandem. |
+| **Flutter-First** | Code follows Flutter idiomatic practices only; Angular concepts used only for educational analogies in documentation |
+
+### 2.1 Flutter-First Principle
+
+**Critical:** Despite the Angular developer background, code must be **pure, idiomatic Flutter**.
+
+- ✅ **Code patterns:** Use Flutter-native patterns (Factory, Strategy, Repository, etc.)
+- ✅ **Educational analogies:** Use Angular comparisons in comments/docs (`/// Similar to Angular's...`)
+- ❌ **Never import Angular patterns:** No DI containers, tokens, registries in Flutter code
+- ❌ **Avoid Angular abstractions:** Use Flutter-native solutions instead
+
+**Angular analogies are teaching tools, not architectural patterns.** Code must follow Flutter/Dart best practices exclusively.
 
 ---
 
@@ -116,7 +128,7 @@ class AdaptiveWidgetFactory {
 
 **Use Cases Pattern** - Encapsulates business logic in dedicated use case classes. Similar to Angular's service methods that coordinate between services and components.
 
-**Dependency Injection** - Domain layer depends on abstractions (repository interfaces) rather than concrete implementations, ensuring loose coupling.
+**Dependency Injection** - Domain layer depends on abstractions (repository interfaces) rather than concrete implementations, ensuring loose coupling. Use Flutter DI solutions (`get_it`, `provider`) for business logic (repositories, use cases, services), but NOT for UI factories.
 
 **Best Practices Applied**
 
@@ -418,6 +430,24 @@ class RegisterDevice {
   Future<Device> execute(DeviceRegistration payload) async =>
       strategy.register(payload);
 }
+
+### 9.1 Dependency Injection in Flutter
+
+**When to use DI (Flutter-native solutions like `get_it`, `provider`):**
+- ✅ **Repositories** - `getIt<CardRepository>()` for LocalCardRepository, ApiCardRepository
+- ✅ **Use Cases** - Inject dependencies via constructor: `AddCard(this.repository)`
+- ✅ **Services** - EncryptionService, BackupService, LoggerService
+- ✅ **Data Sources** - Network clients, database connections
+
+**When NOT to use DI (UI/Factory patterns):**
+- ❌ **UI Factories** - `AdaptiveWidgetFactory.createScaffold()` doesn't need DI (static factory methods)
+- ❌ **UI Components** - Widgets get dependencies via constructor parameters
+- ❌ **Strategy Classes** - Material/Cupertino strategies are simple factory selections
+
+**Flutter DI Solutions:**
+- `get_it` - Service locator (recommended for large apps)
+- `provider` - State management + DI (good for smaller apps)
+- `riverpod` - Modern alternative with compile-time safety
 
 /// 🔶 Command Pattern: Device Registration Command
 /// Encapsulates device registration as an executable command.
