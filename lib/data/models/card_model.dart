@@ -105,6 +105,36 @@ class LoyaltyCardModel {
     );
   }
 
+  /// Create a copy with updated fields
+  /// 🔹 Immutable update pattern (similar to domain entity)
+  LoyaltyCardModel copyWith({
+    String? id,
+    String? name,
+    String? storeName,
+    String? barcodeData,
+    String? format,
+    String? createdAt,
+    String? updatedAt,
+    String? imageUrl,
+    String? colorHex,
+    String? notes,
+    bool? isArchived,
+  }) {
+    return LoyaltyCardModel(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      storeName: storeName ?? this.storeName,
+      barcodeData: barcodeData ?? this.barcodeData,
+      format: format ?? this.format,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      imageUrl: imageUrl ?? this.imageUrl,
+      colorHex: colorHex ?? this.colorHex,
+      notes: notes ?? this.notes,
+      isArchived: isArchived ?? this.isArchived,
+    );
+  }
+
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;

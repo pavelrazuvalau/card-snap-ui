@@ -39,7 +39,6 @@ export 'list_tile/adaptive_list_tile_factory.dart';
 export 'progress_indicator/adaptive_progress_indicator_factory.dart';
 export 'dialog/adaptive_dialog_factory.dart';
 
-
 // Export strategies - all components now use separate files for flexibility
 export 'scaffold/scaffold_strategy_interface.dart';
 export 'scaffold/material_scaffold_strategy.dart';

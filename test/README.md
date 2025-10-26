@@ -8,20 +8,15 @@ This directory contains comprehensive tests for Card Snap UI, organized by Clean
 test/
 ├── domain/              # Domain layer tests
 │   ├── entities/        # Entity validation tests
-│   ├── usecases/        # Use case business logic tests
-│   └── repositories/    # Repository interface tests
+│   └── usecases/        # Use case business logic tests
 ├── data/                # Data layer tests
 │   ├── models/          # Data model serialization tests
 │   ├── datasources/     # Data source implementation tests
 │   └── repositories/     # Repository implementation tests
 ├── presentation/        # Presentation layer tests
-│   ├── pages/           # Page widget tests
-│   ├── widgets/         # Widget component tests
-│   └── blocs/           # State management tests
+│   └── widgets/         # Widget component tests
 ├── core/                # Core layer tests
-│   ├── constants/       # Constants validation tests
-│   ├── errors/          # Error handling tests
-│   └── utils/           # Utility function tests
+│   └── errors/          # Error handling tests
 └── integration/        # End-to-end tests
     ├── card_management/ # Card CRUD operations
     ├── offline_mode/    # Offline functionality
@@ -84,17 +79,15 @@ test('LocalCardRepository should save and retrieve cards', () async {
 
 ### Presentation Layer Tests
 ```dart
-// Example: BLoC state management
-test('CardListBloc should emit loaded state when cards are fetched', () {
-  when(mockRepository.getAllCards()).thenAnswer((_) async => 
-    Result.success([createTestCard()]));
+// Example: Platform detection and factory delegation
+test('AdaptiveWidgetFactory should delegate to platform strategy', () {
+  final card = AdaptiveWidgetFactory.createCard(
+    child: const Text('Test'),
+    margin: const EdgeInsets.all(16),
+  );
   
-  bloc.add(CardsLoadRequested());
-  
-  expectLater(bloc.stream, emitsInOrder([
-    CardListLoading(),
-    CardListLoaded([createTestCard()]),
-  ]));
+  expect(card, isNotNull);
+  // Widget should be created without exceptions
 });
 ```
 
@@ -176,6 +169,225 @@ flutter test --update-goldens
 - **CI/CD**: Uploaded to Codecov for tracking
 - **Thresholds**: Fail build if coverage drops below targets
 
+## 📈 What to Test? (Testing Priorities)
+
+### High Priority - Critical Business Logic
+
+#### 1. Domain Layer (Business Logic)
+**What to test:**
+- Entity models (validation, serialization, equality)
+- Use cases (business rules, error handling)
+- Result pattern (success/failure flows)
+
+**Why it matters:**
+- Core application logic
+- No Flutter dependencies, easy to test
+- Direct impact on functionality
+
+**Example:**
+```dart
+test('AddCard use case should validate required fields', () {
+  final request = AddCardRequest(
+    name: 'Test Card',
+    storeName: 'Test Store',
+    barcodeData: '123456',
+  );
+  expect(request.isValid, isTrue);
+});
+```
+
+#### 2. Core Layer (Foundation)
+**What to test:**
+- Exception types (Domain, Data, Network, Security, Localization)
+- Result<T> pattern (Success/Failure handling)
+- Error handling flows
+
+**Why it matters:**
+- Cross-cutting concerns used everywhere
+- Fundamental data types
+- Critical for error propagation
+
+**Example:**
+```dart
+test('Result should handle success correctly', () {
+  final result = Result.success('data');
+  expect(result.isSuccess, isTrue);
+  expect(result.dataOrNull, equals('data'));
+});
+```
+
+#### 3. Data Layer (Persistence)
+**What to test:**
+- Model serialization/deserialization
+- Data source CRUD operations
+- Repository integration (domain ↔ data mapping)
+- Model ↔ Domain conversion
+
+**Why it matters:**
+- Offline-first architecture critical
+- Wrong serialization = data loss
+- Correctness of mapping between layers
+
+**Example:**
+```dart
+test('LoyaltyCardModel should serialize to JSON correctly', () {
+  final model = LoyaltyCardModel(/* ... */);
+  final json = model.toJson();
+  expect(json['name'], model.name);
+});
+```
+
+### Medium Priority - Platform-Specific Logic
+
+#### 4. Platform Detection
+**What to test:**
+- Platform detection logic
+- Factory delegation to correct strategy
+- Strategy selection logic
+
+**Why it matters:**
+- Correct UI selection for platform
+- Critical for cross-platform compatibility
+
+**Example:**
+```dart
+test('PlatformDetector should return valid platform', () {
+  final theme = PlatformDetector.getCurrentTheme();
+  expect(PlatformTheme.values, contains(theme));
+});
+```
+
+#### 5. Repository Integration
+**What to test:**
+- Repository with real data source
+- CRUD operations end-to-end
+- Search functionality
+- Error handling
+
+**Why it matters:**
+- Real integration between repository + datasource
+- Correctness of transformations
+
+**Example:**
+```dart
+test('should add and retrieve card', () async {
+  final card = createTestCard();
+  await repository.addCard(card);
+  
+  final result = await repository.getCardById(card.id);
+  expect(result.isSuccess, isTrue);
+  expect(result.dataOrNull, equals(card));
+});
+```
+
+### Lower Priority - UI and Integration
+
+#### 6. Widget Tests (UI Rendering)
+**What to test:**
+- Widget rendering
+- User interactions (tap, scroll)
+- Empty states, loading states
+
+**Why it matters:**
+- UI behavior critical for UX
+- Verification of integration with domain/data layers
+
+**Example:**
+```dart
+testWidgets('should render card tile with all fields', (tester) async {
+  final card = createTestCard();
+  
+  await tester.pumpWidget(
+    MaterialApp(
+      home: CardTile(card: card, onTap: () {}),
+    ),
+  );
+  
+  expect(find.text(card.name), findsOneWidget);
+  expect(find.text(card.storeName), findsOneWidget);
+});
+```
+
+#### 7. Integration Tests (End-to-End)
+**What to test:**
+- Complete user journeys
+- Add card flow
+- Search cards flow
+- Offline behavior
+
+**Why it matters:**
+- Tests real user journeys
+- Verifies integration between layers
+
+## 🎓 What NOT to Test (YAGNI Principle)
+
+### Don't Test
+
+1. **UI Styling (margins, colors, borders)**
+   - This is configuration, not logic
+   - Values from Material Design 3 / iOS HIG
+   - Documented in comments
+
+2. **Flutter's Built-in Widgets**
+   - Material/Cupertino widgets are tested by Flutter team
+   - We only configure existing widgets
+
+3. **Pure Configuration**
+   - Factory delegations (test core logic, not delegation)
+   - Strategy selection (test business rules, not selection)
+
+## 🔶 Angular Developer Comparison
+
+**What Angular developers test:**
+
+```typescript
+// ✅ Test business logic
+describe('CardService', () => {
+  it('should add card with validation', () => {
+    // ...
+  });
+});
+
+// ✅ Test data services  
+describe('HttpClient', () => {
+  it('should serialize/deserialize', () => {
+    // ...
+  });
+});
+
+// ✅ Test component behavior
+describe('CardTileComponent', () => {
+  it('should emit tap event', () => {
+    // ...
+  });
+});
+
+// ❌ DON'T test
+describe('Angular Material Card', () => {
+  it('should have correct padding', () => {
+    // ❌ This is Angular Material's responsibility
+  });
+});
+```
+
+**Flutter equivalent:**
+
+```dart
+// ✅ Test business logic
+test('AddCard use case should validate request', () {});
+
+// ✅ Test data models
+test('LoyaltyCardModel should serialize correctly', () {});
+
+// ✅ Test widgets
+testWidgets('CardTile should render correctly', () {});
+
+// ❌ DON'T test
+test('Material Card should have 16dp padding', () {
+  // ❌ This is Flutter's responsibility
+});
+```
+
 ## 🎓 Educational Testing
 
 ### Angular/TypeScript Analogies
@@ -188,20 +400,6 @@ flutter test --update-goldens
 - **Comments**: Explain what each test validates and why
 - **Business Context**: Link tests to BUSINESS.md requirements
 - **Architecture Alignment**: Ensure tests follow Clean Architecture principles
-
-## 📋 TODO: Test Implementation
-
-### Immediate Tasks
-1. **Set up test structure** - Create test directories and base files
-2. **Implement domain tests** - Start with Card entity and AddCard use case
-3. **Add data layer tests** - Repository and data source implementations
-4. **Create widget tests** - CardTile and CardListPage components
-
-### Future Enhancements
-1. **Integration tests** - End-to-end user journeys
-2. **Performance tests** - Card rendering speed validation
-3. **Security tests** - Encryption and data protection
-4. **Accessibility tests** - Screen reader and accessibility compliance
 
 ## 🔗 Related Documentation
 
