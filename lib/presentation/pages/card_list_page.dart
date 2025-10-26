@@ -32,6 +32,7 @@ import '../widgets/offline_indicator.dart';
 import '../widgets/adaptive/adaptive_widget_module.dart';
 import '../../data/repositories/local_card_repository.dart';
 import '../../data/datasources/local_card_datasource.dart';
+import '../../core/constants/app_constants.dart';
 
 /// Main page displaying all loyalty cards
 /// 🔹 Full-screen UI component (like Angular page components)
@@ -109,7 +110,7 @@ class _CardListPageState extends State<CardListPage> {
     return AdaptiveWidgetFactory.createScaffold(
       appBar:
           AdaptiveWidgetFactory.createAppBar(
-                title: 'Card Snap Wallet',
+                title: AppConstants.appName,
                 actions: [
                   // Offline indicator
                   const OfflineIndicator(),

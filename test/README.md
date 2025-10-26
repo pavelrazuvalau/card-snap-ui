@@ -1,6 +1,6 @@
 # Test Structure & Strategy
 
-This directory contains comprehensive tests for Card Snap Wallet, organized by Clean Architecture layers.
+This directory contains comprehensive tests for Card Snap UI, organized by Clean Architecture layers.
 
 ## 📁 Test Organization
 
@@ -211,4 +211,4 @@ flutter test --update-goldens
 
 ---
 
-*This testing strategy ensures the offline-first, security-focused Card Snap Wallet meets all business requirements while maintaining educational value for Flutter development.*
+*This testing strategy ensures the offline-first, security-focused Card Snap UI meets all business requirements while maintaining educational value for Flutter development.*

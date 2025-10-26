@@ -182,7 +182,120 @@ docs/                       # Markdown + generated documentation
 
 ---
 
-## 6. Key Technologies
+### 6.1 Offline-First Data Flow
+
+Card Snap UI follows an **offline-first architecture** where all core functionality works without network connectivity. The data flow is designed to prioritize local storage and encryption while maintaining extensibility for future cloud sync capabilities.
+
+#### Data Flow Architecture
+
+```
+┌──────────────────────────────────────────────────────────────┐
+│                    Presentation Layer                        │
+│  ┌─────────────────────────────────────────────────────────┐ │
+│  │  UI Components (Widgets, Pages)                         │ │
+│  │  - Card List Widget                                     │ │
+│  │  - Add Card Form                                        │ │
+│  │  - Backup/Restore UI                                    │ │
+│  └─────────────────────────────────────────────────────────┘ │
+└─────────────────────────┬────────────────────────────────────┘
+                          │
+                          ▼
+┌──────────────────────────────────────────────────────────────┐
+│                      Domain Layer                            │
+│  ┌─────────────────────────────────────────────────────────┐ │
+│  │  Entities                                               │ │
+│  │  - LoyaltyCard                                          │ │
+│  │  - (Store, BackupArchive, Facet - planned v1.0+)        │ │
+│  └─────────────────────────────────────────────────────────┘ │
+│  ┌─────────────────────────────────────────────────────────┐ │
+│  │  Repository Interfaces                                  │ │
+│  │  - CardRepository                                       │ │
+│  │  - (StoreRepository, BackupRepository, StorageProvider) │ │
+│  │    planned v1.0+                                        │ │
+│  └─────────────────────────────────────────────────────────┘ │
+│  ┌─────────────────────────────────────────────────────────┐ │
+│  │  Use Cases                                              │ │
+│  │  - AddCardUseCase                                       │ │
+│  │  - (SearchStoresUseCase, BackupUseCases) planned v1.0+  │ │
+│  └─────────────────────────────────────────────────────────┘ │
+└─────────────────────────┬────────────────────────────────────┘
+                          │
+                          ▼
+┌──────────────────────────────────────────────────────────────┐
+│                       Data Layer                             │
+│  ┌─────────────────────────────────────────────────────────┐ │
+│  │  Local Implementation (OFFLINE-FIRST)                   │ │
+│  │  - SQLite + SQLCipher (encrypted storage)               │ │
+│  │  - Hive/Isar (NoSQL alternative)                        │ │
+│  │  - Encrypted file system access                         │ │
+│  │  - All data encrypted at rest (AES-256-GCM)             │ │
+│  └─────────────────────────────────────────────────────────┘ │
+│  ┌─────────────────────────────────────────────────────────┐ │
+│  │  Future Cloud Implementation (v1.0+)                    │ │
+│  │  - Google Drive StorageProvider                         │ │
+│  │  - iCloud StorageProvider                               │ │
+│  │  - Dropbox StorageProvider                              │ │
+│  │  - Hybrid Repository (local + cloud)                    │ │
+│  └─────────────────────────────────────────────────────────┘ │
+└─────────────────────────┬────────────────────────────────────┘
+                          │
+                          ▼
+┌──────────────────────────────────────────────────────────────┐
+│                    Platform Layer                            │
+│  ┌─────────────────────────────────────────────────────────┐ │
+│  │  - Android Keystore (key storage)                       │ │
+│  │  - iOS Keychain (key storage)                           │ │
+│  │  - Secure Enclave (hardware-backed keys)                │ │
+│  │  - Biometric authentication (FaceID/TouchID)            │ │
+│  └─────────────────────────────────────────────────────────┘ │
+└──────────────────────────────────────────────────────────────┘
+```
+
+#### Key Architectural Decisions
+
+1. **Offline-First Storage (MVP):**
+   - All card data stored locally with encryption
+   - No network dependency for core operations
+   - Fast access (< 200ms card rendering)
+   - Secure key management via platform APIs
+
+2. **Backup Strategies (MVP):**
+   - **QR-based backup:** Generate encrypted QR code for offline transfer
+   - **Archive export:** Create encrypted `.zip` files for file-based transfer
+   - **Future cloud sync:** Extensible `StorageProvider` interface for v1.0+
+
+3. **Extensibility (Future):**
+   - Repository pattern allows swapping implementations
+   - `StorageProvider` interface ready for cloud integration
+   - Hybrid repositories can merge local + cloud data
+   - No core refactoring needed when adding cloud sync
+
+4. **Privacy-First Design:**
+   - All encryption happens on-device
+   - Keys never leave the device (except in user-exported backups)
+   - No cloud uploads without explicit user consent
+   - GDPR-compliant by default
+
+#### Domain Entity Structure
+
+The domain layer currently includes the core entity (see `BUSINESS.md` section 2 for detailed requirements):
+
+- **LoyaltyCard** (`lib/domain/entities/card.dart`)
+  - Core card entity with barcode data, metadata, timestamps
+  - Supports multiple barcode formats (QR, Code128, EAN-13, etc.)
+  - Pure Dart, no Flutter imports (domain layer principle)
+
+**Future entities** (planned for v1.0+) to be added as development progresses:
+- **Store** - Represents merchant/store locations with location data, barcode format support, deep link info
+- **BackupArchive** - Encapsulates encrypted backup data with schema versioning and metadata
+- **Facet** - Search facets for filtering stores (Angular Material chip-style interface)
+- **StorageProvider** - Abstract interface for cloud sync providers (Google Drive, iCloud, Dropbox)
+
+For detailed business requirements, see `BUSINESS.md` sections 2.1 (Baseline Features), 2.2 (Enhanced Features), and 2.3 (Future Scope).
+
+---
+
+## 7. Key Technologies
 
 | Category | Tools / Packages | Notes |
 |----------|------------------|-------|
@@ -194,7 +307,7 @@ docs/                       # Markdown + generated documentation
 | Observability | OTel Collector + OpenSearch | Unified traces and dashboards. |
 | CI/CD | GitHub Actions | Lint → Test → Coverage → Build. |
 
-### 6.1 pubspec.yaml Baseline
+### 7.1 pubspec.yaml Baseline
 
 When bootstrapping from scratch, populate `pubspec.yaml` with these minimum dependencies and dev dependencies:
 
@@ -228,7 +341,7 @@ dev_dependencies:
 
 ---
 
-## 7. Cross-Platform Support Strategy
+## 8. Cross-Platform Support Strategy
 
 Card Snap UI must deliver identical learning and runtime value on **Android** and **iOS**. Every feature, test, and observability hook is evaluated for cross-platform parity.
 
@@ -244,7 +357,7 @@ Card Snap UI must deliver identical learning and runtime value on **Android** an
 
 > When introducing new features, include a note in the PR/commit describing cross-platform considerations (UI, permissions, native integrations) and reference relevant tests or platform adapters.
 
-### 7.1 Platform Style Guides
+### 8.1 Platform Style Guides
 
 **Material Design 3 (Android/Web)**
 - **Reference:** [Material Design 3 Guidelines](https://m3.material.io/)
@@ -274,7 +387,7 @@ Card Snap UI must deliver identical learning and runtime value on **Android** an
 
 ---
 
-## 8. Domain Layer Principles & Documentation
+## 9. Domain Layer Principles & Documentation
 
 - Domain layer stays **pure Dart** (no Flutter imports).
 - Depends solely on **abstract repositories** and **strategy interfaces** (Dependency Inversion).
@@ -334,7 +447,7 @@ Feature narratives (e.g., device management) should outline end-to-end flows and
 
 ---
 
-## 9. Repository Patterns & Strategy Implementation
+## 10. Repository Patterns & Strategy Implementation
 
 **Goal:** Teach how different data sources interact through the same interface using Strategy pattern.
 
@@ -390,7 +503,7 @@ Document why a pattern is chosen and how it improves the learner’s understandi
 
 ---
 
-## 10. Testing Strategy
+## 11. Testing Strategy
 
 | Type | Purpose | Tools | Required |
 |------|---------|-------|----------|
@@ -403,7 +516,7 @@ Document why a pattern is chosen and how it improves the learner’s understandi
 
 ---
 
-## 11. CI/CD & AI Automation
+## 12. CI/CD & AI Automation
 
 - GitHub Actions enforce linting, formatting, testing, and coverage.
 - Cursor and GitKraken MCP manage GitFlow branches and Conventional Commits.
@@ -440,7 +553,7 @@ jobs:
 
 ---
 
-## 12. Observability & Trace Learning
+## 13. Observability & Trace Learning
 
 Each user journey emits structured logs with a shared `traceId`, linking UI events, API calls, and errors.
 
@@ -459,7 +572,7 @@ Each user journey emits structured logs with a shared `traceId`, linking UI even
 
 ---
 
-## 13. Educational Comment & Documentation Policy
+## 14. Educational Comment & Documentation Policy
 
 ### Comment Taxonomy
 
@@ -486,7 +599,7 @@ Each user journey emits structured logs with a shared `traceId`, linking UI even
 
 ---
 
-## 14. Syntax Explanation Policy
+## 15. Syntax Explanation Policy
 
 Explain Dart syntax using TypeScript analogies so cross-ecosystem developers learn faster:
 
@@ -502,7 +615,7 @@ Reference how each keyword impacts rebuilds, isolates, or state management.
 
 ---
 
-## 15. Documentation Integration Workflow
+## 16. Documentation Integration Workflow
 
 **DartDoc**
 
@@ -542,7 +655,7 @@ theme:
 
 ---
 
-## 16. AI Collaboration Workflow
+## 17. AI Collaboration Workflow
 
 - Follow the playbook in `AGENTS.md` for Observe → Plan → Execute → Review.
 - Humans use `README.md` as the entry point; AI must reconcile changes with sections in this file.
@@ -550,7 +663,7 @@ theme:
 
 ---
 
-## 17. Repository & Version Control Policy
+## 18. Repository & Version Control Policy
 
 Repository management flows through **GitKraken MCP** integrated with Cursor:
 
@@ -569,7 +682,7 @@ Repository management flows through **GitKraken MCP** integrated with Cursor:
 
 ---
 
-## 18. Conventional Commits Standard
+## 19. Conventional Commits Standard
 
 Commit messages MUST follow [Conventional Commits 1.0.0](https://www.conventionalcommits.org/en/v1.0.0/).
 
@@ -598,7 +711,7 @@ refactor(ui): simplify dashboard rebuild logic
 
 ---
 
-## 19. Branching Strategy
+## 20. Branching Strategy
 
 The repository follows **GitFlow**, adapted for AI-managed workflows.
 
@@ -622,9 +735,9 @@ GitKraken MCP and Cursor enforce branch protections and CI requirements automati
 
 ---
 
-## 20. Release Management & Semantic Versioning
+## 21. Release Management & Semantic Versioning
 
-### 20.1 Semantic Versioning Rules
+### 21.1 Semantic Versioning Rules
 
 Card Snap UI follows [Semantic Versioning 2.0.0](https://semver.org/):
 
@@ -634,7 +747,7 @@ Card Snap UI follows [Semantic Versioning 2.0.0](https://semver.org/):
 
 Agents preparing releases must review the diff against the previous tag and propose the correct bump. When unsure, escalate to a human reviewer.
 
-### 20.2 Release Workflow
+### 21.2 Release Workflow
 
 - All releases MUST appear in GitHub Releases with attached Android (APK/AAB) and iOS (IPA) artifacts.
 - Release creation is performed via a manual `workflow_dispatch` (e.g., `.github/workflows/release.yml`) that:
@@ -646,7 +759,7 @@ Agents preparing releases must review the diff against the previous tag and prop
   - Ensure `CHANGELOG.md` has an entry matching the new version and summarizes notable changes.
   - Confirm Conventional Commit history since the previous tag aligns with the proposed SemVer bump.
 
-### 20.3 Changelog Policy
+### 21.3 Changelog Policy
 
 - Maintain a top-level `CHANGELOG.md` in [Keep a Changelog](https://keepachangelog.com/) style.
 - Each release entry includes version, date, change categories (Added/Changed/Fixed/Docs), and cross-links to relevant pull requests.
@@ -654,7 +767,7 @@ Agents preparing releases must review the diff against the previous tag and prop
 
 ---
 
-## 21. Summary
+## 22. Summary
 
 This architecture defines a **full AI-managed development environment**:
 

@@ -39,19 +39,19 @@ Prepared by: Pavel Razuvalau with assistance of ChatGPT 5
 **Feature summary (MUST / SHOULD / WON’T).**
 
 - **MUST** add cards via QR scan, 1D barcode scan, or manual entry with explicit display format selection.
-- **MUST** provide store search with facets that works offline when a local index exists.
+- **MUST** provide offline store search with local index (no network dependency for core functionality).
 - **MUST** render stored codes with pixel-equivalent fidelity in under 200 ms.
 - **MUST** encrypt all sensitive data at rest (AES-256-GCM or OS-backed secure storage).
-- **SHOULD** augment search results with remote facets when the network is available.
-- **SHOULD** support export/import of encrypted backups initiated by the user.
-- **SHOULD** expose hooks for future cloud sync providers.
-- **WON’T** (v0.1.0) offer automatic cloud sync, social sharing, or loyalty enrollment flows.
+- **SHOULD** support export/import of encrypted backups initiated by the user (QR-based or archive format).
+- **SHOULD** expose hooks for future cloud sync providers (see Future Scope in section 2.3).
+- **WON'T** (v0.1.0) offer automatic cloud sync, online store search with facets, social sharing, or loyalty enrollment flows.
 
 **Key differentiators.**
 
-- Offline-first guarantee with seamless upgrades when online services become available.
-- Structured facets in store search, echoing Angular Material chip filters to ease cognitive load.
-- Transparent backup format to build user trust and portability.
+- Offline-first guarantee with encrypted local storage and QR-based cross-device transfer.
+- Privacy-first architecture — no data leaves device without explicit user action.
+- Transparent backup format (QR and archive) to build user trust and portability.
+- Extensible architecture ready for cloud sync providers without core refactoring.
 
 **Localization coverage.**
 
@@ -59,7 +59,7 @@ Prepared by: Pavel Razuvalau with assistance of ChatGPT 5
 - Russian (`ru`) — core audience across Eastern European loyalty ecosystems.
 - Ukrainian (`uk`) — growing demand for digital wallets amid rapid mobile adoption.
 - Polish (`pl`) — critical market with dense loyalty-card usage.
-- German (`de`) — covers Germany, Austria, and Switzerland where apps like Stocard flourish.
+- German (`de`) — covers Germany, Austria, and Switzerland where loyalty card apps have strong market presence.
 - French (`fr`) — serves France, Belgium, and Canada with strong coupon culture.
 - Spanish (`es`) — supports Spain and Latin America loyalty programs.
 - Italian (`it`) — supermarkets and pharmacies rely heavily on QR-based rewards.
@@ -68,14 +68,138 @@ Prepared by: Pavel Razuvalau with assistance of ChatGPT 5
 
 ---
 
+### 2.1 Baseline Features (Market Standard)
+
+These features represent the **standard market baseline** expected by users of loyalty card wallet applications. Our implementation will deliver these capabilities while prioritizing offline-first architecture and enhanced privacy.
+
+#### Core Card Management
+- **Add Card** — Users can add loyalty/discount cards via:
+  - QR code scanning (2D matrix codes)
+  - 1D barcode scanning (Code128, EAN-13, UPC-A)
+  - Manual entry with format selection
+- **Edit Card** — Users can modify card metadata after creation:
+  - Display name (e.g., "My Starbucks Card")
+  - Store/brand association
+  - Notes and personal remarks
+  - Visual customization (color hint, icon selection)
+- **Delete Card** — Soft delete with archive capability for recovery
+- **Display Format Selection** — Users can choose between QR, 1D barcode formats with auto-detection as fallback
+
+#### Barcode and QR Support
+- **Format Compatibility** — Support for industry-standard formats:
+  - QR Code (2D matrix)
+  - Code 128, Code 39 (1D linear)
+  - EAN-13, UPC-A (retail standard)
+  - PDF417 (2D stacked)
+- **Rendering Fidelity** — Pixel-equivalent barcode/QR code generation matching original quality
+- **Scanning Reliability** — Automatic detection and fallback to manual entry on failure
+
+#### Basic Offline Storage
+- **Local-First Architecture** — All card data stored securely on device
+- **Encryption at Rest** — AES-256-GCM with per-record IV and authentication tag
+- **Key Management** — Device-specific keys stored in Android Keystore / iOS Keychain
+- **No Network Dependency** — All core features work without internet connection
+
+#### Widget Support (Future)
+- **Single-Card Widget** — Display a selected card’s barcode directly on home screen
+- **Multi-Card Widget** — Show list of favorite or recently-used cards with quick access
+- **Platform Integration** — Native Android and iOS widget APIs
+
+#### Screenshot Import (Baseline)
+- **Image Selection** — Users can select screenshots from photo library or camera roll
+- **Barcode Recognition** — Automatic detection and extraction of barcodes/QR codes from images
+- **Import Confirmation** — Preview extracted codes before saving to collection
+- **Multiple Card Support** — Import multiple cards from a single image if multiple codes detected
+
+**Note:** The standard screenshot import feature has UX limitations. Our enhanced implementation adds step-by-step guidance and visual tutorials as described in section 2.2.
+
+---
+
+### 2.2 Enhanced Features (Offline-First Improvements)
+
+These features represent **significant improvements** over the baseline market standard, with emphasis on offline reliability, privacy, and extensibility.
+
+#### Enhanced Import Flow
+- **Step-by-Step Guidance** — Visual tutorial explaining screenshot selection and capture
+- **Format Validation** — Real-time feedback on code format and validity before import
+- **Batch Processing** — Import multiple cards from multiple screenshots in one session
+- **Manual File Import** — Support for `.json`, `.zip`, `.csv` file formats for advanced users
+- **Future AI-OCR** — Roadmap for AI-powered card number recognition from images (planned for v1.0)
+- **Full Offline Operation** — No cloud uploads; all processing happens on-device
+
+#### Offline-First Backup and Restore
+- **Encrypted QR Backup** — Generate scannable QR code containing encrypted card collection for offline transfer
+- **QR Restoration** — Scan QR on another device to restore entire card collection
+- **Archive Export/Import** — Create encrypted `.zip` archives containing:
+  - `cards.json` — All card data in encrypted format
+  - `stores.json` — Store metadata and associations
+  - `metadata.json` — Schema versioning and integrity checks
+  - `images/` — Optional card artwork and icons
+- **Conflict Resolution** — User-controlled merge strategies during restore (merge/replace/skip)
+- **Future Storage Providers** — Extensible `StorageProvider` abstraction for:
+  - Google Drive sync (planned v1.0)
+  - iCloud sync (planned v1.0)
+  - Dropbox sync (planned v1.0)
+  - Self-hosted server integration (future)
+
+#### Enhanced UX Improvements
+- **Instant Rendering** — Card codes display in < 200 ms from app open
+- **Fast Startup** — App cold start < 1.0 s on reference devices
+- **Metadata Management** — Rich editing for store names, categories, locations
+- **Visual Customization** — Color themes, icons, and branding per card
+- **Search Performance** — Offline search completes in < 100 ms for 10k entries
+
+#### Encryption and Privacy Enhancements
+- **Granular Encryption** — Per-card encryption with unique IV and authentication tag
+- **Biometric Unlock** — Optional FaceID/TouchID gating for sensitive operations
+- **Password-Protected Backups** — PBKDF2-derived keys (≥ 150k iterations) for backup archives
+- **GDPR Compliance** — No data leaves device without explicit user action
+- **Transparent Policies** — Clear communication about data storage and encryption methods
+
+---
+
+### 2.3 Future Scope (Online Search with Facets)
+
+**Status:** Deferred to future releases. Implementation scheduled for v1.0 or later.
+
+Online store search with faceted filtering represents a **significant architectural addition** requiring network infrastructure, API design, and real-time data synchronization. This feature is explicitly **marked for future implementation** and will not be part of the MVP (v0.1.0).
+
+#### Planned Online Search Features
+- **Faceted Search Interface** — Angular Material chip-style filters for:
+  - Location (city, region, country)
+  - Store type (chain vs. independent)
+  - Barcode format support (QR, Code128, EAN-13, etc.)
+  - Deep linking availability
+  - Loyalty program integration
+- **Hybrid Search Strategy** — Offline local index enriched with online results when network available
+- **Real-Time Store Metadata** — Up-to-date information about store locations, accepted formats, and features
+- **Location-Aware Results** — Proximity-based store suggestions using device GPS
+- **API Integration** — RESTful endpoints for store search and metadata refresh
+
+#### Online Search Architecture (Future)
+- **API Endpoints** — `/v1/stores/search?q={query}&facets=location,type,accepts_barcode_type`
+- **Caching Layer** — Smart caching strategy for offline availability after initial online fetch
+- **Conflict Resolution** — Merging local and remote store data with version-based precedence
+- **Sync Policies** — Configurable sync intervals and data retention policies
+
+**Implementation Timeline:**
+- **MVP (v0.1.0):** Offline local store index only
+- **v1.0:** Online search with facets + first cloud sync provider
+- **v1.1+:** Multi-provider cloud sync + advanced store analytics
+
+**Note:** The architecture is designed to support online search without refactoring core layers. The domain layer includes abstractions for offline-first operation, and the data layer supports hybrid repository patterns that can add online augmentation without breaking existing functionality.
+
+---
+
 ## 3. Business Requirements
 
 **BR-1 (MUST)** Deliver a frictionless, privacy-preserving wallet experience that works without network access.  
-**BR-2 (MUST)** Ensure user-owned recovery through encrypted, portable backups.  
-**BR-3 (SHOULD)** Provide smart store search with facets, preferring local index data and enriching it with cloud results when online.  
-**BR-4 (SHOULD)** Prepare a modular sync layer ready to host Google Drive, iCloud, Dropbox, and similar providers.  
-**BR-5 (SHOULD)** Capture optional analytics locally for future sync once privacy reviews conclude.  
-**BR-6 (WON’T)** Monetize or share user data prior to v1.0 and explicit legal approval.
+**BR-2 (MUST)** Ensure user-owned recovery through encrypted, portable backups (QR-based or archive export).  
+**BR-3 (MUST)** Provide offline store search with local index for basic store metadata lookup.  
+**BR-4 (SHOULD)** Implement offline-first backup mechanisms (QR code generation and archive export) for cross-device transfer.  
+**BR-5 (SHOULD)** Prepare a modular sync layer ready to host Google Drive, iCloud, Dropbox, and similar providers for future releases.  
+**BR-6 (DEFERRED)** Online store search with faceted filtering is planned for v1.0 or later (see section 2.3).  
+**BR-7 (WON'T)** Monetize or share user data prior to v1.0 and explicit legal approval.
 
 **Business metrics.**
 

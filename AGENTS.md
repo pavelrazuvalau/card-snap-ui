@@ -52,6 +52,8 @@ Before editing, review the applicable sections of `ARCHITECTURE.md` and diff you
 7. **Review** — inspect diffs, restate intent, highlight risks, and list recommended verification commands. Ensure consistency with existing patterns and validate that the updates comply with Android/iOS style guides.
 8. **Document** — if any changes go beyond current documentation in `AGENTS.md` or `ARCHITECTURE.md`, **update those files immediately** to reflect new patterns, practices, or architectural decisions.
 
+If any linting, formatting, test, or validation command fails at step 5 (or later), fix the underlying issues, run the appropriate formatter (`dart format .` / `flutter format`), and re-run the failing checks until they pass—never leave failed stages unresolved.
+
 **Critical**: Before making any architectural changes, check if they're documented. If not, document them first. All agents must strictly follow documented practices.
 
 Pause and surface uncertainties; do not invent data or skip validation.

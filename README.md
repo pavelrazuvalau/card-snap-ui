@@ -1,7 +1,7 @@
 # Card Snap UI — AI-Assisted Flutter Learning Playground
 
-Card Snap UI is a Flutter codebase engineered as a self-guided tutorial.  
-Every module, test, and workflow is written to teach an Angular/TypeScript developer how a production-grade Flutter app is assembled, with AI copilots acting as patient mentors instead of raw automation.
+**Card Snap UI** is a Flutter codebase for developing **Card Snap Wallet** — an offline-first loyalty and discount card manager for Android and iOS.  
+The repository is engineered as a self-guided tutorial where every module, test, and workflow teaches an Angular/TypeScript developer how a production-grade Flutter app is assembled, with AI copilots acting as patient mentors instead of raw automation.
 
 > Guiding idea: **write so AI can teach it, and humans can learn it.**
 
@@ -9,9 +9,13 @@ Every module, test, and workflow is written to teach an Angular/TypeScript devel
 
 ## Why This Repo Exists
 
-- translate familiar Angular patterns into idiomatic Dart/Flutter;
-- document *why* architectural choices exist, not just *what* the code does;
-- pair human curiosity with AI explanations so the project functions like a textbook.
+This repository serves two primary purposes:
+
+1. **Build Card Snap Wallet** — A production-ready, offline-first mobile application for managing loyalty and discount cards
+2. **Educational Platform** — A comprehensive learning resource that:
+   - translates familiar Angular patterns into idiomatic Dart/Flutter
+   - documents *why* architectural choices exist, not just *what* the code does
+   - pairs human curiosity with AI explanations so the project functions like a textbook
 
 Depth of understanding comes before delivery speed. Clarity, commentary, and reproducibility are the default success metrics.
 

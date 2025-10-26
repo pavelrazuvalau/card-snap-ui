@@ -1,6 +1,6 @@
-# Card Snap Wallet Documentation
+# Card Snap UI Documentation
 
-Welcome to the Card Snap Wallet documentation! This directory contains comprehensive guides for developers, especially those coming from Angular/TypeScript backgrounds.
+Welcome to the Card Snap UI documentation! This directory contains comprehensive guides for developers, especially those coming from Angular/TypeScript backgrounds.
 
 ## 📚 Documentation Structure
 
@@ -59,4 +59,4 @@ Every file in this project includes:
 
 ---
 
-*This documentation is part of the Card Snap Wallet educational project, designed to teach Flutter development through Angular/TypeScript analogies.*
+*This documentation is part of the Card Snap UI educational project, designed to teach Flutter development through Angular/TypeScript analogies.*

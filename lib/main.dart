@@ -1,6 +1,6 @@
 /// 🔶 Main Application Entry Point
 ///
-/// Bootstrap the Card Snap Wallet application with dependency injection.
+/// Bootstrap the Card Snap UI application with dependency injection.
 /// Similar to Angular's main.ts but using Flutter's app initialization.
 ///
 /// In Angular, you'd have:

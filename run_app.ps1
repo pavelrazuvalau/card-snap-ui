@@ -1,4 +1,4 @@
-# Card Snap Wallet - Windows Launcher
+# Card Snap UI - Windows Launcher
 # PowerShell script for reliable app launching
 
 Write-Host "Card Snap Wallet - Windows Launcher" -ForegroundColor Cyan

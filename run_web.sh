@@ -1,5 +1,5 @@
 #!/bin/bash
-# Card Snap Wallet - Quick Web Development Server
+# Card Snap UI - Quick Web Development Server
 # Simple script for local web development with multi-browser support
 
 echo "🚀 Card Snap Wallet - Web Development Server"

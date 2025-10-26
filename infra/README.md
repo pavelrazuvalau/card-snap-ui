@@ -1,6 +1,6 @@
 # Infrastructure & DevOps
 
-This directory contains infrastructure, CI/CD, and deployment configurations for Card Snap Wallet.
+This directory contains infrastructure, CI/CD, and deployment configurations for Card Snap UI.
 
 ## 📁 Directory Structure
 
@@ -122,4 +122,4 @@ infra/
 
 ---
 
-*This infrastructure setup supports the offline-first, security-focused design of Card Snap Wallet while maintaining educational value for Flutter development.*
+*This infrastructure setup supports the offline-first, security-focused design of Card Snap UI while maintaining educational value for Flutter development.*
