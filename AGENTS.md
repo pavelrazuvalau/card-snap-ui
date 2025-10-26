@@ -490,7 +490,7 @@ Always design for future growth, even if current code seems small. Separate file
 AI agents must ensure all UI implementations comply with official platform style guides:
 
 **Material Design 3 (Android/Web)**
-- Reference: https://m3.material.io/guidelines
+- Reference: https://m3.material.io/
 - Default elevation: 1dp for cards, 3dp for elevated components
 - Default padding: 16dp (Material 3 spacing standard)
 - Border radius: 12dp (Material 3 default for cards)
@@ -509,12 +509,16 @@ AI agents must ensure all UI implementations comply with official platform style
 - Comments must explain differences from Material (e.g., "iOS uses shadows instead of elevation")
 
 **Implementation Requirements:**
-- Every platform-specific strategy file MUST include style guide references in comments
-- Every material_card_strategy.dart MUST reference https://m3.material.io/components/cards
-- Every cupertino_card_strategy.dart MUST reference iOS HIG sections
+- Every platform-specific strategy file MUST include style guide reference in file header comments
 - Comments must explain specific values (why 16dp/16pt, why 12dp/12pt radius, etc.)
 - Use educational comment taxonomy: `/// 🔶` for docs, `// 🔹` for syntax, `// 🧠` for insights
 - Include Angular analogies when explaining style guide compliance
+
+**Style Guide Documentation:**
+- File header MUST include link to relevant style guide component
+- Inline comments explain values but don't need full URLs (header link provides context)
+- This balances documentation needs with code readability
+- Example: Header has `Reference: https://m3.material.io/components/cards`, inline comments explain "M3 elevation level 1" without full URL
 
 ---
 
