@@ -575,6 +575,9 @@ See `test/README.md` for detailed testing strategy and coverage tracking methods
 - GitHub Actions enforce linting, formatting, testing, and coverage.
 - Cursor and GitKraken MCP manage GitFlow branches and Conventional Commits.
 - AI agents annotate CI steps with educational commentary (why the step exists).
+- **Code Quality**: AI agents must follow linting best practices defined in `AGENTS.md` §5 (super parameters, const constructors, avoid redundant arguments).
+
+See `AGENTS.md` §5 for detailed code quality requirements and examples.
 
 ```yaml
 name: Flutter CI

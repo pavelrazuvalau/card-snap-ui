@@ -23,7 +23,7 @@ import 'package:card_snap_ui/domain/entities/card.dart';
 void main() {
   group('LoyaltyCardModel Tests', () {
     late LoyaltyCardModel model;
-    final fixedDate = DateTime(2023, 1, 15, 10, 30, 0);
+    final fixedDate = DateTime(2023, 1, 15, 10, 30);
 
     setUp(() {
       // 🔹 Setup test data before each test
@@ -38,7 +38,6 @@ void main() {
         imageUrl: 'https://example.com/coffee.png',
         colorHex: '#FF5733',
         notes: 'My favorite coffee shop',
-        isArchived: false,
       );
     });
 
@@ -212,7 +211,6 @@ void main() {
           imageUrl: 'https://example.com/logo.png',
           colorHex: '#00FF00',
           notes: 'Test notes',
-          isArchived: false,
         );
 
         final model = LoyaltyCardModel.fromDomain(originalDomain);
@@ -246,7 +244,6 @@ void main() {
           imageUrl: 'https://example.com/coffee.png',
           colorHex: '#FF5733',
           notes: 'My favorite coffee shop',
-          isArchived: false,
         );
 
         expect(model1, equals(model2));

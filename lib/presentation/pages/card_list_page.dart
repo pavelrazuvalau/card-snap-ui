@@ -226,12 +226,12 @@ class _CardListPageState extends State<CardListPage> {
           const SizedBox(height: 24),
           AdaptiveWidgetFactory.createButton(
             onPressed: _navigateToAddCard,
-            child: Row(
+            child: const Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.qr_code_scanner),
-                const SizedBox(width: 8),
-                const Text('Add Card'),
+                Icon(Icons.qr_code_scanner),
+                SizedBox(width: 8),
+                Text('Add Card'),
               ],
             ),
           ),

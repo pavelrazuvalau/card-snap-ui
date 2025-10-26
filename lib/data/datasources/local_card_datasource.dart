@@ -81,7 +81,7 @@ class LocalCardDataSource {
       return Result.success(card);
     } catch (e) {
       if (e is StateError) {
-        return Result.success(null);
+        return const Result.success(null);
       }
       return Result.failure(
         DataException(
@@ -104,7 +104,7 @@ class LocalCardDataSource {
       // Add new card
       _cards.add(card);
 
-      return Result.success(null);
+      return const Result.success(null);
     } catch (e) {
       return Result.failure(
         DataException(
@@ -140,7 +140,7 @@ class LocalCardDataSource {
         _cards[cardIndex] = archivedCard;
       }
 
-      return Result.success(null);
+      return const Result.success(null);
     } catch (e) {
       return Result.failure(
         DataException(
@@ -203,7 +203,7 @@ class LocalCardDataSource {
 
       // TODO: Implement decryption for import
       // For now, return empty list
-      return Result.success([]);
+      return const Result.success([]);
     } catch (e) {
       return Result.failure(
         DataException('Failed to import cards', technicalDetails: e.toString()),

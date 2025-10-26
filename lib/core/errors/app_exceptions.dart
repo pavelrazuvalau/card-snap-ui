@@ -37,21 +37,13 @@ abstract class AppException implements Exception {
 /// Domain layer exceptions
 /// 🔹 Business logic errors (validation, business rules)
 class DomainException extends AppException {
-  const DomainException(
-    String message, {
-    String? technicalDetails,
-    String? traceId,
-  }) : super(message, technicalDetails: technicalDetails, traceId: traceId);
+  const DomainException(super.message, {super.technicalDetails, super.traceId});
 }
 
 /// Data layer exceptions
 /// 🔹 Data access errors (network, database, serialization)
 class DataException extends AppException {
-  const DataException(
-    String message, {
-    String? technicalDetails,
-    String? traceId,
-  }) : super(message, technicalDetails: technicalDetails, traceId: traceId);
+  const DataException(super.message, {super.technicalDetails, super.traceId});
 }
 
 /// Network-specific exceptions
@@ -61,31 +53,31 @@ class NetworkException extends DataException {
   final bool isOffline;
 
   const NetworkException(
-    String message, {
-    String? technicalDetails,
-    String? traceId,
+    super.message, {
+    super.technicalDetails,
+    super.traceId,
     this.isOffline = false,
-  }) : super(message, technicalDetails: technicalDetails, traceId: traceId);
+  });
 }
 
 /// Encryption and security exceptions
 /// 🔹 Critical for offline wallet with encrypted storage
 class SecurityException extends AppException {
   const SecurityException(
-    String message, {
-    String? technicalDetails,
-    String? traceId,
-  }) : super(message, technicalDetails: technicalDetails, traceId: traceId);
+    super.message, {
+    super.technicalDetails,
+    super.traceId,
+  });
 }
 
 /// Localization exceptions
 /// 🔹 Multilingual support requires proper error handling
 class LocalizationException extends AppException {
   const LocalizationException(
-    String message, {
-    String? technicalDetails,
-    String? traceId,
-  }) : super(message, technicalDetails: technicalDetails, traceId: traceId);
+    super.message, {
+    super.technicalDetails,
+    super.traceId,
+  });
 }
 
 /// Result wrapper for error handling

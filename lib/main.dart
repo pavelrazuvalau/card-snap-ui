@@ -79,7 +79,6 @@ class CardSnapApp extends StatelessWidget {
     return ThemeData(
       colorScheme: ColorScheme.fromSeed(
         seedColor: const Color(0xFF0078D4), // Windows blue
-        brightness: Brightness.light,
       ),
       useMaterial3: true,
       appBarTheme: const AppBarTheme(

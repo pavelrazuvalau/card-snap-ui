@@ -149,6 +149,16 @@ flutter build web
 
 See `test/README.md` for detailed testing strategy and coverage requirements. Use `flutter test integration_test` for end-to-end suites when changes cross layers. See `ARCHITECTURE.md` for architecture-specific testing guidance.
 
+### Code Quality Standards
+
+AI agents must follow code quality requirements defined in `AGENTS.md`, including:
+- Use `super.parameter` syntax for cleaner constructors
+- Add `const` keyword for compile-time constants
+- Avoid redundant default arguments
+- Run `dart format .` and `flutter analyze` before committing
+
+See `AGENTS.md` §5 for detailed linting best practices and examples.
+
 ---
 
 ## Run on Specific Platforms

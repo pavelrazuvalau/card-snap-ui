@@ -70,7 +70,9 @@ class AddCard {
     try {
       // Business validation
       if (!request.isValid) {
-        return Result.failure(DomainException('Invalid card data provided'));
+        return const Result.failure(
+          DomainException('Invalid card data provided'),
+        );
       }
 
       // Check for duplicate cards
@@ -87,7 +89,7 @@ class AddCard {
       );
 
       if (isDuplicate) {
-        return Result.failure(
+        return const Result.failure(
           DomainException('Card with this barcode already exists'),
         );
       }
@@ -109,7 +111,7 @@ class AddCard {
 
       // Validate entity
       if (!card.isValid) {
-        return Result.failure(
+        return const Result.failure(
           DomainException('Generated card data is invalid'),
         );
       }

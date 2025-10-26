@@ -182,6 +182,48 @@ Pause and surface uncertainties; do not invent data or skip validation.
 - **Occam's Razor**: When multiple solutions exist, prefer the simplest one that solves the problem.
 - **Avoid Premature Optimization (APO)**: Focus on correctness and readability first, optimize later when profiled performance issues exist.
 
+**Code Quality & Linting Requirements**
+
+AI agents MUST follow these linting best practices to ensure code quality and performance:
+
+- **Super Parameters**: Use `super.parameter` syntax instead of manual parameter forwarding in constructors:
+  ```dart
+  // ✅ DO: Use super parameters
+  const ExceptionClass(super.message, {super.technicalDetails});
+
+  // ❌ DON'T: Manual parameter passing
+  const ExceptionClass(String message, {String? technicalDetails}) 
+    : super(message, technicalDetails: technicalDetails);
+  ```
+
+- **Const Constructors**: Add `const` keyword to constructors with compile-time constants:
+  ```dart
+  // ✅ DO: Use const for compile-time constants
+  return const Result.success(null);
+  return const Result.failure(DomainException('Error message'));
+
+  // ❌ DON'T: Omit const where possible
+  return Result.success(null);
+  return Result.failure(DomainException('Error message'));
+  ```
+
+- **Avoid Redundant Arguments**: Do not specify default values explicitly:
+  ```dart
+  // ✅ DO: Omit default values
+  ColorScheme.fromSeed(seedColor: const Color(0xFF0078D4))
+
+  // ❌ DON'T: Specify default explicitly
+  ColorScheme.fromSeed(
+    seedColor: const Color(0xFF0078D4),
+    brightness: Brightness.light, // Redundant default
+  )
+  ```
+
+- **Prefer Const Declarations**: Use `const` for final variables with compile-time constant values
+- **Always run `dart format .`** and `flutter analyze` before committing to catch these issues early
+
+**Why these matter:** These optimizations improve code performance, reduce boilerplate, and prevent future linting warnings. Following these practices from the start avoids manual corrections later.
+
 **File Organization & Co-location**
 
 - Keep related files together. Strategies live with their factories in the same folder:

@@ -72,7 +72,7 @@ void main() {
       test('should successfully add a valid card', () async {
         // 🔹 Test successful card addition
         // Similar to Angular's happy path testing
-        final request = AddCardRequest(
+        const request = AddCardRequest(
           name: 'Coffee Shop Card',
           storeName: 'Coffee Shop',
           barcodeData: 'QR123456',
@@ -82,7 +82,7 @@ void main() {
         // Mock repository to return empty list (no duplicates)
         when(
           () => mockRepository.getAllCards(),
-        ).thenAnswer((_) async => Result.success([]));
+        ).thenAnswer((_) async => const Result.success([]));
 
         // Mock successful card addition - return the card that was passed in
         when(() => mockRepository.addCard(any())).thenAnswer((
@@ -109,7 +109,7 @@ void main() {
 
       test('should fail when request is invalid', () async {
         // 🔹 Test validation failure
-        final request = AddCardRequest(
+        const request = AddCardRequest(
           name: '', // Empty name
           storeName: 'Coffee Shop',
           barcodeData: 'QR123456',
@@ -127,7 +127,7 @@ void main() {
       });
 
       test('should fail when barcodeData is empty', () async {
-        final request = AddCardRequest(
+        const request = AddCardRequest(
           name: 'Coffee Shop Card',
           storeName: 'Coffee Shop',
           barcodeData: '', // Empty barcode
@@ -141,7 +141,7 @@ void main() {
       });
 
       test('should fail when storeName is empty', () async {
-        final request = AddCardRequest(
+        const request = AddCardRequest(
           name: 'Coffee Shop Card',
           storeName: '', // Empty store name
           barcodeData: 'QR123456',
@@ -156,7 +156,7 @@ void main() {
 
       test('should fail when duplicate card exists', () async {
         // 🔹 Test duplicate detection business rule
-        final request = AddCardRequest(
+        const request = AddCardRequest(
           name: 'Coffee Shop Card',
           storeName: 'Coffee Shop',
           barcodeData: 'QR123456',
@@ -193,7 +193,7 @@ void main() {
       });
 
       test('should handle case-insensitive store name matching', () async {
-        final request = AddCardRequest(
+        const request = AddCardRequest(
           name: 'Coffee Shop Card',
           storeName: 'coffee shop', // Lowercase
           barcodeData: 'QR123456',
@@ -227,7 +227,7 @@ void main() {
       });
 
       test('should fail when repository getAllCards fails', () async {
-        final request = AddCardRequest(
+        const request = AddCardRequest(
           name: 'Coffee Shop Card',
           storeName: 'Coffee Shop',
           barcodeData: 'QR123456',
@@ -236,7 +236,8 @@ void main() {
 
         // Mock repository failure
         when(() => mockRepository.getAllCards()).thenAnswer(
-          (_) async => Result.failure(DataException('Failed to get cards')),
+          (_) async =>
+              const Result.failure(DataException('Failed to get cards')),
         );
 
         // Execute the use case
@@ -248,7 +249,7 @@ void main() {
       });
 
       test('should fail when repository addCard fails', () async {
-        final request = AddCardRequest(
+        const request = AddCardRequest(
           name: 'Coffee Shop Card',
           storeName: 'Coffee Shop',
           barcodeData: 'QR123456',
@@ -257,11 +258,12 @@ void main() {
 
         when(
           () => mockRepository.getAllCards(),
-        ).thenAnswer((_) async => Result.success([]));
+        ).thenAnswer((_) async => const Result.success([]));
 
         // Mock repository failure on add
         when(() => mockRepository.addCard(any())).thenAnswer(
-          (_) async => Result.failure(DataException('Failed to save card')),
+          (_) async =>
+              const Result.failure(DataException('Failed to save card')),
         );
 
         // Execute the use case
@@ -274,7 +276,7 @@ void main() {
 
       test('should trim whitespace from card data', () async {
         // 🔹 Test data sanitization
-        final request = AddCardRequest(
+        const request = AddCardRequest(
           name: '  Coffee Shop Card  ', // With whitespace
           storeName: '  Coffee Shop  ',
           barcodeData: '  QR123456  ',
@@ -283,7 +285,7 @@ void main() {
 
         when(
           () => mockRepository.getAllCards(),
-        ).thenAnswer((_) async => Result.success([]));
+        ).thenAnswer((_) async => const Result.success([]));
 
         LoyaltyCard? capturedCard;
         when(() => mockRepository.addCard(any())).thenAnswer((
@@ -304,7 +306,7 @@ void main() {
       });
 
       test('should generate unique card ID', () async {
-        final request = AddCardRequest(
+        const request = AddCardRequest(
           name: 'Coffee Shop Card',
           storeName: 'Coffee Shop',
           barcodeData: 'QR123456',
@@ -313,7 +315,7 @@ void main() {
 
         when(
           () => mockRepository.getAllCards(),
-        ).thenAnswer((_) async => Result.success([]));
+        ).thenAnswer((_) async => const Result.success([]));
 
         LoyaltyCard? capturedCard;
         when(() => mockRepository.addCard(any())).thenAnswer((
@@ -335,7 +337,7 @@ void main() {
 
     group('AddCardRequest Validation', () {
       test('should validate request with all required fields', () {
-        final request = AddCardRequest(
+        const request = AddCardRequest(
           name: 'Coffee Shop Card',
           storeName: 'Coffee Shop',
           barcodeData: 'QR123456',
@@ -346,7 +348,7 @@ void main() {
       });
 
       test('should fail validation with empty name', () {
-        final request = AddCardRequest(
+        const request = AddCardRequest(
           name: '',
           storeName: 'Coffee Shop',
           barcodeData: 'QR123456',
@@ -357,7 +359,7 @@ void main() {
       });
 
       test('should fail validation with empty storeName', () {
-        final request = AddCardRequest(
+        const request = AddCardRequest(
           name: 'Coffee Shop Card',
           storeName: '',
           barcodeData: 'QR123456',
@@ -368,7 +370,7 @@ void main() {
       });
 
       test('should fail validation with empty barcodeData', () {
-        final request = AddCardRequest(
+        const request = AddCardRequest(
           name: 'Coffee Shop Card',
           storeName: 'Coffee Shop',
           barcodeData: '',
@@ -379,7 +381,7 @@ void main() {
       });
 
       test('should include optional fields', () {
-        final request = AddCardRequest(
+        const request = AddCardRequest(
           name: 'Coffee Shop Card',
           storeName: 'Coffee Shop',
           barcodeData: 'QR123456',

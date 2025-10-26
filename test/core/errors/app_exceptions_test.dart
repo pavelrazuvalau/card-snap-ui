@@ -111,13 +111,13 @@ void main() {
     group('Success Result', () {
       test('should create success result', () {
         // 🔹 Test Result.success factory constructor
-        final result = Result.success('test data');
+        const result = Result.success('test data');
         expect(result.isSuccess, isTrue);
         expect(result.isFailure, isFalse);
       });
 
       test('should return data for success result', () {
-        final result = Result.success(42);
+        const result = Result.success(42);
         expect(result.dataOrNull, 42);
         expect(result.errorOrNull, isNull);
       });
@@ -133,21 +133,21 @@ void main() {
     group('Failure Result', () {
       test('should create failure result', () {
         // 🔹 Test Result.failure factory constructor
-        final error = const DomainException('Validation failed');
+        const error = DomainException('Validation failed');
         final result = Result.failure(error);
         expect(result.isSuccess, isFalse);
         expect(result.isFailure, isTrue);
       });
 
       test('should return error for failure result', () {
-        final error = const DataException('Database error');
+        const error = DataException('Database error');
         final result = Result.failure(error);
         expect(result.dataOrNull, isNull);
         expect(result.errorOrNull, error);
       });
 
       test('should handle different exception types', () {
-        final securityError = const SecurityException('Encryption failed');
+        const securityError = SecurityException('Encryption failed');
         final result = Result.failure(securityError);
         expect(result.errorOrNull, securityError);
         expect(result.errorOrNull?.message, 'Encryption failed');
@@ -156,42 +156,42 @@ void main() {
 
     group('Result Properties', () {
       test('isSuccess should be true for success', () {
-        final result = Result.success('data');
+        const result = Result.success('data');
         expect(result.isSuccess, isTrue);
       });
 
       test('isSuccess should be false for failure', () {
-        final result = Result.failure(const DomainException('Error'));
+        const result = Result.failure(const DomainException('Error'));
         expect(result.isSuccess, isFalse);
       });
 
       test('isFailure should be false for success', () {
-        final result = Result.success('data');
+        const result = Result.success('data');
         expect(result.isFailure, isFalse);
       });
 
       test('isFailure should be true for failure', () {
-        final result = Result.failure(const DomainException('Error'));
+        const result = Result.failure(const DomainException('Error'));
         expect(result.isFailure, isTrue);
       });
 
       test('dataOrNull should return data for success', () {
-        final result = Result.success('test');
+        const result = Result.success('test');
         expect(result.dataOrNull, 'test');
       });
 
       test('dataOrNull should return null for failure', () {
-        final result = Result.failure(const DomainException('Error'));
+        const result = Result.failure(const DomainException('Error'));
         expect(result.dataOrNull, isNull);
       });
 
       test('errorOrNull should return null for success', () {
-        final result = Result.success('data');
+        const result = Result.success('data');
         expect(result.errorOrNull, isNull);
       });
 
       test('errorOrNull should return error for failure', () {
-        final error = const DomainException('Validation failed');
+        const error = DomainException('Validation failed');
         final result = Result.failure(error);
         expect(result.errorOrNull, error);
       });
@@ -201,7 +201,7 @@ void main() {
       test('should handle success flow', () {
         // 🔹 Example: Simulating a successful operation
         // Similar to Angular's Observable success path
-        Result<String> fetchData() => Result.success('data');
+        Result<String> fetchData() => const Result.success('data');
 
         final result = fetchData();
         if (result.isSuccess) {
@@ -213,7 +213,7 @@ void main() {
         // 🔹 Example: Simulating a failed operation
         // Similar to Angular's Observable error path
         Result<String> fetchData() =>
-            Result.failure(const DataException('Network timeout'));
+            const Result.failure(DataException('Network timeout'));
 
         final result = fetchData();
         if (result.isFailure) {

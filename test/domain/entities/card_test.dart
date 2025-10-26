@@ -28,7 +28,7 @@ void main() {
     setUp(() {
       // 🔹 Setup test data before each test
       // Similar to Angular's beforeEach() in describe blocks
-      fixedDate = DateTime(2023, 1, 15, 10, 30, 0);
+      fixedDate = DateTime(2023, 1, 15, 10, 30);
       validCard = LoyaltyCard(
         id: 'card_test_001',
         name: 'Coffee Shop Card',
@@ -40,7 +40,6 @@ void main() {
         imageUrl: 'https://example.com/coffee.png',
         colorHex: '#FF5733',
         notes: 'My favorite coffee shop',
-        isArchived: false,
       );
     });
 
@@ -188,7 +187,6 @@ void main() {
           imageUrl: 'https://example.com/coffee.png',
           colorHex: '#FF5733',
           notes: 'My favorite coffee shop',
-          isArchived: false,
         );
 
         expect(card1, equals(card2));

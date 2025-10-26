@@ -126,7 +126,7 @@ class LocalCardRepository implements CardRepository {
         return Result.failure(result.errorOrNull!);
       }
 
-      return Result.success(null);
+      return const Result.success(null);
     } catch (e) {
       return Result.failure(
         DataException('Failed to delete card', technicalDetails: e.toString()),
