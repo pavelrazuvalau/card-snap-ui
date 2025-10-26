@@ -11,6 +11,7 @@
   - Browser type enumeration (`BrowserType` enum)
 
 ### Browser Support Matrix
+
 | Platform | Chrome | Firefox | Safari | Edge |
 |----------|--------|---------|--------|------|
 | Linux    | ✅     | ✅      | ❌     | ❌   |
@@ -37,4 +38,3 @@
 - `BrowserConfig` = Angular's environment configuration
 - Platform detection = Angular's `@Inject(PLATFORM_ID)` pattern
 - Shell launcher = Angular service implementation using platform APIs
-
