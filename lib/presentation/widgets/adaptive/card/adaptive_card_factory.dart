@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../common/platform_types.dart';
 import 'card_strategy_factory.dart';
 
 /// 🔶 Adaptive Card Factory
@@ -19,8 +18,7 @@ class AdaptiveCardFactory {
     double? elevation,
     ShapeBorder? shape,
   }) {
-    final theme = PlatformDetector.getCurrentTheme();
-    final strategy = CardStrategyFactory.getStrategy(theme);
+    final strategy = CardStrategyFactory.getStrategy();
 
     return strategy.createCard(
       child: child,

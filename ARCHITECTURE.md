@@ -148,7 +148,44 @@ class PlatformDetector {
 
 **Factory Pattern** - Each widget type has its own specialized factory (`AdaptiveCardFactory`, `AdaptiveScaffoldFactory`, `AdaptiveButtonFactory`, etc.) that creates platform-specific components. These factories are self-contained and don't depend on a central registry.
 
-**Strategy Pattern** - Platform-specific implementations are encapsulated in strategy classes (`MaterialCardStrategy`, `CupertinoCardStrategy`, etc.). Each widget has its own strategy files living alongside its factory in the same folder. This follows co-location principle and improves maintainability. The strategy selection happens via `StrategyFactory.getStrategy(theme)` which uses a map-based approach for flexibility.
+**Strategy Pattern** - Platform-specific implementations are encapsulated in strategy classes (`MaterialCardStrategy`, `CupertinoCardStrategy`, etc.). Each widget has its own strategy files living alongside its factory in the same folder. This follows co-location principle and improves maintainability. The strategy selection happens via `StrategySelector` which provides centralized platform detection and eliminates duplication across factories. Each factory delegates directly to `StrategySelector.getStrategyForCurrentPlatform()` and `StrategySelector.getStrategyForTheme()` methods.
+
+**StrategySelector Pattern** - Centralizes platform detection and strategy selection logic. All factories delegate to `StrategySelector` to avoid code duplication. This follows DRY principle by implementing the selection logic once and reusing it across all factory classes. Each factory only needs to specify its specific strategy constructors (Cupertino vs Material implementations).
+
+```dart
+/// 🔶 Strategy Factory Implementation
+/// Each factory is minimal - it only defines constructors for its strategies.
+/// All platform logic is centralized in StrategySelector.
+class AppBarStrategyFactory {
+  static AppBarStrategy getStrategy() =>
+      StrategySelector.getStrategyForCurrentPlatform(
+        () => CupertinoAppBarStrategy(),
+        () => MaterialAppBarStrategy(),
+      );
+
+  static AppBarStrategy getStrategyForTheme(PlatformTheme theme) =>
+      StrategySelector.getStrategyForTheme(
+        theme,
+        () => CupertinoAppBarStrategy(),
+        () => MaterialAppBarStrategy(),
+      );
+}
+
+/// 🔶 Adaptive Factory Usage
+/// Adaptive factories are even simpler - they just call strategy factories.
+class AdaptiveAppBarFactory {
+  static Widget createAppBar({required String title, ...}) {
+    final strategy = AppBarStrategyFactory.getStrategy();
+    return strategy.createAppBar(title: title, ...);
+  }
+}
+```
+
+**Benefits:**
+- DRY compliance: Platform selection logic implemented once in `StrategySelector`
+- Consistent API: All factories have identical `getStrategy()` and `getStrategyForTheme()` methods
+- Easy to add new widgets: Just create folder with factory + strategy, no central registry changes needed
+- Flutter-idiomatic: Uses arrow functions and direct delegation patterns
 
 **Adaptive Root App Widget** - The application root uses adaptive app factory to switch between MaterialApp and CupertinoApp based on platform. This ensures native look-and-feel on each platform without platform-specific code in main.dart.
 

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../common/platform_types.dart';
 import 'progress_indicator_strategy_factory.dart';
 
 /// 🔶 Adaptive Progress Indicator Factory
@@ -12,8 +11,7 @@ class AdaptiveProgressIndicatorFactory {
   /// 🔹 Returns platform-appropriate progress indicator widget
   /// 🧠 Self-contained factory that doesn't depend on central registry
   static Widget createProgressIndicator() {
-    final theme = PlatformDetector.getCurrentTheme();
-    final strategy = ProgressIndicatorStrategyFactory.getStrategy(theme);
+    final strategy = ProgressIndicatorStrategyFactory.getStrategy();
 
     return strategy.createProgressIndicator();
   }

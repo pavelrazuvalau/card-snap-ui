@@ -12,12 +12,18 @@ import '../common/strategy_selector.dart';
 /// 🔶 Scaffold Strategy Factory
 ///
 /// Creates appropriate scaffold strategy based on platform.
+/// 🔹 Delegate directly to StrategySelector to eliminate duplication
 class ScaffoldStrategyFactory {
-  static ScaffoldStrategy getStrategy(PlatformTheme theme) {
-    return StrategySelector.getStrategyForTheme(
-      theme,
-      () => CupertinoScaffoldStrategy(),
-      () => MaterialScaffoldStrategy(),
-    );
-  }
+  static ScaffoldStrategy getStrategy() =>
+      StrategySelector.getStrategyForCurrentPlatform(
+        () => CupertinoScaffoldStrategy(),
+        () => MaterialScaffoldStrategy(),
+      );
+
+  static ScaffoldStrategy getStrategyForTheme(PlatformTheme theme) =>
+      StrategySelector.getStrategyForTheme(
+        theme,
+        () => CupertinoScaffoldStrategy(),
+        () => MaterialScaffoldStrategy(),
+      );
 }

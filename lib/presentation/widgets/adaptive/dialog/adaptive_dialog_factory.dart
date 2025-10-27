@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../common/platform_types.dart';
 import 'dialog_strategy_factory.dart';
 
 /// 🔶 Adaptive Dialog Factory
@@ -16,8 +15,7 @@ class AdaptiveDialogFactory {
     required String content,
     required List<Widget> actions,
   }) {
-    final theme = PlatformDetector.getCurrentTheme();
-    final strategy = DialogStrategyFactory.getStrategy(theme);
+    final strategy = DialogStrategyFactory.getStrategy();
 
     return strategy.createDialog(
       title: title,

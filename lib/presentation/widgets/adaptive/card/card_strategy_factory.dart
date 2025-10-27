@@ -12,12 +12,18 @@ import '../common/strategy_selector.dart';
 /// 🔶 Card Strategy Factory
 ///
 /// Creates appropriate card strategy based on platform.
+/// 🔹 Delegate directly to StrategySelector to eliminate duplication
 class CardStrategyFactory {
-  static CardStrategy getStrategy(PlatformTheme theme) {
-    return StrategySelector.getStrategyForTheme(
-      theme,
-      () => CupertinoCardStrategy(),
-      () => MaterialCardStrategy(),
-    );
-  }
+  static CardStrategy getStrategy() =>
+      StrategySelector.getStrategyForCurrentPlatform(
+        () => CupertinoCardStrategy(),
+        () => MaterialCardStrategy(),
+      );
+
+  static CardStrategy getStrategyForTheme(PlatformTheme theme) =>
+      StrategySelector.getStrategyForTheme(
+        theme,
+        () => CupertinoCardStrategy(),
+        () => MaterialCardStrategy(),
+      );
 }

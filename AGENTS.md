@@ -183,7 +183,9 @@ AI agents MUST automatically verify enterprise Flutter standards compliance in t
 - ✅ **Always** when refactoring code
 - ✅ **Always** when adding new dependencies
 - ✅ **Always** when creating new widgets or BLoCs
+- ✅ **Always** when introducing new patterns or architectural changes
 - ✅ **Always** after receiving user feedback or code review
+- ✅ **MANDATORY**: Update documentation (ARCHITECTURE.md, AGENTS.md) if changes go beyond documented patterns
 
 **Compliance Check Commands (Run when appropriate based on file types):**
 
@@ -216,6 +218,7 @@ dart format .
 - ✅ Documentation includes educational comments
 - ✅ No platform-specific hardcoding
 - ✅ Follows SOLID principles
+- ✅ **Documentation updated** if introducing new patterns (ARCHITECTURE.md, AGENTS.md)
 
 **Automated Checks Required:**
 Agents MUST run these checks before any commit:
@@ -224,6 +227,7 @@ Agents MUST run these checks before any commit:
 3. `dart format .` - No formatting issues
 4. Coverage report reviewed for threshold compliance
 5. Manual review for architectural compliance
+6. **Documentation sync** - ARCHITECTURE.md and AGENTS.md updated if patterns changed
 
 **Failure Handling:**
 - If ANY check fails, agents MUST fix issues before proceeding

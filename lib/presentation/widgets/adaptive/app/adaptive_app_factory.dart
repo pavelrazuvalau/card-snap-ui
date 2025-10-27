@@ -8,7 +8,6 @@ library presentation.widgets.adaptive.app;
 
 import 'package:flutter/material.dart';
 import 'app_strategy_factory.dart';
-import '../common/strategy_selector.dart';
 
 /// 🔶 Adaptive App Factory
 ///
@@ -30,8 +29,7 @@ class AdaptiveAppFactory {
     required Widget home,
     Map<String, WidgetBuilder>? routes,
   }) {
-    final platformTheme = StrategySelector.getCurrentTheme();
-    final strategy = AppStrategyFactory.getStrategy(platformTheme);
+    final strategy = AppStrategyFactory.getStrategy();
 
     // 🔶 Delegate to strategy
     // 🧠 Strategy creates its own theme internally

@@ -11,12 +11,18 @@ import '../common/platform_types.dart';
 import '../common/strategy_selector.dart';
 
 /// Factory for creating platform-specific progress indicator strategies
+/// 🔹 Delegate directly to StrategySelector to eliminate duplication
 class ProgressIndicatorStrategyFactory {
-  static ProgressIndicatorStrategy getStrategy(PlatformTheme theme) {
-    return StrategySelector.getStrategyForTheme(
-      theme,
-      () => CupertinoProgressIndicatorStrategy(),
-      () => MaterialProgressIndicatorStrategy(),
-    );
-  }
+  static ProgressIndicatorStrategy getStrategy() =>
+      StrategySelector.getStrategyForCurrentPlatform(
+        () => CupertinoProgressIndicatorStrategy(),
+        () => MaterialProgressIndicatorStrategy(),
+      );
+
+  static ProgressIndicatorStrategy getStrategyForTheme(PlatformTheme theme) =>
+      StrategySelector.getStrategyForTheme(
+        theme,
+        () => CupertinoProgressIndicatorStrategy(),
+        () => MaterialProgressIndicatorStrategy(),
+      );
 }

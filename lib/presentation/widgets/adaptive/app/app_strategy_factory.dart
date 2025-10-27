@@ -12,12 +12,18 @@ import '../common/strategy_selector.dart';
 /// 🔶 App Strategy Factory
 ///
 /// Creates appropriate app strategy based on platform.
+/// 🔹 Delegate directly to StrategySelector to eliminate duplication
 class AppStrategyFactory {
-  static AppStrategy getStrategy(PlatformTheme theme) {
-    return StrategySelector.getStrategyForTheme(
-      theme,
-      () => CupertinoAppStrategy(),
-      () => MaterialAppStrategy(),
-    );
-  }
+  static AppStrategy getStrategy() =>
+      StrategySelector.getStrategyForCurrentPlatform(
+        () => CupertinoAppStrategy(),
+        () => MaterialAppStrategy(),
+      );
+
+  static AppStrategy getStrategyForTheme(PlatformTheme theme) =>
+      StrategySelector.getStrategyForTheme(
+        theme,
+        () => CupertinoAppStrategy(),
+        () => MaterialAppStrategy(),
+      );
 }

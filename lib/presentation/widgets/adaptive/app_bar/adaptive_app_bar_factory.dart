@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../common/platform_types.dart';
 import 'app_bar_strategy_factory.dart';
 
 /// 🔶 Adaptive App Bar Factory
@@ -17,8 +16,7 @@ class AdaptiveAppBarFactory {
     Widget? leading,
     bool automaticallyImplyLeading = true,
   }) {
-    final theme = PlatformDetector.getCurrentTheme();
-    final strategy = AppBarStrategyFactory.getStrategy(theme);
+    final strategy = AppBarStrategyFactory.getStrategy();
 
     return strategy.createAppBar(
       title: title,

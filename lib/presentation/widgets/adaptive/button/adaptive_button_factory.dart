@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../common/platform_types.dart';
 import 'button_strategy_factory.dart';
 
 /// 🔶 Adaptive Button Factory
@@ -17,8 +16,7 @@ class AdaptiveButtonFactory {
     ButtonStyle? style,
     EdgeInsetsGeometry? padding,
   }) {
-    final theme = PlatformDetector.getCurrentTheme();
-    final strategy = ButtonStrategyFactory.getStrategy(theme);
+    final strategy = ButtonStrategyFactory.getStrategy();
 
     return strategy.createButton(
       child: child,

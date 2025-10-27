@@ -11,12 +11,18 @@ import '../common/platform_types.dart';
 import '../common/strategy_selector.dart';
 
 /// Factory for creating platform-specific dialog strategies
+/// 🔹 Delegate directly to StrategySelector to eliminate duplication
 class DialogStrategyFactory {
-  static DialogStrategy getStrategy(PlatformTheme theme) {
-    return StrategySelector.getStrategyForTheme(
-      theme,
-      () => CupertinoDialogStrategy(),
-      () => MaterialDialogStrategy(),
-    );
-  }
+  static DialogStrategy getStrategy() =>
+      StrategySelector.getStrategyForCurrentPlatform(
+        () => CupertinoDialogStrategy(),
+        () => MaterialDialogStrategy(),
+      );
+
+  static DialogStrategy getStrategyForTheme(PlatformTheme theme) =>
+      StrategySelector.getStrategyForTheme(
+        theme,
+        () => CupertinoDialogStrategy(),
+        () => MaterialDialogStrategy(),
+      );
 }

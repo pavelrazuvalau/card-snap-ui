@@ -68,19 +68,25 @@ void main() {
   group('App Strategy Tests', () {
     test('should create material app strategy for material theme', () {
       // 🔹 Test that correct strategy is selected
-      final strategy = AppStrategyFactory.getStrategy(PlatformTheme.material);
+      final strategy = AppStrategyFactory.getStrategyForTheme(
+        PlatformTheme.material,
+      );
       expect(strategy, isA<MaterialAppStrategy>());
     });
 
     test('should create cupertino app strategy for cupertino theme', () {
       // 🔹 Test that correct strategy is selected
-      final strategy = AppStrategyFactory.getStrategy(PlatformTheme.cupertino);
+      final strategy = AppStrategyFactory.getStrategyForTheme(
+        PlatformTheme.cupertino,
+      );
       expect(strategy, isA<CupertinoAppStrategy>());
     });
 
     test('should create material app strategy for web theme', () {
       // 🔹 Test that web theme uses material strategy
-      final strategy = AppStrategyFactory.getStrategy(PlatformTheme.web);
+      final strategy = AppStrategyFactory.getStrategyForTheme(
+        PlatformTheme.web,
+      );
       expect(strategy, isA<MaterialAppStrategy>());
     });
   });

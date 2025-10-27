@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../common/platform_types.dart';
 import 'list_tile_strategy_factory.dart';
 
 /// 🔶 Adaptive List Tile Factory
@@ -19,8 +18,7 @@ class AdaptiveListTileFactory {
     VoidCallback? onTap,
     bool enabled = true,
   }) {
-    final theme = PlatformDetector.getCurrentTheme();
-    final strategy = ListTileStrategyFactory.getStrategy(theme);
+    final strategy = ListTileStrategyFactory.getStrategy();
 
     return strategy.createListTile(
       leading: leading,

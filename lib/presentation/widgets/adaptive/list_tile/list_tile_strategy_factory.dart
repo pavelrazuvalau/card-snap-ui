@@ -11,12 +11,18 @@ import '../common/platform_types.dart';
 import '../common/strategy_selector.dart';
 
 /// Factory for creating platform-specific list tile strategies
+/// 🔹 Delegate directly to StrategySelector to eliminate duplication
 class ListTileStrategyFactory {
-  static ListTileStrategy getStrategy(PlatformTheme theme) {
-    return StrategySelector.getStrategyForTheme(
-      theme,
-      () => CupertinoListTileStrategy(),
-      () => MaterialListTileStrategy(),
-    );
-  }
+  static ListTileStrategy getStrategy() =>
+      StrategySelector.getStrategyForCurrentPlatform(
+        () => CupertinoListTileStrategy(),
+        () => MaterialListTileStrategy(),
+      );
+
+  static ListTileStrategy getStrategyForTheme(PlatformTheme theme) =>
+      StrategySelector.getStrategyForTheme(
+        theme,
+        () => CupertinoListTileStrategy(),
+        () => MaterialListTileStrategy(),
+      );
 }

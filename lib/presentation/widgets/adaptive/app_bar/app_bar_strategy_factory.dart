@@ -11,12 +11,20 @@ import '../common/platform_types.dart';
 import '../common/strategy_selector.dart';
 
 /// Factory for creating platform-specific app bar strategies
+/// 🔹 Delegate directly to StrategySelector to eliminate duplication
 class AppBarStrategyFactory {
-  static AppBarStrategy getStrategy(PlatformTheme theme) {
-    return StrategySelector.getStrategyForTheme(
-      theme,
-      () => CupertinoAppBarStrategy(),
-      () => MaterialAppBarStrategy(),
-    );
-  }
+  /// Get strategy for current platform
+  static AppBarStrategy getStrategy() =>
+      StrategySelector.getStrategyForCurrentPlatform(
+        () => CupertinoAppBarStrategy(),
+        () => MaterialAppBarStrategy(),
+      );
+
+  /// Get strategy for specific platform theme
+  static AppBarStrategy getStrategyForTheme(PlatformTheme theme) =>
+      StrategySelector.getStrategyForTheme(
+        theme,
+        () => CupertinoAppBarStrategy(),
+        () => MaterialAppBarStrategy(),
+      );
 }

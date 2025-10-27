@@ -11,12 +11,18 @@ import '../common/platform_types.dart';
 import '../common/strategy_selector.dart';
 
 /// Factory for creating platform-specific button strategies
+/// 🔹 Delegate directly to StrategySelector to eliminate duplication
 class ButtonStrategyFactory {
-  static ButtonStrategy getStrategy(PlatformTheme theme) {
-    return StrategySelector.getStrategyForTheme(
-      theme,
-      () => CupertinoButtonStrategy(),
-      () => MaterialButtonStrategy(),
-    );
-  }
+  static ButtonStrategy getStrategy() =>
+      StrategySelector.getStrategyForCurrentPlatform(
+        () => CupertinoButtonStrategy(),
+        () => MaterialButtonStrategy(),
+      );
+
+  static ButtonStrategy getStrategyForTheme(PlatformTheme theme) =>
+      StrategySelector.getStrategyForTheme(
+        theme,
+        () => CupertinoButtonStrategy(),
+        () => MaterialButtonStrategy(),
+      );
 }

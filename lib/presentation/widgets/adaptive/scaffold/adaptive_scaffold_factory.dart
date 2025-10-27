@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../common/platform_types.dart';
 import 'scaffold_strategy_factory.dart';
 
 /// 🔶 Adaptive Scaffold Factory
@@ -18,8 +17,7 @@ class AdaptiveScaffoldFactory {
     Widget? bottomNavigationBar,
     Color? backgroundColor,
   }) {
-    final theme = PlatformDetector.getCurrentTheme();
-    final strategy = ScaffoldStrategyFactory.getStrategy(theme);
+    final strategy = ScaffoldStrategyFactory.getStrategy();
 
     return strategy.createScaffold(
       body: body,
