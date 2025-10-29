@@ -28,6 +28,7 @@ library presentation.widgets;
 
 import 'package:flutter/material.dart';
 import '../../domain/entities/card.dart';
+import 'package:card_snap_ui/l10n/app_localizations.dart';
 import 'adaptive/adaptive_widget_module.dart';
 
 // Note: This widget is a domain-specific presentation widget that displays loyalty cards.
@@ -146,16 +147,24 @@ class CardTile extends StatelessWidget {
         }
       },
       itemBuilder: (context) => [
-        const PopupMenuItem(
+        PopupMenuItem(
           value: 'edit',
           child: Row(
-            children: [Icon(Icons.edit), SizedBox(width: 8), Text('Edit')],
+            children: [
+              const Icon(Icons.edit),
+              const SizedBox(width: 8),
+              Text(AppLocalizations.of(context).actionEdit),
+            ],
           ),
         ),
-        const PopupMenuItem(
+        PopupMenuItem(
           value: 'delete',
           child: Row(
-            children: [Icon(Icons.delete), SizedBox(width: 8), Text('Delete')],
+            children: [
+              const Icon(Icons.delete),
+              const SizedBox(width: 8),
+              Text(AppLocalizations.of(context).actionDelete),
+            ],
           ),
         ),
       ],

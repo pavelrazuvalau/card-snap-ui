@@ -403,6 +403,7 @@ For detailed business requirements, see `BUSINESS.md` sections 2.1 (Baseline Fea
 | Testing | `flutter_test`, `mocktail`, `integration_test` | Core + UI + E2E coverage. |
 | Observability | OTel Collector + OpenSearch | Unified traces and dashboards. |
 | CI/CD | GitHub Actions | Lint → Test → Coverage → Build. |
+| Localization | Flutter gen_l10n (`intl`, `flutter_localizations`) | Offline ARB-based translations. |
 
 ### 7.1 pubspec.yaml Baseline
 
@@ -430,6 +431,11 @@ dev_dependencies:
   integration_test:
     sdk: flutter
   very_good_analysis: ^5.1.0   # or `flutter_lints` if preferred
+
+# 🔶 Localization
+# Use Flutter's built-in gen_l10n with ARB files stored locally for offline-first.
+# Languages for MVP: en, ru, uk, pl.
+# Configuration lives in `l10n.yaml`; ARB files in `lib/l10n/`.
 ```
 
 - Add `analysis_options.yaml` referencing the chosen lint package (e.g., `include: package:very_good_analysis/analysis_options.yaml`).
@@ -451,6 +457,80 @@ Card Snap UI must deliver identical learning and runtime value on **Android** an
 | **Build & Release** | CI/CD provides artifacts for both platforms; fastlane (or equivalent) scripts belong in `infra/`. | Reinforces the production-ready objective and keeps release steps reproducible. |
 | **Dependencies** | Avoid platform-only packages unless there is no Flutter-first alternative; when required, wrap them behind abstractions and document trade-offs. | Maintains educational focus on shared architecture patterns. |
 | **Style Guide Compliance** | All UI components must follow [Material Design 3](https://m3.material.io/) (Android) and [iOS Human Interface Guidelines](https://developer.apple.com/design/human-interface-guidelines) (iOS). Document specific values (padding, colors, elevation) with style guide references. | Ensures platform-native look and feel, improves user experience, maintains design consistency. |
+
+### 8.2 Localization (Offline-First)
+
+- Approach: Use Flutter gen_l10n with ARB files stored locally (`lib/l10n/`) to keep translations offline (no network needed). Similar to Angular i18n JSON catalogs.
+- Files:
+  - `l10n.yaml` — generator config
+  - `lib/l10n/app_en.arb`, `app_ru.arb`, `app_uk.arb`, `app_pl.arb` — MVP languages
+  - Output Dart: `lib/l10n/app_localizations.dart` (synthetic-package: false)
+- Wiring: `MaterialApp`/iOS strategy set `localizationsDelegates` and `supportedLocales` for en/ru/uk/pl.
+- Usage: Replace static strings with `AppLocalizations.of(context).key` in widgets.
+- Rationale: Production-standard Flutter i18n, compatible with ICU messages, pluralization, and formatting while preserving offline-first.
+
+#### 8.2.1 Why gen_l10n (generated Dart) instead of runtime YAML/JSON/XML
+
+- Type safety and DX: gen_l10n generates a strongly-typed `AppLocalizations` API. Keys become getters/methods, catching mistakes at compile-time and enabling IDE autocompletion. With raw JSON/YAML/XML you only have string keys (runtime errors, poorer DX).
+- Performance and cold start: Translations compile into Dart AOT code. There’s no file IO or parsing at runtime, which reduces startup work and GC pressure. The compiler can tree‑shake unused locales/messages.
+- ICU features out of the box: ARB (JSON + metadata) supports ICU plural/gender/select and parameterized messages. gen_l10n turns them into idiomatic Dart methods; with raw files you’d have to build and maintain your own formatter/pluralization layer.
+- First‑party integration: gen_l10n is the Flutter‑recommended approach. It wires `localizationsDelegates`, `supportedLocales`, and `intl` formatting correctly for Material/Cupertino widgets, minimizing drift from platform behavior.
+- Offline‑first storage: ARB files live in the repo (`lib/l10n/`) and are bundled in the app—no network fetch. Editors and localization tools can work directly with ARB, while developers consume a typed Dart API.
+- Production practice: Large Flutter apps adopt gen_l10n for its safety, performance, and CI friendliness. Runtime JSON/YAML/XML solutions tend to introduce regressions (missing keys at runtime, inconsistent pluralization, slower startup).
+
+Summary: We keep translators on ARB (JSON-like, tool-friendly) and developers on generated, type-safe Dart. This mirrors Angular’s build-time i18n (catalog → compiled artifacts) rather than ad‑hoc runtime file parsing.
+
+#### 8.2.2 Source of truth and artifacts
+
+- ARB files (`lib/l10n/*.arb`) are the single source of truth for message catalogs (translator-friendly JSON+metadata with ICU support). Do not edit generated Dart.
+- Generated Dart (`lib/l10n/app_localizations*.dart`) is a build artifact providing a type-safe API for developers. It is regenerated whenever ARB changes.
+- This is not duplication: ARB defines content; Dart exposes typed accessors after compile-time validation.
+
+#### 8.2.3 Untranslated messages report
+
+- `untranslated_messages.json` is produced by gen_l10n (see `l10n.yaml` → `untranslated-messages-file`). It lists keys missing in specific locales at generation time.
+- Purpose: CI/QA visibility. We keep it to surface gaps early and to gate merges if desired. Safe to delete between runs; re-generated by the tool.
+
+#### 8.2.4 Supported locales wiring
+
+- Use `AppLocalizations.supportedLocales` rather than hardcoding `Locale` lists. This ensures the app and generator stay in sync when locales are added/removed.
+
+#### 8.2.5 L10n Rules and CI Guard
+
+- All user-facing strings MUST be provided via ARB and accessed with `AppLocalizations`.
+- For language names display, prefer `flutter_localized_locales` (`LocaleNamesLocalizationsDelegate`) and resolve with `LocaleNames.of(context)?.nameOf(localeTag)`.
+- Locale resolution uses `LocaleController.resolveLocale(deviceLocale, supported)`; do not duplicate policy in UI.
+
+CI grep (example step) to block UI literals (exclude tests and generated files):
+
+```bash
+rg -n --glob '!**/test/**' --glob '!**/lib/l10n/**' "\b(Text|SnackBar|AppBar)\s*\(\s*(?:content:\\s*)?Text\s*\(\s*'" lib/ && exit 1 || true
+```
+
+Integrate this in GitHub Actions after analyze step to fail on new literals.
+
+#### 8.2.6 ICU Patterns (plurals/select/params)
+
+- Define pluralized and parameterized messages in ARB using ICU syntax; gen_l10n generates typed APIs.
+- Example (en):
+
+```json
+{
+  "cardsCount": "{count, plural, =0{No cards} one{{count} card} other{{count} cards}}",
+  "cardsCount@placeholders": {"count": {"type": "int"}}
+}
+```
+
+Example usage:
+
+```dart
+Text(AppLocalizations.of(context).cardsCount(numCards))
+```
+
+Guidelines:
+- No string concatenation for numbers/names; always add placeholders.
+- Keep parameter names stable across locales; avoid formatting logic in widgets.
+- Prefer domain-specific keys that are reusable across widgets (e.g., counts, errors).
 
 > When introducing new features, include a note in the PR/commit describing cross-platform considerations (UI, permissions, native integrations) and reference relevant tests or platform adapters.
 

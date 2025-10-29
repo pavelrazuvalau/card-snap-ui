@@ -28,11 +28,12 @@ class AdaptiveAppFactory {
     required String title,
     required Widget home,
     Map<String, WidgetBuilder>? routes,
+    Locale? locale,
   }) {
     final strategy = AppStrategyFactory.getStrategy();
 
     // 🔶 Delegate to strategy
     // 🧠 Strategy creates its own theme internally
-    return strategy.buildApp(title: title, home: home, routes: routes);
+    return strategy.buildApp(title: title, home: home, routes: routes, locale: locale);
   }
 }

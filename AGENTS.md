@@ -376,6 +376,43 @@ The repository follows **GitFlow** for branch management:
 - Run `dart format` and applicable linters before completion; document deviations.
 - **Never import Angular patterns**: No DI containers, token-based registries, or Angular-specific abstractions in Flutter code. Use Flutter-native Factory + Strategy patterns instead.
 
+### 6.1 Localization Enforcement (Agents MUST follow)
+
+- No user-facing literals in UI. Always add a key to ARB (`lib/l10n/*.arb`) and use `AppLocalizations`.
+- Use `AppLocalizations.supportedLocales` as the source of truth; do not hardcode `Locale` lists.
+- For language names in menus, use `LocaleNames.of(context)?.nameOf(localeTag)` (via `flutter_localized_locales`) instead of manual switches.
+- Locale resolution must use the shared helper (`LocaleController.resolveLocale`).
+- Before submitting changes, agents MUST:
+  - add/modify ARB keys (en + ru/uk/pl),
+  - run `flutter gen-l10n`,
+  - replace literals with `AppLocalizations`,
+  - run analyze/tests/format.
+
+CI/Review rule: reject PRs containing UI literals like `Text('...')`, `SnackBar(content: Text('...'))`, or `AppBar(title: Text('...'))` (tests excluded).
+
+### 6.2 ICU Messages (plurals, select, parameters)
+
+- Always prefer ICU patterns over string concatenation/interpolation in UI.
+- Use placeholders in ARB (e.g., `{count}`, `{name}`) and let gen_l10n generate typed methods.
+- Plurals: define once and reuse. Example (in ARB):
+
+```json
+{
+  "cardsCount": "{count, plural, =0{No cards} one{{count} card} other{{count} cards}}",
+  "cardsCount@placeholders": {"count": {"type": "int"}}
+}
+```
+
+Usage in Dart:
+
+```dart
+final label = AppLocalizations.of(context).cardsCount(count);
+```
+
+- Select/gender: use ICU `select` similarly; avoid branching in widgets for message variants.
+- Do not concatenate: avoid patterns like `'$n items'`; always add a proper ICU message.
+- Tests: when adding ICU messages, add at least one widget or unit test per branch (e.g., 0/1/other) in English; translations follow the same keys.
+
 **Best Practices - Core Principles**
 
 - **YAGNI (You Aren't Gonna Need It)**: Don't add patterns, abstractions, or features until actually needed. Start simple, refactor when needed.

@@ -19,6 +19,10 @@ library presentation.widgets.adaptive.app.cupertino;
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:card_snap_ui/l10n/app_localizations.dart';
+import 'package:card_snap_ui/core/platform/locale_controller.dart';
+import 'package:flutter_localized_locales/flutter_localized_locales.dart';
 import 'app_strategy_interface.dart';
 
 /// Cupertino (iOS) app strategy implementation
@@ -32,6 +36,7 @@ class CupertinoAppStrategy implements AppStrategy {
     required String title,
     required Widget home,
     Map<String, WidgetBuilder>? routes,
+    Locale? locale,
   }) {
     // 🧠 Cupertino strategy creates its own iOS-specific theme
     // 🔹 Theme is fully encapsulated within this strategy
@@ -44,6 +49,17 @@ class CupertinoAppStrategy implements AppStrategy {
       darkTheme: darkCupertinoTheme,
       home: home,
       routes: routes ?? {},
+      locale: locale,
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+        LocaleNamesLocalizationsDelegate(),
+      ],
+      supportedLocales: AppLocalizations.supportedLocales,
+      localeResolutionCallback: (deviceLocale, supported) =>
+          LocaleController.resolveLocale(deviceLocale, supported),
       debugShowCheckedModeBanner: false,
     );
   }

@@ -12,6 +12,10 @@
 library presentation.widgets.adaptive.app.material;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:card_snap_ui/l10n/app_localizations.dart';
+import 'package:card_snap_ui/core/platform/locale_controller.dart';
+import 'package:flutter_localized_locales/flutter_localized_locales.dart';
 import 'app_strategy_interface.dart';
 
 /// Material Design app strategy implementation
@@ -25,6 +29,7 @@ class MaterialAppStrategy implements AppStrategy {
     required String title,
     required Widget home,
     Map<String, WidgetBuilder>? routes,
+    Locale? locale,
   }) {
     // 🧠 Material strategy creates its own theme internally
     // 🔹 Theme is fully encapsulated within this strategy
@@ -37,6 +42,17 @@ class MaterialAppStrategy implements AppStrategy {
       darkTheme: darkTheme,
       home: home,
       routes: routes ?? {},
+      locale: locale,
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+        LocaleNamesLocalizationsDelegate(),
+      ],
+      supportedLocales: AppLocalizations.supportedLocales,
+      localeResolutionCallback: (deviceLocale, supported) =>
+          LocaleController.resolveLocale(deviceLocale, supported),
       debugShowCheckedModeBanner: false,
     );
   }

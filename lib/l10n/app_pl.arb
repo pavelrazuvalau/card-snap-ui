@@ -1,0 +1,14 @@
+{
+  "@@locale": "pl",
+  "retry": "Ponów",
+  "noCardsYet": "Brak kart",
+  "emptyHint": "Dodaj pierwszą kartę, skanując kod QR lub kod kreskowy",
+  "unknownState": "Nieznany stan",
+  "languageSystemDefault": "Język systemu",
+  "languageEnglish": "English",
+  "languageRussian": "Русский",
+  "languageUkrainian": "Українська",
+  "languagePolish": "Polski",
+  "actionEdit": "Edytuj",
+  "actionDelete": "Usuń"
+}

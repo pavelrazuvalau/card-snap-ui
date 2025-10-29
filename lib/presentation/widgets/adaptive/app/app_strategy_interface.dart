@@ -25,5 +25,6 @@ abstract class AppStrategy {
     required String title,
     required Widget home,
     Map<String, WidgetBuilder>? routes,
+    Locale? locale,
   });
 }

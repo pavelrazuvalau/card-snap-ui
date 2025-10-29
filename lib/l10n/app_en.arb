@@ -1,0 +1,14 @@
+{
+  "@@locale": "en",
+  "retry": "Retry",
+  "noCardsYet": "No cards yet",
+  "emptyHint": "Add your first loyalty card by scanning a QR code or barcode",
+  "unknownState": "Unknown state",
+  "languageSystemDefault": "System default",
+  "languageEnglish": "English",
+  "languageRussian": "Русский",
+  "languageUkrainian": "Українська",
+  "languagePolish": "Polski",
+  "actionEdit": "Edit",
+  "actionDelete": "Delete"
+}

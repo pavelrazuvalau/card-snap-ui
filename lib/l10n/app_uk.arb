@@ -1,0 +1,14 @@
+{
+  "@@locale": "uk",
+  "retry": "Спробувати ще раз",
+  "noCardsYet": "Поки немає карт",
+  "emptyHint": "Додайте першу карту, відсканувавши QR-код або штрихкод",
+  "unknownState": "Невідомий стан",
+  "languageSystemDefault": "Мова системи",
+  "languageEnglish": "English",
+  "languageRussian": "Русский",
+  "languageUkrainian": "Українська",
+  "languagePolish": "Polski",
+  "actionEdit": "Редагувати",
+  "actionDelete": "Видалити"
+}

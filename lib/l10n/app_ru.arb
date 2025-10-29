@@ -1,0 +1,14 @@
+{
+  "@@locale": "ru",
+  "retry": "Повторить",
+  "noCardsYet": "Пока нет карт",
+  "emptyHint": "Добавьте первую карту, отсканировав QR-код или штрихкод",
+  "unknownState": "Неизвестное состояние",
+  "languageSystemDefault": "Системный по умолчанию",
+  "languageEnglish": "English",
+  "languageRussian": "Русский",
+  "languageUkrainian": "Українська",
+  "languagePolish": "Polski",
+  "actionEdit": "Редактировать",
+  "actionDelete": "Удалить"
+}

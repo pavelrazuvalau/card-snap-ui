@@ -30,11 +30,14 @@ import '../../core/constants/app_constants.dart';
 import '../../core/di/service_locator.dart';
 import '../../data/repositories/local_card_repository.dart';
 import '../../domain/entities/card.dart';
+import 'package:card_snap_ui/l10n/app_localizations.dart';
 import '../widgets/card_tile.dart';
 import '../widgets/offline_indicator.dart';
 import '../blocs/card_list/card_list_bloc.dart';
 import '../blocs/card_list/card_list_event.dart';
 import '../blocs/card_list/card_list_state.dart';
+import '../../core/platform/locale_controller.dart';
+import 'package:flutter_localized_locales/flutter_localized_locales.dart';
 
 /// Main page displaying all loyalty cards
 /// 🔹 Uses BLoC pattern for state management (enterprise best practice)
@@ -60,6 +63,7 @@ class CardListPage extends StatelessWidget {
           title: const Text(AppConstants.appName),
           actions: [
             const OfflineIndicator(),
+            _LocaleMenu(),
             IconButton(
               icon: const Icon(Icons.add),
               onPressed: () => _navigateToAddCard(context),
@@ -109,7 +113,7 @@ class CardListBody extends StatelessWidget {
                   onPressed: () {
                     context.read<CardListBloc>().add(const LoadCardsEvent());
                   },
-                  child: const Text('Retry'),
+                  child: Text(AppLocalizations.of(context).retry),
                 ),
               ],
             ),
@@ -125,7 +129,7 @@ class CardListBody extends StatelessWidget {
           return _buildCardList(context, cards);
         }
 
-        return const Center(child: Text('Unknown state'));
+        return Center(child: Text(AppLocalizations.of(context).unknownState));
       },
     );
   }
@@ -140,12 +144,12 @@ class CardListBody extends StatelessWidget {
           const Icon(Icons.credit_card_outlined, size: 64, color: Colors.grey),
           const SizedBox(height: 16),
           Text(
-            'No cards yet',
+            AppLocalizations.of(context).noCardsYet,
             style: Theme.of(context).textTheme.headlineSmall,
           ),
           const SizedBox(height: 8),
           Text(
-            'Add your first loyalty card by scanning a QR code or barcode',
+            AppLocalizations.of(context).emptyHint,
             style: Theme.of(context).textTheme.bodyMedium,
             textAlign: TextAlign.center,
           ),
@@ -189,5 +193,38 @@ class CardListBody extends StatelessWidget {
   /// Delete card
   void _deleteCard(BuildContext context, String cardId) {
     context.read<CardListBloc>().add(DeleteCardEvent(cardId));
+  }
+}
+
+/// Language selector menu (system default + supported locales)
+class _LocaleMenu extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    const locales = AppLocalizations.supportedLocales;
+    return PopupMenuButton<String>(
+      icon: const Icon(Icons.language),
+      onSelected: (value) {
+        if (value == 'system') {
+          LocaleController.instance.setLocale(null);
+          return;
+        }
+        LocaleController.instance.setLocale(Locale(value));
+      },
+      itemBuilder: (context) => [
+        PopupMenuItem<String>(
+          value: 'system',
+          child: Text(l10n.languageSystemDefault),
+        ),
+        const PopupMenuDivider(),
+        ...locales.map((loc) => PopupMenuItem<String>(
+              value: loc.languageCode,
+              child: Text(
+                LocaleNames.of(context)!.nameOf(loc.toLanguageTag()) ??
+                    loc.languageCode,
+              ),
+            )),
+      ],
+    );
   }
 }

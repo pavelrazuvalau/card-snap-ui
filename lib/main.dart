@@ -26,6 +26,7 @@ import 'core/di/service_locator.dart';
 // Presentation imports
 import 'presentation/pages/card_list_page.dart';
 import 'presentation/widgets/adaptive/adaptive_widget_module.dart';
+import 'core/platform/locale_controller.dart';
 
 /// Main application entry point
 /// 🔹 Bootstrap the Flutter application
@@ -62,15 +63,21 @@ class CardSnapApp extends StatelessWidget {
     // 🔹 Returns MaterialApp for Android/Web, Cupertino-styled MaterialApp for iOS
     // 🧠 This provides native look-and-feel on each platform
     // 🧠 Strategies handle their own themes internally - no configuration needed
-    return AdaptiveAppFactory.createApp(
-      title: AppConstants.appName,
-      home: const CardListPage(),
-      // TODO: Add routing configuration
-      // routes: {
-      //   '/': (context) => const CardListPage(),
-      //   '/add-card': (context) => const AddCardPage(),
-      //   '/card-details': (context) => const CardDetailsPage(),
-      // },
+    return ValueListenableBuilder<Locale?>(
+      valueListenable: LocaleController.instance.locale,
+      builder: (context, selectedLocale, _) {
+        return AdaptiveAppFactory.createApp(
+          title: AppConstants.appName,
+          home: const CardListPage(),
+          locale: selectedLocale,
+          // TODO: Add routing configuration
+          // routes: {
+          //   '/': (context) => const CardListPage(),
+          //   '/add-card': (context) => const AddCardPage(),
+          //   '/card-details': (context) => const CardDetailsPage(),
+          // },
+        );
+      },
     );
   }
 }

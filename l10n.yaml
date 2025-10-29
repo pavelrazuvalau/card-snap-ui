@@ -1,0 +1,9 @@
+# Flutter gen_l10n configuration (official Flutter localization tool)
+arb-dir: lib/l10n
+template-arb-file: app_en.arb
+output-localization-file: app_localizations.dart
+output-class: AppLocalizations
+nullable-getter: false
+untranslated-messages-file: lib/l10n/untranslated_messages.json
+use-escaping: true
+format: true
