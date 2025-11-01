@@ -281,9 +281,11 @@ jobs:
         run: |
           flutter build apk --release
 
-      - name: Build Android App Bundle
-        run: |
-          flutter build appbundle --release
+      # Android App Bundle build disabled until 1.0.0 release
+      # AAB is required for Google Play Store publication, but not needed for testing/development
+      # - name: Build Android App Bundle
+      #   run: |
+      #     flutter build appbundle --release
 
       - name: Prepare artifact names
         id: artifacts
@@ -293,21 +295,21 @@ jobs:
           BUILD_NUM="${{ steps.build_number.outputs.number }}"
           
           APK_NAME="app-${BRANCH_SAFE}-${BUILD_DATE}-${BUILD_NUM}.apk"
-          AAB_NAME="app-${BRANCH_SAFE}-${BUILD_DATE}-${BUILD_NUM}.aab"
+          # AAB_NAME="app-${BRANCH_SAFE}-${BUILD_DATE}-${BUILD_NUM}.aab"
           
           echo "apk_name=$APK_NAME" >> $GITHUB_OUTPUT
-          echo "aab_name=$AAB_NAME" >> $GITHUB_OUTPUT
+          # echo "aab_name=$AAB_NAME" >> $GITHUB_OUTPUT
           echo "Artifact names:"
           echo "  APK: $APK_NAME"
-          echo "  AAB: $AAB_NAME"
+          # echo "  AAB: $AAB_NAME"
 
       - name: Rename Android APK
         run: |
           mv build/app/outputs/flutter-apk/app-release.apk "build/app/outputs/flutter-apk/${{ steps.artifacts.outputs.apk_name }}"
 
-      - name: Rename Android AAB
-        run: |
-          mv build/app/outputs/bundle/release/app-release.aab "build/app/outputs/bundle/release/${{ steps.artifacts.outputs.aab_name }}"
+      # - name: Rename Android AAB
+      #   run: |
+      #     mv build/app/outputs/bundle/release/app-release.aab "build/app/outputs/bundle/release/${{ steps.artifacts.outputs.aab_name }}"
 
       # ============================================================================
       # iOS BUILD (DISABLED - Requires Apple Developer Program)
@@ -350,12 +352,12 @@ jobs:
           path: build/app/outputs/flutter-apk/${{ steps.artifacts.outputs.apk_name }}
           retention-days: 7
 
-      - name: Upload Android AAB
-        uses: actions/upload-artifact@v4
-        with:
-          name: android-aab
-          path: build/app/outputs/bundle/release/${{ steps.artifacts.outputs.aab_name }}
-          retention-days: 7
+      # - name: Upload Android AAB
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: android-aab
+      #     path: build/app/outputs/bundle/release/${{ steps.artifacts.outputs.aab_name }}
+      #     retention-days: 7
 
       # - name: Upload iOS IPA
       #   uses: actions/upload-artifact@v4
@@ -372,5 +374,5 @@ jobs:
           echo "- **Build Date:** ${{ steps.build_date.outputs.date }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Build Number:** ${{ steps.build_number.outputs.number }}" >> $GITHUB_STEP_SUMMARY
           echo "- **APK:** \`${{ steps.artifacts.outputs.apk_name }}\`" >> $GITHUB_STEP_SUMMARY
-          echo "- **AAB:** \`${{ steps.artifacts.outputs.aab_name }}\`" >> $GITHUB_STEP_SUMMARY
+          # echo "- **AAB:** \`${{ steps.artifacts.outputs.aab_name }}\`" >> $GITHUB_STEP_SUMMARY
 
