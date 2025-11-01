@@ -1,22 +1,23 @@
-name: Feature Branch CI
+name: Feature/Bugfix Branch CI
 
 on:
-  # Automatic checks on push to feature branches
+  # Automatic checks on push to feature and bugfix branches
   push:
     branches:
       - 'feature/**'
+      - 'bugfix/**'
   
-  # Manual build trigger for feature branches
+  # Manual build trigger for feature and bugfix branches
   workflow_dispatch:
     inputs:
       branch_name:
-        description: 'Feature branch name (e.g., feature/add-card-scanning)'
+        description: 'Branch name (e.g., feature/add-card-scanning or bugfix/fix-crash)'
         required: true
         type: string
         default: ${{ github.ref_name }}
 
 jobs:
-  # Job for automatic push triggers - only checks
+  # Job for automatic push triggers - only checks (feature and bugfix branches)
   checks:
     runs-on: ubuntu-latest
     if: github.event_name == 'push'
@@ -54,7 +55,7 @@ jobs:
           echo ""
           echo "Review coverage/lcov.info to ensure thresholds are met"
 
-  # Job for manual workflow_dispatch - checks + Android build
+  # Job for manual workflow_dispatch - checks + Android build (feature and bugfix branches)
   build:
     runs-on: ubuntu-latest
     if: github.event_name == 'workflow_dispatch'
