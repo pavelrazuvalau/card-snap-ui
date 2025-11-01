@@ -19,7 +19,7 @@ jobs:
           fetch-depth: 0
 
       - name: Setup GitHub CLI
-        uses: cli/cli@v1
+        uses: actions/setup-github-cli@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
