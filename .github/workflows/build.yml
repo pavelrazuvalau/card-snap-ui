@@ -3,11 +3,7 @@ name: Build Android App
 on:
   # Manual build trigger for any branch
   workflow_dispatch:
-    inputs:
-      branch_name:
-        description: 'Branch name to build (e.g., feature/add-card-scanning, bugfix/fix-crash)'
-        required: true
-        type: string
+    # Branch selection is done via "Use workflow from" dropdown in GitHub UI
 
 jobs:
   # Verify checks status before building
@@ -19,7 +15,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          ref: ${{ inputs.branch_name }}
+          ref: ${{ github.ref_name }}
           fetch-depth: 0
 
       - name: Setup GitHub CLI
@@ -30,7 +26,7 @@ jobs:
       - name: Check if branch is feature or bugfix
         id: branch_check
         run: |
-          BRANCH_NAME="${{ inputs.branch_name }}"
+          BRANCH_NAME="${{ github.ref_name }}"
           
           # Check if branch is feature/ or bugfix/
           IS_FEATURE=false
@@ -58,7 +54,7 @@ jobs:
         id: workflow_status
         if: steps.branch_check.outputs.is_feature_bugfix == 'true'
         run: |
-          BRANCH_NAME="${{ inputs.branch_name }}"
+          BRANCH_NAME="${{ github.ref_name }}"
           
           # Get the latest workflow run for "Feature/Bugfix Branch CI" on this branch
           # This workflow runs automatically on push to feature/* and bugfix/* branches
@@ -94,7 +90,7 @@ jobs:
         id: wait_checks
         if: steps.branch_check.outputs.is_feature_bugfix == 'true' && steps.workflow_status.outputs.has_run == 'true' && steps.workflow_status.outputs.status != 'completed'
         run: |
-          BRANCH_NAME="${{ inputs.branch_name }}"
+          BRANCH_NAME="${{ github.ref_name }}"
           MAX_WAIT_TIME=900   # 15 minutes in seconds (reasonable timeout)
           CHECK_INTERVAL=30   # Check every 30 seconds
           ELAPSED=0
@@ -167,7 +163,7 @@ jobs:
       - name: Verify checks passed for feature or bugfix branch
         if: steps.branch_check.outputs.is_feature_bugfix == 'true'
         run: |
-          BRANCH_NAME="${{ inputs.branch_name }}"
+          BRANCH_NAME="${{ github.ref_name }}"
           HAS_RUN="${{ steps.workflow_status.outputs.has_run }}"
           
           # Use conclusion from wait step if checks were running, otherwise use initial status
@@ -251,7 +247,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          ref: ${{ inputs.branch_name }}
+          ref: ${{ github.ref_name }}
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
@@ -274,7 +270,7 @@ jobs:
       - name: Get build number
         id: build_number
         run: |
-          BRANCH_NAME="${{ inputs.branch_name }}"
+          BRANCH_NAME="${{ github.ref_name }}"
           BUILD_DATE="${{ steps.build_date.outputs.date }}"
           
           # Use script to get next build number
@@ -293,7 +289,7 @@ jobs:
       - name: Prepare artifact names
         id: artifacts
         run: |
-          BRANCH_SAFE=$(echo "${{ inputs.branch_name }}" | sed 's/\//-/g')
+          BRANCH_SAFE=$(echo "${{ github.ref_name }}" | sed 's/\//-/g')
           BUILD_DATE="${{ steps.build_date.outputs.date }}"
           BUILD_NUM="${{ steps.build_number.outputs.number }}"
           
@@ -342,7 +338,7 @@ jobs:
       #
       # - name: Rename iOS IPA
       #   run: |
-      #     BRANCH_SAFE=$(echo "${{ inputs.branch_name }}" | sed 's/\//-/g')
+      #     BRANCH_SAFE=$(echo "${{ github.ref_name }}" | sed 's/\//-/g')
       #     BUILD_DATE="${{ steps.build_date.outputs.date }}"
       #     BUILD_NUM="${{ steps.build_number.outputs.number }}"
       #     IPA_NAME="app-${BRANCH_SAFE}-${BUILD_DATE}-${BUILD_NUM}.ipa"
@@ -373,7 +369,7 @@ jobs:
         run: |
           echo "## Build Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "- **Branch:** ${{ inputs.branch_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Branch:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Build Date:** ${{ steps.build_date.outputs.date }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Build Number:** ${{ steps.build_number.outputs.number }}" >> $GITHUB_STEP_SUMMARY
           echo "- **APK:** \`${{ steps.artifacts.outputs.apk_name }}\`" >> $GITHUB_STEP_SUMMARY
