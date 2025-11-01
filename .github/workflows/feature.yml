@@ -1,0 +1,49 @@
+name: Feature/Bugfix Branch CI
+
+on:
+  # Automatic checks on push to feature and bugfix branches
+  # These branches are merged via PR into 'develop' branch
+  push:
+    branches:
+      - 'feature/**'
+      - 'bugfix/**'
+  
+jobs:
+  # Job for checks - runs automatically on push to feature/bugfix branches
+  # Purpose: Validate code quality before creating PR to develop branch
+  checks:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.35.x'
+          channel: 'stable'
+          cache: true
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Verify formatting
+        run: dart format --set-exit-if-changed .
+
+      - name: Run analyzer
+        run: flutter analyze
+
+      - name: Run tests with coverage
+        run: flutter test --coverage
+
+      - name: Check coverage thresholds
+        run: |
+          echo "Coverage thresholds:"
+          echo "  Domain: 90%+"
+          echo "  Data: 80%+"
+          echo "  Presentation: 70%+"
+          echo "  Core: 85%+"
+          echo ""
+          echo "Review coverage/lcov.info to ensure thresholds are met"
+

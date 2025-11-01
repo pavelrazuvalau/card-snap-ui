@@ -25,30 +25,72 @@ infra/
 
 ### GitHub Actions Workflows
 
-- **[Flutter CI](ci/github-actions/flutter-ci.yml)** - Linting, testing, and building
-- **[Release Pipeline](ci/github-actions/release.yml)** - Automated versioning and deployment
-- **[Security Scan](ci/github-actions/security.yml)** - Dependency and code security checks
+All workflows are located in `.github/workflows/`:
 
-### Build Scripts
+- **[Feature Branch CI](../.github/workflows/feature.yml)** - Automatic checks on push + manual Android builds
+  - **Triggers:** `push` to `feature/**` (checks only), `workflow_dispatch` (manual build)
+  - **Actions:** Lint, format, tests, coverage checks, optional Android build
+  - **Artifacts:** APK/AAB for manual builds (stored as workflow artifacts, 7 days retention)
 
-- **[Android Build](ci/scripts/build-android.sh)** - Android APK/AAB generation
-- **[iOS Build](ci/scripts/build-ios.sh)** - iOS IPA generation
-- **[Cross-Platform Test](ci/scripts/test-cross-platform.sh)** - Multi-platform testing
+- **[Develop Branch CI (Nightly)](../.github/workflows/develop.yml)** - Nightly Android builds
+  - **Triggers:** `push` to `develop`
+  - **Actions:** CHANGELOG validation, lint, tests, Android build, GitHub Release creation
+  - **Releases:** Pre-release with tag format `nightly-YYYYMMDD-<commit-sha>`
+  - **Artifacts:** APK/AAB attached to GitHub Release
+
+- **[Main Branch CI (Releases)](../.github/workflows/main.yml)** - Stable release builds
+  - **Triggers:** `push` to `main`
+  - **Actions:** CHANGELOG validation, lint, tests, Android build, GitHub Release creation
+  - **Releases:** Stable release with tag format `vX.Y.Z`
+  - **Artifacts:** APK/AAB attached to GitHub Release
+
+### Validation Scripts
+
+- **[CHANGELOG Validator](../.github/scripts/validate-changelog.sh)** - Validates CHANGELOG.md entries
+  - Checks for release versions in `main` branch
+  - Checks for nightly versions in `develop` branch
+  - Runs early in workflow (before tests) for fast failure
+
+- **[Build Number Generator](../.github/scripts/get-build-number.sh)** - Auto-increments build numbers
+  - Used for feature branch manual builds
+  - Searches previous builds to determine next number
+  - Format: `app-{branch-name}-{YYYY-MM-DD}-{number}.apk/aab`
+
+### iOS Builds
+
+iOS builds are **prepared but disabled** in all workflows. To enable:
+
+1. **Subscribe to Apple Developer Program** ($99/year)
+2. Create certificates and provisioning profiles
+3. Store in GitHub Secrets:
+   - `APPLE_DEVELOPER_CERTIFICATE_BASE64`
+   - `APPLE_DEVELOPER_CERTIFICATE_PASSWORD`
+   - `APPLE_PROVISIONING_PROFILE_BASE64`
+   - `APPLE_APP_ID`
+4. Uncomment iOS build steps in workflows
+5. Switch runner to `macos-latest`
+
+See workflow comments for detailed instructions.
 
 ## 🚀 Deployment
 
 ### Android Deployment
 
 - **Target**: Android 9+ (API 23+)
-- **Build Types**: Debug, Profile, Release
-- **Signing**: Automated with GitHub Secrets
-- **Distribution**: Google Play Store (future)
+- **Build Types**: Release (unsigned for testing)
+- **Signing**: Currently unsigned (free, no registration required)
+- **Distribution**: 
+  - Feature builds: Workflow artifacts (manual download)
+  - Nightly builds: GitHub Releases (pre-release)
+  - Stable releases: GitHub Releases (latest)
+- **Future**: Signing with keystore for Google Play Store (when ready)
 
 ### iOS Deployment
 
 - **Target**: iOS 15+
-- **Build Types**: Debug, Profile, Release
-- **Signing**: Automated with Apple Developer certificates
+- **Build Types**: Release (requires Apple Developer Program)
+- **Signing**: Requires Apple Developer Program ($99/year)
+- **Status**: Prepared but disabled (uncomment workflow steps when ready)
 - **Distribution**: App Store (future)
 
 ## 📊 Monitoring & Observability
@@ -98,21 +140,25 @@ infra/
 - **Formatting**: dart format
 - **Analysis**: Dart analyzer with strict mode
 
-## 📋 TODO: Infrastructure Setup
+## ✅ Completed: Infrastructure Setup (v0.0.1)
 
-### Immediate Tasks
+### Implemented
 
-1. **Set up GitHub Actions** - Configure CI/CD pipeline
-2. **Configure code signing** - Android keystore and iOS certificates
-3. **Implement logging** - Structured logging with trace IDs
-4. **Set up monitoring** - Performance metrics collection
+1. ✅ **GitHub Actions CI/CD** - Three workflows (feature, develop, main)
+2. ✅ **Automated Android builds** - APK/AAB generation for all branches
+3. ✅ **GitHub Releases automation** - Nightly and stable releases
+4. ✅ **CHANGELOG validation** - Automated checks before releases
+5. ✅ **Code coverage checks** - Enforced per-layer thresholds
+6. ✅ **Build number automation** - Auto-increment for feature builds
+7. ✅ **iOS preparation** - Workflow steps prepared (disabled)
 
 ### Future Enhancements
 
-1. **Automated testing** - Cross-platform test automation
-2. **Release automation** - Semantic versioning and changelog generation
-3. **Security scanning** - Dependency vulnerability checks
-4. **Performance monitoring** - Real-time app performance tracking
+1. **Code signing** - Android keystore and iOS certificates (when ready for store)
+2. **Security scanning** - Dependency vulnerability checks
+3. **Performance monitoring** - Real-time app performance tracking
+4. **Structured logging** - JSON logs with trace IDs
+5. **Metrics collection** - App launch time, rendering performance
 
 ## 🔗 Related Documentation
 

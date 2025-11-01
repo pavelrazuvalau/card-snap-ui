@@ -1,0 +1,399 @@
+name: Build Android App
+
+on:
+  # Manual build trigger for any branch
+  workflow_dispatch:
+    # Branch selection is done via "Use workflow from" dropdown in GitHub UI
+
+jobs:
+  # Verify checks status before building
+  verify-checks:
+    name: Verify Checks Status
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          fetch-depth: 0
+
+      - name: Configure GitHub CLI
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
+
+      - name: Check if branch requires CI verification
+        id: branch_check
+        run: |
+          BRANCH_NAME="${{ github.ref_name }}"
+          
+          # Check if branch is feature/, bugfix/, or release/
+          IS_FEATURE=false
+          IS_BUGFIX=false
+          IS_RELEASE=false
+          
+          if [[ "$BRANCH_NAME" =~ ^feature/ ]]; then
+            IS_FEATURE=true
+            echo "Branch $BRANCH_NAME is a feature branch"
+          fi
+          
+          if [[ "$BRANCH_NAME" =~ ^bugfix/ ]]; then
+            IS_BUGFIX=true
+            echo "Branch $BRANCH_NAME is a bugfix branch"
+          fi
+          
+          if [[ "$BRANCH_NAME" =~ ^release/ ]]; then
+            IS_RELEASE=true
+            echo "Branch $BRANCH_NAME is a release branch"
+          fi
+          
+          if [ "$IS_FEATURE" = "true" ] || [ "$IS_BUGFIX" = "true" ] || [ "$IS_RELEASE" = "true" ]; then
+            echo "requires_ci_check=true" >> $GITHUB_OUTPUT
+            echo "Checking CI status for branch $BRANCH_NAME..."
+          else
+            echo "requires_ci_check=false" >> $GITHUB_OUTPUT
+            echo "Branch $BRANCH_NAME does not require CI verification - skipping checks"
+          fi
+          
+          # Determine workflow name based on branch type
+          if [ "$IS_FEATURE" = "true" ] || [ "$IS_BUGFIX" = "true" ]; then
+            echo "workflow_name=Feature/Bugfix Branch CI" >> $GITHUB_OUTPUT
+          elif [ "$IS_RELEASE" = "true" ]; then
+            echo "workflow_name=Release Branch CI (Pre-Release Testing)" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Get latest workflow run for branch
+        id: workflow_status
+        if: steps.branch_check.outputs.requires_ci_check == 'true'
+        run: |
+          BRANCH_NAME="${{ github.ref_name }}"
+          WORKFLOW_NAME="${{ steps.branch_check.outputs.workflow_name }}"
+          
+          # Get the latest workflow run for this branch type
+          # Feature/bugfix branches: "Feature/Bugfix Branch CI"
+          # Release branches: "Release Branch CI (Pre-Release Testing)"
+          echo "Checking CI status for branch: $BRANCH_NAME"
+          echo "Expected workflow: $WORKFLOW_NAME"
+          RUN_INFO=$(gh run list \
+            --branch "$BRANCH_NAME" \
+            --workflow "$WORKFLOW_NAME" \
+            --limit 1 \
+            --json conclusion,status,url,headSha,event 2>/dev/null || echo '[]')
+          
+          if [ "$RUN_INFO" = "[]" ] || [ -z "$RUN_INFO" ]; then
+            echo "No workflow runs found for branch $BRANCH_NAME"
+            echo "conclusion=none" >> $GITHUB_OUTPUT
+            echo "status=none" >> $GITHUB_OUTPUT
+            echo "has_run=false" >> $GITHUB_OUTPUT
+          else
+            CONCLUSION=$(echo "$RUN_INFO" | jq -r '.[0].conclusion // "null"')
+            STATUS=$(echo "$RUN_INFO" | jq -r '.[0].status // "null"')
+            URL=$(echo "$RUN_INFO" | jq -r '.[0].url // "null"')
+            
+            echo "conclusion=$CONCLUSION" >> $GITHUB_OUTPUT
+            echo "status=$STATUS" >> $GITHUB_OUTPUT
+            echo "url=$URL" >> $GITHUB_OUTPUT
+            echo "has_run=true" >> $GITHUB_OUTPUT
+            
+            echo "Latest CI workflow run:"
+            echo "  Status: $STATUS"
+            echo "  Conclusion: $CONCLUSION"
+            echo "  URL: $URL"
+          fi
+
+      - name: Wait for checks to complete (if running)
+        id: wait_checks
+        if: steps.branch_check.outputs.requires_ci_check == 'true' && steps.workflow_status.outputs.has_run == 'true' && steps.workflow_status.outputs.status != 'completed'
+        run: |
+          BRANCH_NAME="${{ github.ref_name }}"
+          WORKFLOW_NAME="${{ steps.branch_check.outputs.workflow_name }}"
+          MAX_WAIT_TIME=900   # 15 minutes in seconds (reasonable timeout)
+          CHECK_INTERVAL=30   # Check every 30 seconds
+          ELAPSED=0
+          TIMEOUT_REACHED=false
+          
+          echo "⏳ CI checks are still running. Waiting for completion..."
+          echo "Will check every ${CHECK_INTERVAL} seconds (max wait: ${MAX_WAIT_TIME} seconds / $((MAX_WAIT_TIME / 60)) minutes)"
+          
+          while [ $ELAPSED -lt $MAX_WAIT_TIME ]; do
+            # Get current workflow status
+            RUN_INFO=$(gh run list \
+              --branch "$BRANCH_NAME" \
+              --workflow "$WORKFLOW_NAME" \
+              --limit 1 \
+              --json conclusion,status,url 2>/dev/null || echo '[]')
+            
+            if [ "$RUN_INFO" = "[]" ] || [ -z "$RUN_INFO" ]; then
+              echo "⚠️  Warning: Could not retrieve workflow status. Continuing to wait..."
+              sleep $CHECK_INTERVAL
+              ELAPSED=$((ELAPSED + CHECK_INTERVAL))
+              continue
+            fi
+            
+            STATUS=$(echo "$RUN_INFO" | jq -r '.[0].status // "unknown"')
+            CONCLUSION=$(echo "$RUN_INFO" | jq -r '.[0].conclusion // "null"')
+            URL=$(echo "$RUN_INFO" | jq -r '.[0].url // "null"')
+            
+            MINUTES=$((ELAPSED / 60))
+            SECONDS=$((ELAPSED % 60))
+            echo "[${MINUTES}m ${SECONDS}s] Status: $STATUS"
+            
+            if [ "$STATUS" = "completed" ]; then
+              echo "conclusion=$CONCLUSION" >> $GITHUB_OUTPUT
+              echo "url=$URL" >> $GITHUB_OUTPUT
+              echo "timeout_reached=false" >> $GITHUB_OUTPUT
+              
+              if [ "$CONCLUSION" = "success" ]; then
+                echo "✅ CI checks completed successfully after ${MINUTES}m ${SECONDS}s!"
+              else
+                echo "❌ CI checks completed with conclusion: $CONCLUSION after ${MINUTES}m ${SECONDS}s"
+              fi
+              break
+            fi
+            
+            sleep $CHECK_INTERVAL
+            ELAPSED=$((ELAPSED + CHECK_INTERVAL))
+          done
+          
+          if [ $ELAPSED -ge $MAX_WAIT_TIME ]; then
+            TIMEOUT_REACHED=true
+            RUN_INFO=$(gh run list \
+              --branch "$BRANCH_NAME" \
+              --workflow "Feature/Bugfix Branch CI" \
+              --limit 1 \
+              --json conclusion,status,url 2>/dev/null || echo '[]')
+            
+            if [ "$RUN_INFO" != "[]" ] && [ -n "$RUN_INFO" ]; then
+              URL=$(echo "$RUN_INFO" | jq -r '.[0].url // "null"')
+              STATUS=$(echo "$RUN_INFO" | jq -r '.[0].status // "unknown"')
+            else
+              URL="unknown"
+              STATUS="unknown"
+            fi
+            
+            echo "timeout_reached=true" >> $GITHUB_OUTPUT
+            echo "url=$URL" >> $GITHUB_OUTPUT
+            echo "status=$STATUS" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Verify checks passed for branch
+        if: steps.branch_check.outputs.requires_ci_check == 'true'
+        run: |
+          BRANCH_NAME="${{ github.ref_name }}"
+          WORKFLOW_NAME="${{ steps.branch_check.outputs.workflow_name }}"
+          HAS_RUN="${{ steps.workflow_status.outputs.has_run }}"
+          
+          # Use conclusion from wait step if checks were running, otherwise use initial status
+          if [ "${{ steps.wait_checks.outputs.conclusion }}" != "" ]; then
+            CONCLUSION="${{ steps.wait_checks.outputs.conclusion }}"
+            URL="${{ steps.wait_checks.outputs.url }}"
+            STATUS="completed"
+          else
+            CONCLUSION="${{ steps.workflow_status.outputs.conclusion }}"
+            STATUS="${{ steps.workflow_status.outputs.status }}"
+            URL="${{ steps.workflow_status.outputs.url }}"
+          fi
+          
+          if [ "$HAS_RUN" != "true" ]; then
+            echo "❌ Error: No CI checks found for branch $BRANCH_NAME"
+            echo ""
+            echo "This branch requires CI checks to pass before building:"
+            echo "  - feature/* and bugfix/* branches require 'Feature/Bugfix Branch CI'"
+            echo "  - release/* branches require 'Release Branch CI (Pre-Release Testing)'"
+            echo ""
+            echo "Please ensure:"
+            echo "  1. The branch has been pushed to the repository"
+            echo "  2. CI checks have run at least once"
+            echo "  3. Expected workflow: '$WORKFLOW_NAME'"
+            echo ""
+            echo "Push your changes to trigger automatic CI checks."
+            exit 1
+          fi
+          
+          # Check if timeout was reached during waiting
+          TIMEOUT_REACHED="${{ steps.wait_checks.outputs.timeout_reached }}"
+          
+          if [ "$TIMEOUT_REACHED" = "true" ]; then
+            FINAL_STATUS="${{ steps.wait_checks.outputs.status }}"
+            FINAL_URL="${{ steps.wait_checks.outputs.url }}"
+            
+            echo "❌ Error: CI checks did not complete within timeout (15 minutes) for branch $BRANCH_NAME"
+            echo "Final status: $FINAL_STATUS"
+            echo "Workflow URL: $FINAL_URL"
+            echo ""
+            echo "Build cannot proceed without verified CI checks."
+            echo "Please:"
+            echo "  1. Check the CI workflow status manually"
+            echo "  2. Wait for CI checks to complete"
+            echo "  3. Re-run the build after CI checks pass"
+            exit 1
+          fi
+          
+          if [ "$STATUS" != "completed" ]; then
+            echo "❌ Error: CI checks did not complete for branch $BRANCH_NAME"
+            echo "Status: $STATUS"
+            echo "Workflow URL: $URL"
+            echo ""
+            echo "Please wait for CI checks to complete, or check for issues in the workflow run."
+            exit 1
+          fi
+          
+          if [ "$CONCLUSION" != "success" ]; then
+            echo "❌ Error: Latest CI checks did not pass for branch $BRANCH_NAME!"
+            echo "Conclusion: $CONCLUSION"
+            echo "Workflow URL: $URL"
+            echo ""
+            echo "Please fix all CI issues before building:"
+            echo "  - Check formatting: dart format --set-exit-if-changed ."
+            echo "  - Check analyzer: flutter analyze"
+            echo "  - Check tests: flutter test --coverage"
+            echo ""
+            echo "After fixing issues, push your changes to trigger new CI checks."
+            exit 1
+          fi
+          
+          echo "✅ CI checks passed successfully for branch $BRANCH_NAME!"
+          echo "Workflow URL: $URL"
+          echo ""
+          echo "Proceeding with Android build..."
+
+  # Build Android app - only runs after checks verification
+  build:
+    name: Build Android App
+    runs-on: ubuntu-latest
+    needs: verify-checks
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.35.x'
+          channel: 'stable'
+          cache: true
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      # Auto-determine build parameters
+      - name: Set build date
+        id: build_date
+        run: |
+          BUILD_DATE=$(date +%Y-%m-%d)
+          echo "date=$BUILD_DATE" >> $GITHUB_OUTPUT
+          echo "Build date: $BUILD_DATE"
+
+      - name: Get build number
+        id: build_number
+        run: |
+          BRANCH_NAME="${{ github.ref_name }}"
+          BUILD_DATE="${{ steps.build_date.outputs.date }}"
+          
+          # Use script to get next build number
+          BUILD_NUM=$(bash .github/scripts/get-build-number.sh "$BRANCH_NAME" "$BUILD_DATE")
+          echo "number=$BUILD_NUM" >> $GITHUB_OUTPUT
+          echo "Build number: $BUILD_NUM"
+
+      - name: Build Android APK
+        run: |
+          flutter build apk --release
+
+      # Android App Bundle build disabled until 1.0.0 release
+      # AAB is required for Google Play Store publication, but not needed for testing/development
+      # - name: Build Android App Bundle
+      #   run: |
+      #     flutter build appbundle --release
+
+      - name: Prepare artifact names
+        id: artifacts
+        run: |
+          BRANCH_SAFE=$(echo "${{ github.ref_name }}" | sed 's/\//-/g')
+          BUILD_DATE="${{ steps.build_date.outputs.date }}"
+          BUILD_NUM="${{ steps.build_number.outputs.number }}"
+          
+          APK_NAME="app-${BRANCH_SAFE}-${BUILD_DATE}-${BUILD_NUM}.apk"
+          # AAB_NAME="app-${BRANCH_SAFE}-${BUILD_DATE}-${BUILD_NUM}.aab"
+          
+          echo "apk_name=$APK_NAME" >> $GITHUB_OUTPUT
+          # echo "aab_name=$AAB_NAME" >> $GITHUB_OUTPUT
+          echo "Artifact names:"
+          echo "  APK: $APK_NAME"
+          # echo "  AAB: $AAB_NAME"
+
+      - name: Rename Android APK
+        run: |
+          mv build/app/outputs/flutter-apk/app-release.apk "build/app/outputs/flutter-apk/${{ steps.artifacts.outputs.apk_name }}"
+
+      # - name: Rename Android AAB
+      #   run: |
+      #     mv build/app/outputs/bundle/release/app-release.aab "build/app/outputs/bundle/release/${{ steps.artifacts.outputs.aab_name }}"
+
+      # ============================================================================
+      # iOS BUILD (DISABLED - Requires Apple Developer Program)
+      # ============================================================================
+      # To enable iOS builds:
+      # 1. Subscribe to Apple Developer Program ($99/year)
+      # 2. Create certificates and provisioning profiles
+      # 3. Store them in GitHub Secrets:
+      #    - APPLE_DEVELOPER_CERTIFICATE_BASE64
+      #    - APPLE_DEVELOPER_CERTIFICATE_PASSWORD
+      #    - APPLE_PROVISIONING_PROFILE_BASE64
+      #    - APPLE_APP_ID
+      # 4. Uncomment the steps below and switch to macOS runner
+      # 5. Add: runs-on: macos-latest
+      # 
+      # Documentation: https://docs.flutter.dev/deployment/ios
+      # ============================================================================
+      #
+      # - name: Setup iOS Build
+      #   uses: maxim-lobanov/setup-xcode@v1
+      #   with:
+      #     xcode-version: latest-stable
+      #
+      # - name: Build iOS IPA
+      #   run: |
+      #     flutter build ipa --release
+      #
+      # - name: Rename iOS IPA
+      #   run: |
+      #     BRANCH_SAFE=$(echo "${{ github.ref_name }}" | sed 's/\//-/g')
+      #     BUILD_DATE="${{ steps.build_date.outputs.date }}"
+      #     BUILD_NUM="${{ steps.build_number.outputs.number }}"
+      #     IPA_NAME="app-${BRANCH_SAFE}-${BUILD_DATE}-${BUILD_NUM}.ipa"
+      #     mv build/ios/ipa/*.ipa "build/ios/ipa/$IPA_NAME"
+
+      - name: Upload Android APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-apk
+          path: build/app/outputs/flutter-apk/${{ steps.artifacts.outputs.apk_name }}
+          retention-days: 7
+
+      # - name: Upload Android AAB
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: android-aab
+      #     path: build/app/outputs/bundle/release/${{ steps.artifacts.outputs.aab_name }}
+      #     retention-days: 7
+
+      # - name: Upload iOS IPA
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: ios-ipa
+      #     path: build/ios/ipa/${{ steps.artifacts.outputs.ipa_name }}
+      #     retention-days: 7
+
+      - name: Build summary
+        run: |
+          echo "## Build Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Branch:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Build Date:** ${{ steps.build_date.outputs.date }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Build Number:** ${{ steps.build_number.outputs.number }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **APK:** \`${{ steps.artifacts.outputs.apk_name }}\`" >> $GITHUB_STEP_SUMMARY
+          # echo "- **AAB:** \`${{ steps.artifacts.outputs.aab_name }}\`" >> $GITHUB_STEP_SUMMARY
+

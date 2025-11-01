@@ -831,23 +831,87 @@ refactor(ui): simplify dashboard rebuild logic
 
 ## 20. Branching Strategy
 
-The repository follows **GitFlow**, adapted for AI-managed workflows.
+The repository follows **GitFlow**, adapted for AI-managed workflows with clear branch responsibilities and merge paths.
 
-| Branch | Purpose |
-|--------|---------|
-| `main` | Stable production releases only. |
-| `develop` | Active development (feature merges). |
-| `feature/*` | One feature or task per branch. |
-| `release/*` | Pre-release stabilization. |
-| `hotfix/*` | Urgent fixes against production. |
+### 20.1 Branch Types and Responsibilities
 
-### Example Workflow
+| Branch | Purpose | Merge Target | CI/CD Behavior |
+|--------|---------|--------------|----------------|
+| `main` | **Stable production releases only.** Represents the latest released version. | N/A (protected branch) | On merge from `release/*`: Full release build, create GitHub Release, tag version |
+| `develop` | **Active development integration branch.** Contains latest features and bugfixes merged from feature/bugfix branches. | N/A (protected branch) | On push: Nightly builds, validate CHANGELOG for nightly entries, create pre-release |
+| `feature/*` | **New feature development.** One feature per branch. Examples: `feature/add-card-scanning`, `feature/offline-sync` | Merged into `develop` via PR | On push: Code quality checks (formatting, analyzer, tests, coverage) |
+| `bugfix/*` | **Bug fixes and patches.** Examples: `bugfix/fix-crash-on-startup`, `bugfix/memory-leak` | Merged into `develop` via PR | On push: Code quality checks (formatting, analyzer, tests, coverage) |
+| `release/*` | **Pre-release stabilization and testing.** Created before major releases for final testing. Examples: `release/1.0.0`, `release/0.1.0` | Merged into `main` via PR | On push: Full validation (CHANGELOG, tests, build), create pre-release APK for testing |
+| `hotfix/*` | **Urgent production fixes.** For critical bugs that need immediate release. | Merged into both `main` and `develop` | On push: Full validation and build (future: automated hotfix workflow) |
 
-1. Create `feature/auth-login`.
-2. Develop & test → commit via Cursor using Conventional Commits.
-3. Open PR into `develop`; CI must pass and reviewers approve.
-4. Create `release/1.0.0` for stabilization.
-5. Merge to `main`, tag `v1.0.0`, and deploy.
+### 20.2 Branching Workflow
+
+#### Development Flow (Feature/Bugfix → Develop)
+
+1. **Create feature/bugfix branch** from `develop`:
+   ```bash
+   git checkout develop
+   git pull origin develop
+   git checkout -b feature/add-card-scanning
+   # or
+   git checkout -b bugfix/fix-memory-leak
+   ```
+
+2. **Develop and test**:
+   - Make changes with Conventional Commits
+   - Push commits → automatic CI checks run (formatting, analyzer, tests)
+   - Fix any CI failures
+
+3. **Create Pull Request** into `develop`:
+   - PR description should follow project standards
+   - CI must pass (checks are automatically re-run on PR)
+   - Code review required (enforced by branch protection)
+
+4. **Merge to `develop`**:
+   - After PR approval and CI pass
+   - Merge triggers `develop` workflow → nightly build created
+   - CHANGELOG must have nightly entry for version
+
+#### Release Flow (Develop → Release → Main)
+
+1. **Create release branch** from `develop`:
+   ```bash
+   git checkout develop
+   git pull origin develop
+   git checkout -b release/1.0.0
+   ```
+   - Update `pubspec.yaml` version to target release (e.g., `1.0.0`)
+   - Ensure `CHANGELOG.md` has entry for this version with release notes
+   - Push release branch
+
+2. **Pre-release testing** on `release/*` branch:
+   - CI automatically runs: CHANGELOG validation, full test suite, build
+   - Pre-release APK is created for testing
+   - Test thoroughly on real devices
+   - Fix any issues found during testing
+
+3. **Merge to `main`** via PR:
+   - After successful testing, create PR from `release/*` to `main`
+   - PR should reference release notes from CHANGELOG
+   - CI must pass (release workflow runs automatically)
+   - After merge: Official release build created, GitHub Release published, version tagged
+
+4. **Backmerge to `develop`** (if needed):
+   - After release, merge `release/*` changes back to `develop` if any release-specific fixes were made
+   - Usually `develop` is already ahead, so this may not be necessary
+
+### 20.3 CI/CD Integration
+
+- **Feature/Bugfix branches**: Automatic checks on push (formatting, analyzer, tests, coverage)
+- **Develop branch**: Nightly builds on merge from feature/bugfix PRs (validates CHANGELOG, builds APK, creates pre-release)
+- **Release branches**: Pre-release validation and builds (full test suite, CHANGELOG validation, creates test APK)
+- **Main branch**: Official release builds (validates CHANGELOG, builds release artifacts, creates GitHub Release, tags version)
+
+### 20.4 Branch Protection Rules
+
+- **`main`**: Protected branch, requires PR approval, CI must pass, no direct pushes
+- **`develop`**: Protected branch, requires PR approval, CI must pass, no direct pushes
+- **Feature/Bugfix/Release**: No protection (developers can push directly for CI checks)
 
 GitKraken MCP and Cursor enforce branch protections and CI requirements automatically.
 
