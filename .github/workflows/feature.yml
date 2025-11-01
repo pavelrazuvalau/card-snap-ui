@@ -14,7 +14,6 @@ on:
         description: 'Branch name (e.g., feature/add-card-scanning or bugfix/fix-crash)'
         required: true
         type: string
-        default: ${{ github.ref_name }}
 
 jobs:
   # Job for automatic push triggers - only checks (feature and bugfix branches)
@@ -64,7 +63,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          ref: ${{ inputs.branch_name }}
+          ref: ${{ inputs.branch_name || github.ref_name }}
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
