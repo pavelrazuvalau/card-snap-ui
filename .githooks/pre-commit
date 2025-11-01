@@ -20,14 +20,6 @@ NC='\033[0m' # No Color
 # Get current branch name
 BRANCH_NAME=$(git rev-parse --abbrev-ref HEAD)
 
-# Get commit message (from COMMIT_MSG file or stdin)
-COMMIT_MSG_FILE="$1"
-if [ -n "$COMMIT_MSG_FILE" ]; then
-  COMMIT_MSG=$(cat "$COMMIT_MSG_FILE")
-else
-  COMMIT_MSG=$(cat)
-fi
-
 ERRORS=0
 
 echo -e "${GREEN}Running pre-commit checks...${NC}"
@@ -129,37 +121,9 @@ else
 fi
 
 # ============================================================================
-# 3. Check Commit Message Format (Conventional Commits)
-# ============================================================================
-
-echo -e "${YELLOW}Checking commit message format...${NC}"
-
-# Remove leading/trailing whitespace and get first line
-FIRST_LINE=$(echo "$COMMIT_MSG" | head -n 1 | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
-
-# Conventional Commits pattern: type(scope): description
-# Types: feat, fix, docs, style, refactor, test, chore
-CONVENTIONAL_PATTERN='^(feat|fix|docs|style|refactor|test|chore)(\([^)]+\))?: .+$'
-
-if echo "$FIRST_LINE" | grep -qE "$CONVENTIONAL_PATTERN"; then
-  echo -e "${GREEN}✓ Commit message follows Conventional Commits format${NC}"
-else
-  echo -e "${RED}❌ Invalid commit message format${NC}"
-  echo -e "${YELLOW}Commit message must follow Conventional Commits:${NC}"
-  echo -e "  Format: \`type(scope): description\`"
-  echo -e "  Types: feat, fix, docs, style, refactor, test, chore"
-  echo -e "  Examples:"
-  echo -e "    feat(auth): add token refresh on login"
-  echo -e "    fix(devices): prevent crash when device id is null"
-  echo -e "    docs(domain): explain device sync use case"
-  echo -e "    refactor(ui): simplify dashboard rebuild logic"
-  echo -e ""
-  echo -e "${YELLOW}Your message:${NC} $FIRST_LINE"
-  ERRORS=$((ERRORS + 1))
-fi
-
-# ============================================================================
 # Summary
+# ============================================================================
+# Note: Commit message format is validated by commit-msg hook, not here
 # ============================================================================
 
 if [ $ERRORS -eq 0 ]; then
