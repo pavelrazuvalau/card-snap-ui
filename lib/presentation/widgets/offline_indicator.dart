@@ -22,6 +22,9 @@
 /// In Flutter/Dart, we use widgets with connectivity monitoring and adaptive theming.
 /// 🧠 This widget integrates with core/platform/browser_launcher.dart for platform detection
 /// and uses adaptive styling to match the current platform theme.
+///
+/// See STYLEGUIDE.md#32-const-constructors (§3.2) (const constructors), STYLEGUIDE.md#31-super-parameters (§3.1) (super.key),
+/// and STYLEGUIDE.md#7-platform-style-guide-compliance (§7) (Platform Style Guides) for implementation guidelines.
 library presentation.widgets;
 
 import 'package:flutter/material.dart';
@@ -31,6 +34,7 @@ import 'adaptive/adaptive_widget_module.dart';
 /// 🔹 Shows when device is offline
 /// 🔹 Offline-first approach (from BUSINESS.md requirements)
 /// 🧠 Integrates with browser launcher platform detection for consistent theming
+/// See STYLEGUIDE.md#32-const-constructors (§3.2) for const constructors and STYLEGUIDE.md#31-super-parameters (§3.1) for super parameters
 class OfflineIndicator extends StatelessWidget {
   const OfflineIndicator({super.key});
 

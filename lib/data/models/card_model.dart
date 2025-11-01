@@ -17,6 +17,9 @@
 /// ```
 ///
 /// In Flutter/Dart, we use data models with JSON serialization.
+///
+/// See STYLEGUIDE.md#81-immutable-models (§8.1) for Immutable Models guidelines,
+/// STYLEGUIDE.md#32-const-constructors (§3.2) for const constructors, and STYLEGUIDE.md#22-dart-syntax-explained-with-angulartypescript-analogies (§2.2) for factory methods.
 library data.models;
 
 import '../../domain/entities/card.dart';

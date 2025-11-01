@@ -10,6 +10,9 @@
 /// - Converts Material AppBar to CupertinoNavigationBar when needed
 ///
 /// Angular analogy: iOS-native page layout with HIG compliance.
+///
+/// See STYLEGUIDE.md#72-ios-human-interface-guidelines-hig (§7.2) for iOS Human Interface Guidelines compliance requirements
+/// and STYLEGUIDE.md#73-style-guide-documentation-requirements (§7.3) for documentation standards with style guide references.
 
 import 'package:flutter/material.dart' show AppBar, MainAxisSize, Row, Widget;
 import 'package:flutter/cupertino.dart';

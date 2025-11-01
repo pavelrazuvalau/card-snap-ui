@@ -13,6 +13,8 @@
 /// ```
 ///
 /// In Flutter/Dart, we use static const for compile-time constants.
+///
+/// See STYLEGUIDE.md#32-const-constructors (§3.2) for const declaration guidelines and best practices.
 library core.constants;
 
 /// Application metadata constants

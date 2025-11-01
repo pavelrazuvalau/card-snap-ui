@@ -7,6 +7,9 @@
 /// This module provides platform-agnostic UI components that adapt to different
 /// platforms (Android Material, iOS Cupertino, Web) while maintaining consistent
 /// behavior and appearance.
+///
+/// See STYLEGUIDE.md#44-shared-utilities (§4.4) (Shared Utilities) and STYLEGUIDE.md#5-educational-comment-taxonomy (§5) (Educational Comment Taxonomy)
+/// for module organization and documentation standards.
 library presentation.widgets.adaptive;
 
 import 'package:flutter/material.dart';

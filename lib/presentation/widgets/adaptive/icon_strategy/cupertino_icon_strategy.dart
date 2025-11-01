@@ -8,6 +8,9 @@
 /// - Uses CupertinoColors for system colors
 ///
 /// Angular analogy: iOS-native icon service.
+///
+/// See STYLEGUIDE.md#72-ios-human-interface-guidelines-hig (§7.2) for iOS Human Interface Guidelines compliance requirements
+/// and STYLEGUIDE.md#73-style-guide-documentation-requirements (§7.3) for documentation standards with style guide references.
 
 library presentation.widgets.adaptive.icon_strategy.cupertino;
 

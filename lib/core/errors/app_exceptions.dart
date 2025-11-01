@@ -14,10 +14,14 @@
 /// ```
 ///
 /// In Flutter/Dart, we use custom exceptions and error handling.
+///
+/// See STYLEGUIDE.md#83-error-handling-pattern (§8.3) for Error Handling Pattern (Result<T>),
+/// STYLEGUIDE.md#31-super-parameters (§3.1) for super parameters, and STYLEGUIDE.md#22-dart-syntax-explained-with-angulartypescript-analogies (§2.2) for sealed classes and factory constructors.
 library core.errors;
 
 /// Base application exception
 /// 🔹 All custom exceptions extend this for consistent error handling
+/// See STYLEGUIDE.md#31-super-parameters (§3.1) for super parameters usage
 abstract class AppException implements Exception {
   /// Error message for display to user
   final String message;
@@ -28,6 +32,7 @@ abstract class AppException implements Exception {
   /// Trace ID for correlating errors across layers
   final String? traceId;
 
+  /// See STYLEGUIDE.md#32-const-constructors (§3.2) for const constructor guidelines
   const AppException(this.message, {this.technicalDetails, this.traceId});
 
   @override
@@ -83,7 +88,9 @@ class LocalizationException extends AppException {
 /// Result wrapper for error handling
 /// 🔹 Similar to TypeScript's Result<T, E> pattern or Rust's Result
 /// 🔹 Forces explicit error handling (no silent failures)
+/// See STYLEGUIDE.md#83-error-handling-pattern (§8.3) for comprehensive Error Handling Pattern documentation
 sealed class Result<T> {
+  /// See STYLEGUIDE.md#32-const-constructors (§3.2) for const constructors and STYLEGUIDE.md#22-dart-syntax-explained-with-angulartypescript-analogies (§2.2) for sealed classes
   const Result();
 
   /// Success result with data

@@ -22,6 +22,9 @@
 /// In Flutter/Dart, we use BLoC pattern with BlocBuilder for reactive UI.
 /// 🧠 This page uses BLoC pattern instead of StatefulWidget + setState
 /// 🧠 Following enterprise Flutter best practices
+///
+/// See STYLEGUIDE.md#32-const-constructors (§3.2) (const constructors), STYLEGUIDE.md#31-super-parameters (§3.1) (super.key),
+/// STYLEGUIDE.md#6-localization-standards (§6) (Localization), and STYLEGUIDE.md#82-dependency-injection (§8.2) (Dependency Injection) for implementation guidelines.
 library presentation.pages;
 
 import 'package:flutter/material.dart';
@@ -43,6 +46,7 @@ import 'package:flutter_localized_locales/flutter_localized_locales.dart';
 /// 🔹 Uses BLoC pattern for state management (enterprise best practice)
 /// 🔹 StatelessWidget with BlocBuilder for reactive UI
 /// 🧠 Similar to Angular components with NgRx store subscription
+/// See STYLEGUIDE.md#32-const-constructors (§3.2) for const constructors and STYLEGUIDE.md#31-super-parameters (§3.1) for super parameters
 class CardListPage extends StatelessWidget {
   const CardListPage({super.key});
 
@@ -89,6 +93,7 @@ class CardListPage extends StatelessWidget {
 /// Body widget that reacts to BLoC state changes
 /// 🔹 Uses BlocBuilder for reactive UI
 /// 🧠 Similar to Angular async pipe in template
+/// See STYLEGUIDE.md#32-const-constructors (§3.2) for const constructors and STYLEGUIDE.md#6-localization-standards (§6) for Localization usage
 class CardListBody extends StatelessWidget {
   const CardListBody({super.key});
 
@@ -217,13 +222,15 @@ class _LocaleMenu extends StatelessWidget {
           child: Text(l10n.languageSystemDefault),
         ),
         const PopupMenuDivider(),
-        ...locales.map((loc) => PopupMenuItem<String>(
-              value: loc.languageCode,
-              child: Text(
-                LocaleNames.of(context)!.nameOf(loc.toLanguageTag()) ??
-                    loc.languageCode,
-              ),
-            )),
+        ...locales.map(
+          (loc) => PopupMenuItem<String>(
+            value: loc.languageCode,
+            child: Text(
+              LocaleNames.of(context)!.nameOf(loc.toLanguageTag()) ??
+                  loc.languageCode,
+            ),
+          ),
+        ),
       ],
     );
   }

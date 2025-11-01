@@ -16,6 +16,9 @@
 /// ```
 ///
 /// In Flutter/Dart, we use dedicated use case classes for single operations.
+///
+/// See STYLEGUIDE.md#82-dependency-injection (§8.2) for Dependency Injection (constructor injection),
+/// STYLEGUIDE.md#83-error-handling-pattern (§8.3) for Error Handling Pattern (Result<T>), and STYLEGUIDE.md#22-dart-syntax-explained-with-angulartypescript-analogies (§2.2) for async/await patterns.
 library domain.usecases;
 
 import '../entities/card.dart';
@@ -56,16 +59,19 @@ class AddCardRequest {
 /// Use case for adding a new card
 /// 🔶 Single Responsibility Principle - one business operation
 /// 🔹 Pure domain logic - no UI or framework dependencies
+/// See STYLEGUIDE.md#13-best-practices---core-principles (§1.3) (SOLID principles) and STYLEGUIDE.md#82-dependency-injection (§8.2) (Dependency Injection)
 class AddCard {
   final CardRepository repository;
 
   /// Constructor injection (like Angular dependency injection)
   /// 🔹 Depends on abstraction, not implementation
+  /// See STYLEGUIDE.md#32-const-constructors (§3.2) for const constructors and STYLEGUIDE.md#82-dependency-injection (§8.2) for DI patterns
   const AddCard(this.repository);
 
   /// Execute the use case
   /// 🔹 Main business operation
   /// 🧠 Offline-first: works without network connectivity
+  /// See STYLEGUIDE.md#83-error-handling-pattern (§8.3) for Result<T> error handling and STYLEGUIDE.md#22-dart-syntax-explained-with-angulartypescript-analogies (§2.2) for async/await
   Future<Result<LoyaltyCard>> execute(AddCardRequest request) async {
     try {
       // Business validation

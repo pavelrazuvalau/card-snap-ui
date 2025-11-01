@@ -18,7 +18,8 @@ This architecture ensures consistency in code, commits, and documentation across
 - Observability and traceability practices.
 
 > **Guiding principle:** Depth of understanding outweighs speed. Every file, comment, and commit should teach humans *and* AI.  
-> **Critical reference:** All business requirements, functional specifications, user stories, data models, and feature priorities are defined in `BUSINESS.md`. This document serves as the **primary source of truth** for business rules. Architecture decisions must align with business requirements outlined in `BUSINESS.md`.
+> **Critical reference:** All business requirements, functional specifications, user stories, data models, and feature priorities are defined in `BUSINESS.md`. This document serves as the **primary source of truth** for business rules. Architecture decisions must align with business requirements outlined in `BUSINESS.md`.  
+> **Code style standards:** All coding style standards, Dart/Flutter best practices, and syntax explanations are defined in `STYLEGUIDE.md`. This document serves as the **single source of truth** for code style.
 
 ---
 
@@ -64,16 +65,9 @@ This architecture ensures consistency in code, commits, and documentation across
 
 ## 4. Syntax Comparison (Angular → Flutter / Dart)
 
-| Concept | Angular / TypeScript | Flutter / Dart | Analogy |
-|---------|----------------------|----------------|---------|
-| Component | `@Component` class | `Widget` | View + logic |
-| Template | HTML + bindings | Widget tree + properties | Declarative UI |
-| Dependency Injection | Angular Injector | `get_it`, `provider` | Inversion of control |
-| RxJS Observable | `Observable<T>` | `Stream<T>` / `Future<T>` | Async pipeline |
-| Module system | `NgModule` | import + library | Grouping |
-| Change Detection | Zone.js | Flutter render / `setState` | Rebuild triggers |
+**All syntax comparisons and Dart language explanations with Angular/TypeScript analogies are defined in `STYLEGUIDE.md` §2.**
 
-Use this mapping when writing comments so Angular developers can build Dart intuition quickly.
+See `STYLEGUIDE.md` §2.1 for the complete syntax comparison table and §2.2 for detailed Dart syntax explanations with examples.
 
 ---
 
@@ -204,10 +198,10 @@ return AdaptiveAppFactory.createApp(
 - **Platform Detection:** Automatic selection between Material and Cupertino based on runtime platform
 - **Zero Configuration:** main.dart doesn't need to know about themes at all
 
-**Style Guide Compliance** - All strategy implementations must follow official platform design guidelines:
+**Style Guide Compliance** - All strategy implementations must follow official platform design guidelines. **See `STYLEGUIDE.md` §7** for comprehensive platform style guide compliance requirements, examples, and documentation standards.
 
-- **Material Design 3** ([https://m3.material.io/](https://m3.material.io/)) for Android/Web (elevation 1dp, padding 16dp, 12dp border radius)
-- **iOS Human Interface Guidelines** ([https://developer.apple.com/design/human-interface-guidelines](https://developer.apple.com/design/human-interface-guidelines)) for iOS (shadows instead of elevation, padding 16pt, 44pt minimum touch target)
+- **Material Design 3** ([https://m3.material.io/](https://m3.material.io/)) for Android/Web (elevation 1dp, padding 16dp, 12dp border radius) - **See `STYLEGUIDE.md` §7.1**
+- **iOS Human Interface Guidelines** ([https://developer.apple.com/design/human-interface-guidelines](https://developer.apple.com/design/human-interface-guidelines)) for iOS (shadows instead of elevation, padding 16pt, 44pt minimum touch target) - **See `STYLEGUIDE.md` §7.2**
 
 **Repository Pattern** - Abstracts data access layer with `CardRepository` interface and implementations. Similar to Angular's service layer that abstracts HTTP calls.
 
@@ -217,17 +211,15 @@ return AdaptiveAppFactory.createApp(
 
 **Best Practices Applied**
 
-- **YAGNI (You Aren't Gonna Need It)**: Only add patterns when actually needed, start simple.
-- **DRY (Don't Repeat Yourself)**: Extract common logic, but only when duplication occurs more than twice.
-- **KISS (Keep It Simple, Stupid)**: Prefer simple solutions that both humans and AI can understand.
-- **SOLID Principles**: Apply Single Responsibility, Open/Closed, and Dependency Inversion in architecture decisions.
-- **Occam's Razor**: When multiple solutions exist, choose the simplest one.
-- **Avoid Premature Optimization**: Focus on correctness first, optimize when profiling shows issues.
+**All best practices (YAGNI, DRY, KISS, SOLID, Occam's Razor, Avoid Premature Optimization) are defined in `STYLEGUIDE.md` §1.3.**
+
+See `STYLEGUIDE.md` §1.3 for comprehensive best practices guidelines with detailed explanations and examples.
 
 **File Organization**
-- **Co-location**: Keep related files together. Strategies live with their factories in the same folder.
-- **Meaningful Names**: File names should describe their purpose clearly.
-- **Shared Utilities**: Place common code in `common/` subdirectory.
+
+**All file organization rules (co-location, meaningful names, separate files by role, shared utilities) are defined in `STYLEGUIDE.md` §4.**
+
+See `STYLEGUIDE.md` §4 for comprehensive file organization guidelines with structure examples and naming conventions.
 
 **SOLID Compliance**
 - **Open/Closed Principle**: Each widget factory is self-contained. To add a new widget, create a new folder with factory + strategy. No central registry needs modification.
@@ -460,107 +452,34 @@ Card Snap UI must deliver identical learning and runtime value on **Android** an
 
 ### 8.2 Localization (Offline-First)
 
-- Approach: Use Flutter gen_l10n with ARB files stored locally (`lib/l10n/`) to keep translations offline (no network needed). Similar to Angular i18n JSON catalogs.
-- Files:
-  - `l10n.yaml` — generator config
-  - `lib/l10n/app_en.arb`, `app_ru.arb`, `app_uk.arb`, `app_pl.arb` — MVP languages
-  - Output Dart: `lib/l10n/app_localizations.dart` (synthetic-package: false)
-- Wiring: `MaterialApp`/iOS strategy set `localizationsDelegates` and `supportedLocales` for en/ru/uk/pl.
-- Usage: Replace static strings with `AppLocalizations.of(context).key` in widgets.
-- Rationale: Production-standard Flutter i18n, compatible with ICU messages, pluralization, and formatting while preserving offline-first.
+**All localization standards, ICU message patterns, ARB file structure, and best practices are defined in `STYLEGUIDE.md` §6.**
 
-#### 8.2.1 Why gen_l10n (generated Dart) instead of runtime YAML/JSON/XML
+Card Snap UI uses Flutter gen_l10n with ARB files stored locally (`lib/l10n/`) for offline-first translations, similar to Angular i18n JSON catalogs.
 
-- Type safety and DX: gen_l10n generates a strongly-typed `AppLocalizations` API. Keys become getters/methods, catching mistakes at compile-time and enabling IDE autocompletion. With raw JSON/YAML/XML you only have string keys (runtime errors, poorer DX).
-- Performance and cold start: Translations compile into Dart AOT code. There’s no file IO or parsing at runtime, which reduces startup work and GC pressure. The compiler can tree‑shake unused locales/messages.
-- ICU features out of the box: ARB (JSON + metadata) supports ICU plural/gender/select and parameterized messages. gen_l10n turns them into idiomatic Dart methods; with raw files you’d have to build and maintain your own formatter/pluralization layer.
-- First‑party integration: gen_l10n is the Flutter‑recommended approach. It wires `localizationsDelegates`, `supportedLocales`, and `intl` formatting correctly for Material/Cupertino widgets, minimizing drift from platform behavior.
-- Offline‑first storage: ARB files live in the repo (`lib/l10n/`) and are bundled in the app—no network fetch. Editors and localization tools can work directly with ARB, while developers consume a typed Dart API.
-- Production practice: Large Flutter apps adopt gen_l10n for its safety, performance, and CI friendliness. Runtime JSON/YAML/XML solutions tend to introduce regressions (missing keys at runtime, inconsistent pluralization, slower startup).
+**Key Points:**
+- Production-standard Flutter i18n, compatible with ICU messages, pluralization, and formatting
+- Offline-first: ARB files bundled in app, no network dependency
+- Type-safe generated Dart API (gen_l10n)
+- MVP languages: en, ru, uk, pl; extended set includes de, fr, es, it, nl, sv
 
-Summary: We keep translators on ARB (JSON-like, tool-friendly) and developers on generated, type-safe Dart. This mirrors Angular’s build-time i18n (catalog → compiled artifacts) rather than ad‑hoc runtime file parsing.
-
-#### 8.2.2 Source of truth and artifacts
-
-- ARB files (`lib/l10n/*.arb`) are the single source of truth for message catalogs (translator-friendly JSON+metadata with ICU support). Do not edit generated Dart.
-- Generated Dart (`lib/l10n/app_localizations*.dart`) is a build artifact providing a type-safe API for developers. It is regenerated whenever ARB changes.
-- This is not duplication: ARB defines content; Dart exposes typed accessors after compile-time validation.
-
-#### 8.2.3 Untranslated messages report
-
-- `untranslated_messages.json` is produced by gen_l10n (see `l10n.yaml` → `untranslated-messages-file`). It lists keys missing in specific locales at generation time.
-- Purpose: CI/QA visibility. We keep it to surface gaps early and to gate merges if desired. Safe to delete between runs; re-generated by the tool.
-
-#### 8.2.4 Supported locales wiring
-
-- Use `AppLocalizations.supportedLocales` rather than hardcoding `Locale` lists. This ensures the app and generator stay in sync when locales are added/removed.
-
-#### 8.2.5 L10n Rules and CI Guard
-
-- All user-facing strings MUST be provided via ARB and accessed with `AppLocalizations`.
-- For language names display, prefer `flutter_localized_locales` (`LocaleNamesLocalizationsDelegate`) and resolve with `LocaleNames.of(context)?.nameOf(localeTag)`.
-- Locale resolution uses `LocaleController.resolveLocale(deviceLocale, supported)`; do not duplicate policy in UI.
-
-CI grep (example step) to block UI literals (exclude tests and generated files):
-
-```bash
-rg -n --glob '!**/test/**' --glob '!**/lib/l10n/**' "\b(Text|SnackBar|AppBar)\s*\(\s*(?:content:\\s*)?Text\s*\(\s*'" lib/ && exit 1 || true
-```
-
-Integrate this in GitHub Actions after analyze step to fail on new literals.
-
-#### 8.2.6 ICU Patterns (plurals/select/params)
-
-- Define pluralized and parameterized messages in ARB using ICU syntax; gen_l10n generates typed APIs.
-- Example (en):
-
-```json
-{
-  "cardsCount": "{count, plural, =0{No cards} one{{count} card} other{{count} cards}}",
-  "cardsCount@placeholders": {"count": {"type": "int"}}
-}
-```
-
-Example usage:
-
-```dart
-Text(AppLocalizations.of(context).cardsCount(numCards))
-```
-
-Guidelines:
-- No string concatenation for numbers/names; always add placeholders.
-- Keep parameter names stable across locales; avoid formatting logic in widgets.
-- Prefer domain-specific keys that are reusable across widgets (e.g., counts, errors).
+See `STYLEGUIDE.md` §6 for:
+- ARB file structure and wiring (§6.2)
+- Why gen_l10n over runtime YAML/JSON/XML (§6.2 rationale)
+- ICU message patterns with examples (§6.4)
+- Supported locales handling (§6.3)
+- CI guards and validation (§6.7)
 
 > When introducing new features, include a note in the PR/commit describing cross-platform considerations (UI, permissions, native integrations) and reference relevant tests or platform adapters.
 
 ### 8.1 Platform Style Guides
 
-**Material Design 3 (Android/Web)**
-- **Reference:** [Material Design 3 Guidelines](https://m3.material.io/)
-- **Components:** [Cards](https://m3.material.io/components/cards), [Buttons](https://m3.material.io/components/buttons)
-- **Default Values:**
-  - Elevation: 1dp for cards, 3dp for elevated components
-  - Padding: 16dp (standard spacing)
-  - Border radius: 12dp (default for cards)
-  - Minimum touch target: 40dp × 40dp
-- **Implementation:** All Material strategy files in `lib/presentation/widgets/adaptive/*/material_*_strategy.dart` must reference specific Material Design sections and explain chosen values.
+**All platform style guide compliance requirements, default values, implementation examples, and documentation standards are defined in `STYLEGUIDE.md` §7.**
 
-**iOS Human Interface Guidelines (HIG)**
-- **Reference:** [iOS Human Interface Guidelines](https://developer.apple.com/design/human-interface-guidelines)
-- **Components:** [Cards](https://developer.apple.com/design/human-interface-guidelines/components/content-views/cards), [Buttons](https://developer.apple.com/design/human-interface-guidelines/components/selection-and-input/buttons)
-- **Default Values:**
-  - No Material elevation - use subtle shadows with 8pt blur, 2pt offset
-  - Border radius: 12pt (standard for cards)
-  - Padding: 16pt (content inset standard)
-  - Minimum touch target: 44pt × 44pt (accessibility requirement)
-- **Implementation:** All Cupertino strategy files in `lib/presentation/widgets/adaptive/*/cupertino_*_strategy.dart` must reference specific iOS HIG sections and explain differences from Material (e.g., "iOS uses shadows instead of elevation").
+All strategy implementations must follow official platform design guidelines:
+- **Material Design 3** (Android/Web) - See `STYLEGUIDE.md` §7.1
+- **iOS Human Interface Guidelines** (iOS) - See `STYLEGUIDE.md` §7.2
 
-**Documentation Requirements:**
-- Every platform-specific strategy file MUST include style guide references in top-level documentation comments
-- Comments must explain WHY specific values were chosen (e.g., "16dp ensures proper content breathing room per Material guidelines")
-- Use educational comment taxonomy: `/// 🔶` for architecture, `// 🔹` for syntax, `// 🧠` for deep insights
-- Include Angular analogies when explaining style guide compliance (e.g., "Similar to Angular Material Card with Material Design 3 styling")
+Strategy files in `lib/presentation/widgets/adaptive/*/material_*_strategy.dart` and `cupertino_*_strategy.dart` must include style guide references and explain chosen values. See `STYLEGUIDE.md` §7.3 for documentation requirements.
 
 ---
 
@@ -611,21 +530,13 @@ class AddCard {
 
 ### 9.1 Dependency Injection in Flutter
 
-**When to use DI (Flutter-native solutions like `get_it`, `provider`):**
-- ✅ **Repositories** - `getIt<CardRepository>()` for LocalCardRepository, ApiCardRepository
-- ✅ **Use Cases** - Inject dependencies via constructor: `AddCard(this.repository)`
-- ✅ **Services** - EncryptionService, BackupService, LoggerService
-- ✅ **Data Sources** - Network clients, database connections
+**All Dependency Injection guidelines, when to use DI, Flutter DI solutions, and examples are defined in `STYLEGUIDE.md` §8.2.**
 
-**When NOT to use DI (UI/Factory patterns):**
-- ❌ **UI Factories** - `AdaptiveWidgetFactory.createScaffold()` doesn't need DI (static factory methods)
-- ❌ **UI Components** - Widgets get dependencies via constructor parameters
-- ❌ **Strategy Classes** - Material/Cupertino strategies are simple factory selections
-
-**Flutter DI Solutions:**
-- `get_it` - Service locator (recommended for large apps)
-- `provider` - State management + DI (good for smaller apps)
-- `riverpod` - Modern alternative with compile-time safety
+See `STYLEGUIDE.md` §8.2 for comprehensive Dependency Injection guidelines including:
+- When to use DI (repositories, use cases, services, data sources)
+- When NOT to use DI (UI factories, UI components, strategy classes)
+- Flutter DI solutions (`get_it`, `provider`, `riverpod`)
+- Rationale and examples
 ```
 
 Feature narratives should outline end-to-end flows and highlight caching/offline strategies. Refer to `BUSINESS.md` for specific user stories and acceptance criteria.
@@ -730,9 +641,9 @@ See `test/README.md` for detailed testing strategy and coverage tracking methods
 - GitHub Actions enforce linting, formatting, testing, and coverage.
 - Cursor and GitKraken MCP manage GitFlow branches and Conventional Commits.
 - AI agents annotate CI steps with educational commentary (why the step exists).
-- **Code Quality**: AI agents must follow linting best practices defined in `AGENTS.md` §5 (super parameters, const constructors, avoid redundant arguments).
+- **Code Quality**: AI agents must follow linting best practices defined in `STYLEGUIDE.md` §3 (super parameters, const constructors, avoid redundant arguments).
 
-See `AGENTS.md` §5 for detailed code quality requirements and examples.
+See `STYLEGUIDE.md` §3 for comprehensive code quality requirements and examples.
 
 ```yaml
 name: Flutter CI
@@ -786,26 +697,28 @@ Each user journey emits structured logs with a shared `traceId`, linking UI even
 
 ## 14. Educational Comment & Documentation Policy
 
-### Comment Taxonomy
+**All comment taxonomy, documentation standards, and examples are defined in `STYLEGUIDE.md` §5.**
 
-| Level | Prefix | Purpose | Used by |
-|-------|--------|---------|---------|
-| **Business / Architecture** | `///` | Documents features, classes, use cases. | Humans, `dartdoc`, `mkdocs` |
-| **Syntax / Framework** | `//` | Explains Dart syntax or Flutter mechanics. | Developers, AI |
-| **Deep Insights** | `// 🧠` | Advanced runtime, performance, GC insights. | Developers, AI reviewers |
+Comments are part of the architecture. AI assistants must preserve all comment layers when generating or refactoring code. See `STYLEGUIDE.md` §5 for:
+- Comment taxonomy table with all prefixes
+- Documentation expectations and usage guidelines
+- Detailed examples showing proper comment usage
 
-### Documentation Expectations
+### STYLEGUIDE.md References in Code Comments
 
-- `///` describes *what* and *why* (business intent, architecture).
-- `//` describes *how* (syntax, framework nuances).
-- `// 🧠` offers deep dives (event loop, isolates, memory).
-- AI assistants must preserve all three layers when generating or refactoring code.
+**All requirements for adding `STYLEGUIDE.md` references in code comments, format specifications, and discovery workflow are defined in `AGENTS.md` §6.3.**
+
+AI assistants must follow the complete workflow in `AGENTS.md` §6.3 when:
+- Adding references to documented patterns, practices, or syntax
+- Discovering new patterns not yet documented in `STYLEGUIDE.md`
+- Updating `STYLEGUIDE.md` before referencing in code
 
 ### Using Documentation for AI Context
 
 1. Comments serve as the curriculum—do not remove them.
 2. DartDoc output feeds AI context for future tasks.
 3. Annotate commits/pull requests with links to relevant comments or docs.
+4. Include `STYLEGUIDE.md` references in code comments for context.
 
 > Treat comments as immutable contracts unless the learning content changes.
 
@@ -813,17 +726,9 @@ Each user journey emits structured logs with a shared `traceId`, linking UI even
 
 ## 15. Syntax Explanation Policy
 
-Explain Dart syntax using TypeScript analogies so cross-ecosystem developers learn faster:
+**All Dart syntax explanations with Angular/TypeScript analogies are defined in `STYLEGUIDE.md` §2.2.**
 
-```dart
-// 🔹 `final` = assign once; similar to TS `const`, but runtime-bound flexibly.
-// 🔹 `const` = compile-time constant; useful for immutable widgets.
-// 🔹 `late` = deferred initialization; like the TS non-null `!` assertion.
-// 🔹 `factory` = constructor returning cached/custom instances (akin to Angular providers).
-// 🔹 `async` / `await` = Futures; similar to Promises but scheduled via Dart's event loop.
-```
-
-Reference how each keyword impacts rebuilds, isolates, or state management.
+Dart syntax should be explained using TypeScript analogies so cross-ecosystem developers learn faster. See `STYLEGUIDE.md` §2.2 for comprehensive syntax explanations with examples, including how each keyword impacts rebuilds, isolates, or state management.
 
 ---
 
@@ -870,6 +775,7 @@ theme:
 ## 17. AI Collaboration Workflow
 
 - Follow the playbook in `AGENTS.md` for Observe → Plan → Execute → Review.
+- Follow code style standards in `STYLEGUIDE.md` for all code changes.
 - Humans use `README.md` as the entry point; AI must reconcile changes with sections in this file.
 - When choices exist, surface trade-offs and seek human confirmation before deviating from architecture.
 

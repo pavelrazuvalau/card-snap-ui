@@ -2,6 +2,9 @@
 ///
 /// Shared types and utilities used across all adaptive widget implementations.
 /// Similar to Angular's shared types that are used across different modules.
+///
+/// See STYLEGUIDE.md#44-shared-utilities (§4.4) (Shared Utilities) for organization guidelines
+/// and STYLEGUIDE.md#22-dart-syntax-explained-with-angulartypescript-analogies (§2.2) for enum patterns in Dart.
 library presentation.widgets.adaptive.common;
 
 import 'dart:io' show Platform;
@@ -26,10 +29,12 @@ enum PlatformTheme {
 ///
 /// Centralized platform detection logic.
 /// Similar to Angular's platform service that provides platform information.
+/// See STYLEGUIDE.md#13-best-practices---core-principles (§1.3) (DRY principle) and STYLEGUIDE.md#44-shared-utilities (§4.4) (Shared Utilities) for organization
 class PlatformDetector {
   /// Get the current platform theme
   /// 🔹 Determines UI theme based on platform detection
   /// 🧠 Web platform uses Material by default but can be customized
+  /// See STYLEGUIDE.md#22-dart-syntax-explained-with-angulartypescript-analogies (§2.2) for try-catch error handling patterns
   static PlatformTheme getCurrentTheme() {
     // 🧠 Web doesn't support Platform.isIOS/isAndroid, use try-catch
     try {

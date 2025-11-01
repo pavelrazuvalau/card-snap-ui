@@ -15,6 +15,9 @@
 ///
 /// Angular analogy: No direct Angular equivalent (iOS-specific), but similar to
 /// a custom loading spinner that adapts to platform conventions.
+///
+/// See STYLEGUIDE.md#72-ios-human-interface-guidelines-hig (§7.2) for iOS Human Interface Guidelines compliance requirements
+/// and STYLEGUIDE.md#73-style-guide-documentation-requirements (§7.3) for documentation standards with style guide references.
 
 library presentation.widgets.adaptive.progress_indicator.cupertino;
 

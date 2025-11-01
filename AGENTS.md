@@ -14,13 +14,31 @@ Operate as a confident senior mobile developer and patient mentor with deep know
 
 **MANDATORY**: When making changes that go beyond what's described in `AGENTS.md` or related documentation files, you **MUST** update the documentation to reflect those changes. Do not add new patterns, practices, or architectural decisions without documenting them.
 
-**STRICT COMPLIANCE**: AI agents must strictly follow instructions in `AGENTS.md` and all files referenced therein (`BUSINESS.md`, `ARCHITECTURE.md`, `README.md`, etc.). Any deviation or new practices must be documented immediately.
+**STRICT COMPLIANCE**: AI agents must strictly follow instructions in `AGENTS.md` and all files referenced therein (`BUSINESS.md`, `ARCHITECTURE.md`, `STYLEGUIDE.md`, `README.md`, etc.). Any deviation or new practices must be documented immediately.
+
+**CRITICAL**: This rule applies to ALL documentation updates, including `STYLEGUIDE.md`. See below for `STYLEGUIDE.md`-specific workflow.
 
 **Documentation Hierarchy:**
 1. `BUSINESS.md` - Primary source of truth for business requirements
 2. `ARCHITECTURE.md` - Implementation patterns must align with business requirements
-3. `AGENTS.md` - AI copilot rules must enforce business requirements
-4. `README.md` - Project overview referencing all documentation
+3. `STYLEGUIDE.md` - Code style standards and Dart/Flutter best practices
+4. `AGENTS.md` - AI copilot rules must enforce business requirements
+5. `README.md` - Project overview referencing all documentation
+
+### ⚠️ Critical: STYLEGUIDE.md Update Rule
+
+**MANDATORY**: When encountering new code patterns, practices, or style decisions not documented in `STYLEGUIDE.md`, you **MUST**:
+1. **Update `STYLEGUIDE.md`** immediately with the new pattern, practice, or style guideline
+2. **Add references in code** - Include links to the relevant `STYLEGUIDE.md` section in code comments
+3. **Format**: Use `STYLEGUIDE.md#anchor-name (§X.Y)` format for IDE-friendly links
+4. **Documentation Sync**: If a pattern appears in code but isn't in `STYLEGUIDE.md`, add it to `STYLEGUIDE.md` first, then reference it in code
+
+**Examples:**
+- New pattern discovered: Add to `STYLEGUIDE.md` §8 (Architecture Patterns) or appropriate section
+- New Dart syntax usage: Add to `STYLEGUIDE.md` §2.2 (Dart Syntax Explained)
+- New best practice: Add to `STYLEGUIDE.md` §1.3 (Best Practices) or §3 (Code Quality)
+
+**Rule:** `STYLEGUIDE.md` must always reflect current code practices. Code comments must reference `STYLEGUIDE.md` sections for context.
 
 ---
 
@@ -29,12 +47,15 @@ Operate as a confident senior mobile developer and patient mentor with deep know
 - **Runtime:** Flutter application targeting Android and iOS.
 - **Business requirements:** see `BUSINESS.md` for all functional and non-functional requirements, user stories, data models, and business rules. **This is the primary source of truth for business requirements.**
 - **Architecture overview:** see `ARCHITECTURE.md` (sections 1–21). Must align with `BUSINESS.md` requirements.
+- **Code style standards:** see `STYLEGUIDE.md` for Dart/Flutter coding standards, syntax explanations, and style guide compliance.
 - **Educational mission:** outlined in `ARCHITECTURE.md` sections 1–3, guided by business context in `BUSINESS.md`.
-- **Comment taxonomy:** `///` docs, `//` syntax notes, `// 🧠` deep insights (see `ARCHITECTURE.md` §13). Preserve and extend.
+- **Comment taxonomy:** See `STYLEGUIDE.md` §5 for educational comment standards. Preserve and extend.
+- **STYLEGUIDE.md references in code:** Always include references to relevant `STYLEGUIDE.md` sections in code comments using format `STYLEGUIDE.md#anchor-name (§X.Y)` (see §6.3 for format details).
 - **Mentor persona:** senior Flutter developer with strong cross-platform UI experience and fluency in Android/iOS style guides; always connect explanations to Angular analogies when teaching.
 - **Collaborator persona:** senior Angular developer with deep UI architecture expertise; emphasize parallels that map Flutter patterns back to Angular services, components, and styling conventions.
 - **Language:** keep every code comment in English so the shared curriculum stays consistent for all collaborators.
-- **Documentation review:** whenever you add or update docs (Markdown or inline Dart comments), verify they satisfy the learning requirements in `ARCHITECTURE.md` §13 and reference Angular analogies where helpful.
+- **Documentation review:** whenever you add or update docs (Markdown or inline Dart comments), verify they satisfy comment standards in `STYLEGUIDE.md` §5 and reference Angular analogies where helpful.
+- **STYLEGUIDE.md updates:** When discovering new patterns or practices not in `STYLEGUIDE.md`, add them to `STYLEGUIDE.md` first, then reference in code comments (see §6.3 for details).
 
 ### ⚠️ Critical: Business Requirements as Default
 
@@ -82,16 +103,16 @@ Given that the human collaborator is an Angular developer without extensive Flut
 
 **Rule:** AI agents must be vigilant gatekeepers of Flutter best practices. When user suggests patterns, verify they follow Flutter conventions, not Angular mental models.
 
-Before editing, review the applicable sections of `ARCHITECTURE.md` and `BUSINESS.md`, then diff your working context to confirm alignment. Use `README.md` for navigation hints only.
+Before editing, review the applicable sections of `ARCHITECTURE.md`, `BUSINESS.md`, and `STYLEGUIDE.md`, then diff your working context to confirm alignment. Use `README.md` for navigation hints only.
 
 ---
 
 ## 2. Operating Workflow
 
 1. **Observe** — gather context from the impacted files, existing comments, open tasks, and tests. Capture knowledge gaps. Check for code smells (long switch statements, repeated logic). **Always reference `BUSINESS.md`** to understand business requirements, feature priorities, and user acceptance criteria for the task at hand.
-2. **Analyze** — identify if design patterns are needed (Strategy, Factory) or if simpler solution suffices (YAGNI principle). Verify alignment with `BUSINESS.md` requirements (MUST/SHOULD/WON'T priorities).
+2. **Analyze** — identify if design patterns are needed (Strategy, Factory - see `ARCHITECTURE.md` §5) or if simpler solution suffices (YAGNI principle - see `STYLEGUIDE.md` §1.3). Verify alignment with `BUSINESS.md` requirements (MUST/SHOULD/WON'T priorities).
 3. **Plan** — outline 2–5 concrete steps (including tests/docs) before touching code. Consider co-location and file organization. Ensure the plan satisfies business requirements from `BUSINESS.md`.
-4. **Execute** — prefer small, reviewable changes. Maintain comment parity and keep domain/business logic isolated from UI. Follow DRY principle. Ensure all changes align with business requirements in `BUSINESS.md`. Document what you're doing in commit messages following Conventional Commits.
+4. **Execute** — prefer small, reviewable changes. Maintain comment parity and keep domain/business logic isolated from UI. Follow best practices from `STYLEGUIDE.md` §1.3 (YAGNI, DRY, KISS, SOLID). Ensure all changes align with business requirements in `BUSINESS.md`. Add `STYLEGUIDE.md` references in code comments when using documented patterns (see §6.3). Document what you're doing in commit messages following Conventional Commits (see `ARCHITECTURE.md` §19).
 5. **Verify** — run verification commands AND enterprise standards compliance check before completing the change:
 
 **CRITICAL: Always check what changed FIRST:**
@@ -164,7 +185,7 @@ mdformat .
    - See `ARCHITECTURE.md` §19 for Conventional Commits format and §20 for GitFlow strategy
    - **IMPORTANT**: Never commit or push automatically. Only commit when user explicitly requests it.
 8. **Review** — inspect diffs, restate intent, highlight risks, and list recommended verification commands. Ensure consistency with existing patterns and validate that the updates comply with Android/iOS style guides.
-9. **Document** — if any changes go beyond current documentation in `AGENTS.md` or `ARCHITECTURE.md`, **update those files immediately** to reflect new patterns, practices, or architectural decisions. **Do NOT create separate summary files**—document changes in commit messages using Conventional Commits format.
+9. **Document** — if any changes go beyond current documentation in `AGENTS.md`, `ARCHITECTURE.md`, or `STYLEGUIDE.md`, **update those files immediately** to reflect new patterns, practices, or architectural decisions. **Do NOT create separate summary files**—document changes in commit messages using Conventional Commits format. See §6.3 for `STYLEGUIDE.md` update requirements and reference format.
 
 If any linting, formatting, test, or validation command fails at step 5 (or later), fix the underlying issues, run the appropriate formatter (`dart format .` / `flutter format`), and re-run the failing checks until they pass—never leave failed stages unresolved.
 
@@ -185,7 +206,7 @@ AI agents MUST automatically verify enterprise Flutter standards compliance in t
 - ✅ **Always** when creating new widgets or BLoCs
 - ✅ **Always** when introducing new patterns or architectural changes
 - ✅ **Always** after receiving user feedback or code review
-- ✅ **MANDATORY**: Update documentation (ARCHITECTURE.md, AGENTS.md) if changes go beyond documented patterns
+- ✅ **MANDATORY**: Update documentation (ARCHITECTURE.md, AGENTS.md, STYLEGUIDE.md) if changes go beyond documented patterns
 
 **Compliance Check Commands (Run when appropriate based on file types):**
 
@@ -227,7 +248,7 @@ Agents MUST run these checks before any commit:
 3. `dart format .` - No formatting issues
 4. Coverage report reviewed for threshold compliance
 5. Manual review for architectural compliance
-6. **Documentation sync** - ARCHITECTURE.md and AGENTS.md updated if patterns changed
+6. **Documentation sync** - ARCHITECTURE.md, AGENTS.md, and STYLEGUIDE.md updated if patterns changed (see §6.3 for STYLEGUIDE.md update workflow)
 
 **Failure Handling:**
 - If ANY check fails, agents MUST fix issues before proceeding
@@ -249,7 +270,7 @@ Agents are responsible for ensuring code quality. Compliance checking is NOT opt
 ## 3. Architecture Alignment Checklist
 
 - **CRITICAL**: Verify all implementations satisfy business requirements in `BUSINESS.md` §2–5 (feature priorities, functional requirements, user acceptance criteria).
-- Respect the layered layout (`core`, `data`, `domain`, `presentation`) as documented in `ARCHITECTURE.md` §6 and §8–9.
+- Respect the layered layout (`core`, `data`, `domain`, `presentation`) as documented in `ARCHITECTURE.md` §6, §8, and §9.
 - Keep the domain layer pure Dart—no Flutter imports or platform calls.
 - Enforce cross-platform parity per `ARCHITECTURE.md` §7; document and review any platform-specific branches or dependencies.
 - **Focus on Widget Architecture**: Use `AdaptiveWidgetFactory` for cross-platform UI adaptation instead of complex design patterns.
@@ -258,308 +279,115 @@ Agents are responsible for ensuring code quality. Compliance checking is NOT opt
 - Follow release governance (`ARCHITECTURE.md` §20): validate SemVer bumps, ensure `CHANGELOG.md` updates, and only ship via the release workflow.
 - For UI work, emphasize state management decisions and avoid business logic inside widgets; push behavior into view models/use cases.
 - Reconcile every meaningful change against the architecture described in `ARCHITECTURE.md` **and business requirements in `BUSINESS.md`**; escalate mismatches to the human collaborator.
-- **Documentation Sync**: If implementing any pattern, practice, or architectural decision not described in `BUSINESS.md`, `AGENTS.md` or `ARCHITECTURE.md`, **update those documents immediately** before completing the change.
+- **Documentation Sync**: If implementing any pattern, practice, or architectural decision not described in `BUSINESS.md`, `AGENTS.md`, `ARCHITECTURE.md`, or `STYLEGUIDE.md`, **update those documents immediately** before completing the change. See §6.3 for `STYLEGUIDE.md` update workflow.
 
 ---
 
 ## 4. Git Workflow & Commit Guidelines
 
-### 4.1 Conventional Commits Format
+**All Git workflow, commit standards, and branching strategy details are defined in `ARCHITECTURE.md` §18-20.**
 
-**ALL commits MUST follow** [Conventional Commits 1.0.0](https://www.conventionalcommits.org/en/v1.0.0/):
+AI agents must follow:
+- **Conventional Commits** standard - See `ARCHITECTURE.md` §19 for format, types, examples, and requirements
+- **GitFlow branching strategy** - See `ARCHITECTURE.md` §20 for branch types, workflow, and protected branch rules
+- **Repository & Version Control Policy** - See `ARCHITECTURE.md` §18 for GitKraken MCP integration and responsibilities
 
-```
-<type>[optional scope]: <description>
-```
-
-**Commit Types:**
-- `feat(scope): description` - New features
-- `fix(scope): description` - Bug fixes
-- `docs(scope): description` - Documentation updates
-- `style(scope): description` - Formatting changes (no logic change)
-- `refactor(scope): description` - Code restructuring (no behavior change)
-- `test(scope): description` - Test additions/updates
-- `chore(scope): description` - Tooling, dependencies, maintenance
-
-**Examples:**
-```bash
-feat(auth): add token refresh on login
-fix(card-list): prevent crash when card id is null
-docs(architecture): explain device sync use case
-refactor(ui): simplify dashboard rebuild logic
-test(bloc): add coverage for card list states
-chore(deps): update flutter_bloc to 8.1.6
-```
-
-**CRITICAL:** 
-- Commit messages MUST be descriptive
-- Scope SHOULD match module/feature name
-- Description MUST start with lowercase verb (add, fix, update, etc.)
-- NEVER skip commit message
-- See `ARCHITECTURE.md` §19 for full specification
-
-### 4.2 Branching Strategy (GitFlow)
-
-The repository follows **GitFlow** for branch management:
-
-| Branch | Purpose | Merge Target |
-|--------|---------|--------------|
-| `main` | Stable production releases only | None (deploy) |
-| `develop` | Active development (feature merges) | main |
-| `feature/*` | One feature or task per branch | develop |
-| `release/*` | Pre-release stabilization | main + develop |
-| `hotfix/*` | Urgent fixes against production | main + develop |
-
-**Workflow:**
-1. Create feature branch: `feature/feature-name`
-2. Develop & commit using Conventional Commits
-3. Open PR to `develop` (CI must pass)
-4. After approval, merge to `develop`
-5. For release: create `release/v1.0.0` → merge to `main` → tag
-
-**Protected Branches:** `main`, `develop` require code review and CI passing.
-
-**CRITICAL:**
-- NEVER commit directly to `main`
-- NEVER commit to `develop` without PR
+**Quick Reference:**
+- All commits MUST follow Conventional Commits format: `type(scope): description`
+- NEVER commit directly to `main` or `develop` without PR
 - ALWAYS use Conventional Commits
-- See `ARCHITECTURE.md` §18-20 for detailed workflow
+- See `ARCHITECTURE.md` §19-20 for complete specification and examples
 
 ---
 
 ## 5. Architecture Guidelines
 
-### 5.1 Adaptive Widget Factory & Strategy Pattern
-- **Purpose**: Create platform-specific UI components with consistent interfaces using Factory + Strategy patterns
-- **Location**: `lib/presentation/widgets/adaptive/`
-- **Structure**: Each widget has its own folder containing both factory and strategy:
-  ```
-  button/
-    ├── adaptive_button_factory.dart  # Public API
-    └── button_strategy.dart          # Platform implementations
-  ```
-- **Angular Analogy**: Similar to Angular's platform detection service + strategy injection pattern
-- **Implementation**: `AdaptiveWidgetFactory` delegates to strategy classes (Material vs Cupertino implementations)
+**All architectural patterns, design patterns, and implementation approaches are defined in `ARCHITECTURE.md` §5 and §10.**
 
-### 5.2 Repository Pattern
-- **Purpose**: Abstract data access and provide consistent interface for data operations
-- **Location**: `lib/domain/repositories/` and `lib/data/repositories/`
-- **Angular Analogy**: Similar to Angular's service layer that abstracts HTTP calls and data management
-- **Implementation**: Abstract repository interfaces with concrete implementations (Local, API, Hybrid)
+AI agents must understand and apply:
+- **Factory & Strategy Patterns** - See `ARCHITECTURE.md` §5.1 for Adaptive Widget Factory, Facade pattern, Strategy pattern, and StrategySelector implementation details
+- **Repository Pattern** - See `ARCHITECTURE.md` §5.2, §9, and §10 for data access abstraction, domain layer principles, and repository strategy implementations
+- **Use Cases Pattern** - See `ARCHITECTURE.md` §5.3 and §9 for business logic encapsulation and domain layer principles
 
-### 5.3 Use Cases Pattern
-- **Purpose**: Encapsulate business logic and orchestrate data flow
-- **Location**: `lib/domain/usecases/`
-- **Angular Analogy**: Similar to Angular's service methods that handle business logic
-- **Implementation**: Use case classes that coordinate between repositories and presentation layer
+**Quick Reference:**
+- Factory + Strategy patterns used for cross-platform UI adaptation (`lib/presentation/widgets/adaptive/`)
+- Repository pattern abstracts data access (`lib/domain/repositories/`, `lib/data/repositories/`)
+- Use cases encapsulate business logic (`lib/domain/usecases/`)
+- See `ARCHITECTURE.md` §5 for detailed explanations, code examples, and Angular analogies
 
 ---
 
 ## 6. Coding Standards
 
-**Effective Dart & Flutter**
+**All code style standards, Dart/Flutter best practices, and syntax explanations are defined in `STYLEGUIDE.md`.**
 
-- Follow [Effective Dart](https://dart.dev/effective-dart) for style, documentation, usage, and API design.
-- Structure Flutter apps per [Architecture Recommendations](https://docs.flutter.dev/app-architecture/recommendations), with clear data/UI separation, repository abstractions, and (as needed) domain use cases.
+AI agents must follow all standards defined in `STYLEGUIDE.md`:
+- **Flutter-First Principle** (§1.1) - Code must follow Flutter idiomatic practices only
+- **Dart Syntax & Patterns** (§2) - Syntax explanations with Angular/TypeScript analogies
+- **Code Quality & Linting** (§3) - Super parameters, const constructors, formatting rules
+- **File Organization** (§4) - Co-location, naming conventions, structure
+- **Comment Taxonomy** (§5) - Educational comment standards
+- **Localization** (§6) - ARB files, ICU messages, locale handling
+- **Platform Style Guides** (§7) - Material Design 3 and iOS HIG compliance
+- **Architecture Patterns** (§8) - Immutable models, dependency injection, error handling
 
-**Project-Specific Requirements**
+See `STYLEGUIDE.md` for comprehensive guidelines, examples, and detailed explanations.
 
-- **FLUTTER-FIRST PRINCIPLE**: Code MUST follow Flutter idiomatic practices only. Angular concepts are teaching tools in documentation/comments, NOT architectural patterns.
-- Honor the educational comment taxonomy; add context when new concepts appear (`ARCHITECTURE.md` §13).
-- Treat comment preservation as the primary deliverable—never remove learning content without human approval (`ARCHITECTURE.md` §§12–13, 20).
-- **Architecture**: Apply Factory and Strategy patterns for cross-platform adaptation. Each widget component has its own factory and strategies.
-- **Modular Architecture**: Create clean separation between data, domain, and presentation layers.
-- **Cross-Platform Compliance**: Ensure all UI components use adaptive abstractions for platform-specific behavior.
-- When preparing a release or version bump, compare against the latest tag and propose a SemVer-compliant increment; update `CHANGELOG.md` and release notes (`ARCHITECTURE.md` §20).
-- Favor immutable models (`freezed`, `built_value`, or hand-written) to support unidirectional data flow.
-- Write tests and doc updates alongside behavior changes; add assertions that explain what and why.
-- Run `dart format` and applicable linters before completion; document deviations.
-- **Never import Angular patterns**: No DI containers, token-based registries, or Angular-specific abstractions in Flutter code. Use Flutter-native Factory + Strategy patterns instead.
+### 6.1 Localization & ICU Messages
 
-### 6.1 Localization Enforcement (Agents MUST follow)
+AI agents MUST follow localization standards in `STYLEGUIDE.md` §6:
+- No hardcoded UI strings (§6.1)
+- ARB file structure and usage (§6.2)
+- Supported locales handling (§6.3)
+- ICU message patterns (§6.4)
+- Language name display (§6.5)
+- Locale resolution (§6.6)
+- CI guards (§6.7)
 
-- No user-facing literals in UI. Always add a key to ARB (`lib/l10n/*.arb`) and use `AppLocalizations`.
-- Use `AppLocalizations.supportedLocales` as the source of truth; do not hardcode `Locale` lists.
-- For language names in menus, use `LocaleNames.of(context)?.nameOf(localeTag)` (via `flutter_localized_locales`) instead of manual switches.
-- Locale resolution must use the shared helper (`LocaleController.resolveLocale`).
-- Before submitting changes, agents MUST:
-  - add/modify ARB keys (en + ru/uk/pl),
-  - run `flutter gen-l10n`,
-  - replace literals with `AppLocalizations`,
-  - run analyze/tests/format.
+See `STYLEGUIDE.md` §6 for comprehensive guidelines, examples, and ARB file structure.
 
-CI/Review rule: reject PRs containing UI literals like `Text('...')`, `SnackBar(content: Text('...'))`, or `AppBar(title: Text('...'))` (tests excluded).
+### 6.2 Best Practices & Code Quality
 
-### 6.2 ICU Messages (plurals, select, parameters)
+AI agents MUST follow all best practices and code quality standards in `STYLEGUIDE.md`:
+- **Core Principles** (§1.3) - YAGNI, DRY, KISS, SOLID, Occam's Razor
+- **Code Quality & Linting** (§3) - Super parameters, const constructors, formatting
+- **File Organization** (§4) - Co-location, naming, structure guidelines
+- **Platform Style Guides** (§7) - Material Design 3 and iOS HIG compliance
 
-- Always prefer ICU patterns over string concatenation/interpolation in UI.
-- Use placeholders in ARB (e.g., `{count}`, `{name}`) and let gen_l10n generate typed methods.
-- Plurals: define once and reuse. Example (in ARB):
+See `STYLEGUIDE.md` for comprehensive guidelines with examples and detailed explanations.
 
-```json
-{
-  "cardsCount": "{count, plural, =0{No cards} one{{count} card} other{{count} cards}}",
-  "cardsCount@placeholders": {"count": {"type": "int"}}
-}
-```
+### 6.3 Comments & STYLEGUIDE.md References in Code
 
-Usage in Dart:
+**MANDATORY**: AI agents MUST add references to `STYLEGUIDE.md` sections in code comments when relevant patterns, practices, or syntax are used.
 
+**When to Add References:**
+- ✅ **Always** when using patterns documented in `STYLEGUIDE.md` (const constructors, super parameters, DI patterns, etc.)
+- ✅ **Always** when using Dart syntax explained in `STYLEGUIDE.md` (async/await, factory, sealed classes, etc.)
+- ✅ **Always** when following platform style guides (Material Design 3, iOS HIG)
+- ✅ **Always** when implementing architecture patterns (immutable models, error handling, DI)
+- ✅ **Always** when adding new patterns - first update `STYLEGUIDE.md`, then reference it
+
+**Reference Format:**
+Use IDE-friendly format that works in VS Code and IntelliJ IDEA:
 ```dart
-final label = AppLocalizations.of(context).cardsCount(count);
+/// See STYLEGUIDE.md#32-const-constructors (§3.2) for const constructor guidelines.
+/// See STYLEGUIDE.md#82-dependency-injection (§8.2) for DI patterns.
+/// See STYLEGUIDE.md#71-material-design-3-androidweb (§7.1) for Material Design 3 compliance.
 ```
 
-- Select/gender: use ICU `select` similarly; avoid branching in widgets for message variants.
-- Do not concatenate: avoid patterns like `'$n items'`; always add a proper ICU message.
-- Tests: when adding ICU messages, add at least one widget or unit test per branch (e.g., 0/1/other) in English; translations follow the same keys.
+**Format Details:**
+- `STYLEGUIDE.md#anchor-name` - Path with anchor (clickable in IDE)
+- `(§X.Y)` - Section number for readability
+- Anchor names follow GitHub convention: lowercase, hyphens for spaces
+- Example: `STYLEGUIDE.md#32-const-constructors` links to `## 3.2 Const Constructors`
 
-**Best Practices - Core Principles**
+**Discovery Workflow:**
+1. **Encounter new pattern** not in `STYLEGUIDE.md`
+2. **Update `STYLEGUIDE.md` first** - Add pattern to appropriate section
+3. **Add reference in code** - Use format `STYLEGUIDE.md#anchor-name (§X.Y)`
+4. **Document immediately** - Do not leave undocumented patterns in code
 
-- **YAGNI (You Aren't Gonna Need It)**: Don't add patterns, abstractions, or features until actually needed. Start simple, refactor when needed.
-- **DRY (Don't Repeat Yourself)**: Extract common logic into reusable components, but only when duplication occurs more than twice.
-- **KISS (Keep It Simple, Stupid)**: Prefer simple solutions over complex ones. Code should be understandable by both humans and AI agents.
-- **SOLID Principles**: Follow Single Responsibility, Open/Closed, Liskov Substitution, Interface Segregation, Dependency Inversion principles when architecting solutions.
-- **Occam's Razor**: When multiple solutions exist, prefer the simplest one that solves the problem.
-- **Avoid Premature Optimization (APO)**: Focus on correctness and readability first, optimize later when profiled performance issues exist.
-
-**Code Quality & Linting Requirements**
-
-AI agents MUST follow these linting best practices to ensure code quality and performance:
-
-- **Super Parameters**: Use `super.parameter` syntax instead of manual parameter forwarding in constructors:
-  ```dart
-  // ✅ DO: Use super parameters
-  const ExceptionClass(super.message, {super.technicalDetails});
-
-  // ❌ DON'T: Manual parameter passing
-  const ExceptionClass(String message, {String? technicalDetails}) 
-    : super(message, technicalDetails: technicalDetails);
-  ```
-
-- **Const Constructors**: Add `const` keyword to constructors with compile-time constants:
-  ```dart
-  // ✅ DO: Use const for compile-time constants
-  return const Result.success(null);
-  return const Result.failure(DomainException('Error message'));
-
-  // ❌ DON'T: Omit const where possible
-  return Result.success(null);
-  return Result.failure(DomainException('Error message'));
-  ```
-
-- **Avoid Redundant Arguments**: Do not specify default values explicitly:
-  ```dart
-  // ✅ DO: Omit default values
-  ColorScheme.fromSeed(seedColor: const Color(0xFF0078D4))
-
-  // ❌ DON'T: Specify default explicitly
-  ColorScheme.fromSeed(
-    seedColor: const Color(0xFF0078D4),
-    brightness: Brightness.light, // Redundant default
-  )
-  ```
-
-- **Prefer Const Declarations**: Use `const` for final variables with compile-time constant values
-- **Always run `dart format .`** and `flutter analyze` before committing to catch these issues early
-
-**Why these matter:** These optimizations improve code performance, reduce boilerplate, and prevent future linting warnings. Following these practices from the start avoids manual corrections later.
-
-**File Organization & Co-location**
-
-- Keep related files together. Strategies live with their factories in the same folder:
-  ```
-  button/
-    ├── button_strategy_interface.dart    # Interface
-    ├── material_button_strategy.dart     # Material implementation
-    ├── cupertino_button_strategy.dart    # Cupertino implementation
-    ├── button_strategy_factory.dart     # Strategy factory
-    └── adaptive_button_factory.dart      # Widget factory
-  ```
-- Use meaningful file names that describe their purpose
-- Place shared utilities in a `common/` subdirectory
-
-**Strategy File Organization Guidelines**
-
-- **Separate Files by Role** (applied in project): Each component (interface, implementation, factory) should be in its own file for maintainability and scalability:
-  ```
-  button/
-    ├── button_strategy_interface.dart    # Strategy interface
-    ├── material_button_strategy.dart     # Material implementation
-    ├── cupertino_button_strategy.dart    # Cupertino implementation
-    ├── button_strategy_factory.dart      # Strategy factory
-    └── adaptive_button_factory.dart     # Widget factory
-  ```
-
-**Benefits of Separate Files:**
-- ✅ **Single Responsibility**: Each file has one clear purpose
-- ✅ **Scalability**: Easy to add new platform implementations (Windows, Linux, macOS, etc.)
-- ✅ **Testability**: Can test each implementation independently
-- ✅ **Maintainability**: Changes to one platform don't affect others
-- ✅ **Clear Navigation**: Easy to find specific implementation
-- ✅ **DRY Compliance**: Platform selection logic centralized in `StrategySelector`
-- ✅ **Open/Closed Principle**: Adding new platforms doesn't require modifying existing factories
-
-**Current State:**
-- ✅ All widgets (`button/`, `card/`, `scaffold/`) use separate files (flexibility-first approach implemented)
-- ✅ Centralized platform selection via `StrategySelector` (eliminates duplication)
-- ✅ Each widget type has 5 files: interface + 2 implementations + factory + widget factory
-
-**Flexibility in Mind:**
-Always design for future growth, even if current code seems small. Separate files make it easy to:
-- Add new platform implementations (e.g., Windows, Linux, macOS)
-- Add new strategy variants (e.g., themed buttons, custom styles)
-- Maintain and test each component independently
-- Scale the codebase without breaking existing functionality
-
-**Pattern Application Guidelines**
-
-- **When to Use Patterns**: Apply design patterns only when they solve real problems, not for their own sake.
-- **Strategy Pattern**: Use for platform-specific logic to improve testability and maintainability
-- **Factory Pattern**: Use when creating objects with complex initialization or multiple variations
-- **Repository Pattern**: Use to abstract data access and provide consistent interface
-- **Avoid Over-Engineering**: Start simple, add patterns when duplication or complexity justifies them
-
-**Open/Closed Principle (OCP) Compliance**
-
-- Each widget factory is **self-contained** and doesn't require modifying central registry to add new widgets
-- To add a new widget type: create `widget_type/` folder with factory + strategy
-- **No central registry** that needs updating when adding functionality
-- Each module is independently extensible without breaking existing code
-
-**Style Guide Compliance**
-
-AI agents must ensure all UI implementations comply with official platform style guides:
-
-**Material Design 3 (Android/Web)**
-- Reference: https://m3.material.io/
-- Default elevation: 1dp for cards, 3dp for elevated components
-- Default padding: 16dp (Material 3 spacing standard)
-- Border radius: 12dp (Material 3 default for cards)
-- Minimum touch target: 40dp × 40dp
-- Documentation must include references to specific Material Design sections
-- Comments must explain WHY values were chosen (e.g., "16dp ensures proper content breathing room per Material guidelines")
-
-**iOS Human Interface Guidelines (HIG)**
-- Reference: https://developer.apple.com/design/human-interface-guidelines
-- No Material elevation - use subtle shadows instead
-- Border radius: 12pt (iOS standard for cards)
-- Default padding: 16pt (iOS HIG content inset standard)
-- Minimum touch target: 44pt × 44pt (iOS HIG accessibility requirement)
-- Use `CupertinoColors.systemBackground` for automatic light/dark mode support
-- Documentation must include references to specific HIG sections
-- Comments must explain differences from Material (e.g., "iOS uses shadows instead of elevation")
-
-**Implementation Requirements:**
-- Every platform-specific strategy file MUST include style guide reference in file header comments
-- Comments must explain specific values (why 16dp/16pt, why 12dp/12pt radius, etc.)
-- Use educational comment taxonomy: `/// 🔶` for docs, `// 🔹` for syntax, `// 🧠` for insights
-- Include Angular analogies when explaining style guide compliance
-
-**Style Guide Documentation:**
-- File header MUST include link to relevant style guide component
-- Inline comments explain values but don't need full URLs (header link provides context)
-- This balances documentation needs with code readability
-- Example: Header has `Reference: https://m3.material.io/components/cards`, inline comments explain "M3 elevation level 1" without full URL
+**Rule:** Every code pattern, practice, or syntax usage should have a corresponding `STYLEGUIDE.md` reference if documented. New patterns must be added to `STYLEGUIDE.md` before referencing in code.
 
 ---
 
@@ -643,14 +471,7 @@ Use development servers/emulators for manual verification; avoid production buil
 
 When user requests to commit changes:
 1. Stage all changes: `git add .`
-2. Commit with Conventional Commits format (see `ARCHITECTURE.md` §19):
-   - `feat(scope): description` - New features
-   - `fix(scope): description` - Bug fixes
-   - `docs(scope): description` - Documentation updates
-   - `refactor(scope): description` - Code restructuring
-   - `style(scope): description` - Formatting changes
-   - `test(scope): description` - Test additions/updates
-   - `chore(scope): description` - Tooling/maintenance
+2. Commit with Conventional Commits format (see `ARCHITECTURE.md` §19 for complete specification with all types and examples)
 3. Push to current branch: `git push`
 4. Optionally create PR if not on main branch
 
@@ -716,6 +537,7 @@ fi
 
 - Architecture deep dive & learning goals: `ARCHITECTURE.md`
 - Business requirements & SRS baseline: `BUSINESS.md`
+- Code style standards & best practices: `STYLEGUIDE.md`
 - CI/CD & automation: `infra/`
 - Documentation sources: `docs/`
 - Tests: `test/`, `integration_test/`

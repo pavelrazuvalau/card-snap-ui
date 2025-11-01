@@ -16,6 +16,9 @@
 /// ```
 ///
 /// In Flutter/Dart, we use BLoC pattern with events and states.
+///
+/// See STYLEGUIDE.md#82-dependency-injection (§8.2) for Dependency Injection patterns,
+/// STYLEGUIDE.md#83-error-handling-pattern (§8.3) for Error Handling (Result<T>), and STYLEGUIDE.md#22-dart-syntax-explained-with-angulartypescript-analogies (§2.2) for async/await usage.
 library presentation.blocs.card_list;
 
 import 'package:flutter_bloc/flutter_bloc.dart';

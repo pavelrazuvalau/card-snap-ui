@@ -24,6 +24,9 @@
 /// In Flutter/Dart, we use widgets with callbacks and adaptive theming.
 /// 🧠 This widget now uses adaptive abstractions to support both Material and Cupertino themes,
 /// ensuring consistent behavior across Android, iOS, and Web platforms.
+///
+/// See STYLEGUIDE.md#32-const-constructors (§3.2) (const constructors), STYLEGUIDE.md#31-super-parameters (§3.1) (super.key),
+/// and STYLEGUIDE.md#7-platform-style-guide-compliance (§7) (Platform Style Guides) for implementation guidelines.
 library presentation.widgets;
 
 import 'package:flutter/material.dart';
@@ -39,6 +42,7 @@ import 'adaptive/adaptive_widget_module.dart';
 /// Reusable widget for displaying a single card
 /// 🔹 Stateless widget for performance
 /// 🔹 Callback-based interaction (like Angular @Output)
+/// See STYLEGUIDE.md#32-const-constructors (§3.2) for const constructors and STYLEGUIDE.md#31-super-parameters (§3.1) for super parameters
 class CardTile extends StatelessWidget {
   final LoyaltyCard card;
   final VoidCallback? onTap;

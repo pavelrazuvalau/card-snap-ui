@@ -12,6 +12,9 @@
 /// ```
 ///
 /// In Flutter/Dart, we use main() function with dependency injection.
+///
+/// See STYLEGUIDE.md#11-flutter-first-principle (§1.1) (Flutter-First Principle), STYLEGUIDE.md#82-dependency-injection (§8.2) (Dependency Injection),
+/// and STYLEGUIDE.md#22-dart-syntax-explained-with-angulartypescript-analogies (§2.2) (Dart Syntax - async/await, const) for implementation guidelines.
 library main;
 
 import 'package:flutter/material.dart';
@@ -31,6 +34,7 @@ import 'core/platform/locale_controller.dart';
 /// Main application entry point
 /// 🔹 Bootstrap the Flutter application
 /// 🧠 Initialize dependencies before running app
+/// See STYLEGUIDE.md#22-dart-syntax-explained-with-angulartypescript-analogies (§2.2) for async/await patterns and STYLEGUIDE.md#82-dependency-injection (§8.2) for DI setup
 void main() async {
   // Ensure Flutter binding is initialized
   WidgetsFlutterBinding.ensureInitialized();
@@ -46,6 +50,7 @@ void main() async {
 /// 🔹 Register all services and repositories
 /// 🧠 Offline-first approach - local storage is primary
 /// 🧠 Uses get_it for dependency injection (similar to Angular providers)
+/// See STYLEGUIDE.md#82-dependency-injection (§8.2) for Dependency Injection guidelines and best practices
 Future<void> _initializeDependencies() async {
   await initializeDependencyInjection();
 }
@@ -54,6 +59,7 @@ Future<void> _initializeDependencies() async {
 /// 🔶 Root widget for the entire application
 /// 🔹 Similar to Angular's AppComponent
 /// 🧠 Uses adaptive app factory for cross-platform theme adaptation
+/// See STYLEGUIDE.md#32-const-constructors (§3.2) (const constructors) and STYLEGUIDE.md#31-super-parameters (§3.1) (super parameters) for best practices
 class CardSnapApp extends StatelessWidget {
   const CardSnapApp({super.key});
 

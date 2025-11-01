@@ -10,6 +10,9 @@
 /// - Disabled state with reduced opacity
 ///
 /// Angular analogy: Angular Material List Item component with Material Design 3 styling.
+///
+/// See STYLEGUIDE.md#71-material-design-3-androidweb (§7.1) for Material Design 3 compliance requirements
+/// and STYLEGUIDE.md#73-style-guide-documentation-requirements (§7.3) for documentation standards with style guide references.
 
 library presentation.widgets.adaptive.list_tile.material;
 

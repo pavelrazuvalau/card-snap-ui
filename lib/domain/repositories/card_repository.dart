@@ -14,6 +14,9 @@
 /// ```
 ///
 /// In Flutter/Dart, we use repository pattern with Future-based async operations.
+///
+/// See STYLEGUIDE.md#82-dependency-injection (§8.2) for Dependency Injection (interface design),
+/// STYLEGUIDE.md#83-error-handling-pattern (§8.3) for Error Handling Pattern (Result<T>), and STYLEGUIDE.md#22-dart-syntax-explained-with-angulartypescript-analogies (§2.2) for async/await patterns.
 library domain.repositories;
 
 import '../entities/card.dart';

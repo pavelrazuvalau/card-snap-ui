@@ -17,6 +17,9 @@
 /// ```
 ///
 /// In Flutter/Dart, we implement repository interfaces with data sources.
+///
+/// See STYLEGUIDE.md#82-dependency-injection (§8.2) for Dependency Injection patterns,
+/// STYLEGUIDE.md#83-error-handling-pattern (§8.3) for Error Handling (Result<T>), and STYLEGUIDE.md#22-dart-syntax-explained-with-angulartypescript-analogies (§2.2) for async/await patterns.
 library data.repositories;
 
 import '../datasources/local_card_datasource.dart';
@@ -33,6 +36,7 @@ class LocalCardRepository implements CardRepository {
 
   /// Constructor injection
   /// 🔹 Depends on data source abstraction
+  /// See STYLEGUIDE.md#32-const-constructors (§3.2) for const constructors and STYLEGUIDE.md#82-dependency-injection (§8.2) for DI patterns
   const LocalCardRepository(this._dataSource);
 
   @override

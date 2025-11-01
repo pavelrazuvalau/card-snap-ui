@@ -14,6 +14,9 @@
 /// 🧠 NOTE: MaterialApp can also wrap Cupertino widgets, so we use MaterialApp with
 /// Cupertino theme for better compatibility with adaptive widgets.
 /// However, for true native experience, we could use CupertinoApp wrapper.
+///
+/// See STYLEGUIDE.md#72-ios-human-interface-guidelines-hig (§7.2) for iOS Human Interface Guidelines compliance requirements,
+/// STYLEGUIDE.md#6-localization-standards (§6) for Localization standards, and STYLEGUIDE.md#73-style-guide-documentation-requirements (§7.3) for documentation requirements.
 library presentation.widgets.adaptive.app.cupertino;
 
 import 'package:flutter/material.dart';

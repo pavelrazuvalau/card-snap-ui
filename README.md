@@ -26,7 +26,8 @@ Depth of understanding comes before delivery speed. Clarity, commentary, and rep
 
 - **🔴 CRITICAL: Business requirements & SRS baseline:** [BUSINESS.md](BUSINESS.md) - **Primary source of truth** for all business rules, functional requirements, user stories, and feature priorities
 - **Architecture & detailed patterns:** [ARCHITECTURE.md](ARCHITECTURE.md) - Must align with `BUSINESS.md` requirements
-- **AI copilot operating rules:** [AGENTS.md](AGENTS.md) - Agents must follow `BUSINESS.md` by default
+- **Code style standards & best practices:** [STYLEGUIDE.md](STYLEGUIDE.md) - **Single source of truth** for Dart/Flutter coding standards, syntax explanations, and style guide compliance
+- **AI copilot operating rules:** [AGENTS.md](AGENTS.md) - Agents must follow `BUSINESS.md` by default and `STYLEGUIDE.md` for code style
 - **Automation & infrastructure:** [infra/](infra/)
 - **Narrative docs & guides:** [docs/](docs/)
 - **Release process & changelog:** [ARCHITECTURE.md](ARCHITECTURE.md) §20, [CHANGELOG.md](CHANGELOG.md)
@@ -36,6 +37,7 @@ Depth of understanding comes before delivery speed. Clarity, commentary, and rep
 ### Documentation
 - [ARCHITECTURE.md](ARCHITECTURE.md) - Detailed architecture guide
 - [BUSINESS.md](BUSINESS.md) - Business requirements
+- [STYLEGUIDE.md](STYLEGUIDE.md) - Code style standards and Dart/Flutter best practices
 - [AGENTS.md](AGENTS.md) - AI copilot playbook
 - [MOBILE_SETUP.md](MOBILE_SETUP.md) - Mobile development setup guide
 
@@ -152,13 +154,19 @@ See `test/README.md` for detailed testing strategy and coverage requirements. Us
 
 ### Code Quality Standards
 
-AI agents must follow code quality requirements defined in `AGENTS.md`, including:
+AI agents must follow code quality requirements defined in `STYLEGUIDE.md`. **See `STYLEGUIDE.md` §3** for comprehensive code quality and linting requirements.
+
+**Quick Reference:**
 - Use `super.parameter` syntax for cleaner constructors
 - Add `const` keyword for compile-time constants
 - Avoid redundant default arguments
 - Run `dart format .` and `flutter analyze` before committing
+- Include `STYLEGUIDE.md` references in code comments (see `AGENTS.md` §6.3)
 
-See `AGENTS.md` §5 for detailed linting best practices and examples.
+**Code Comments & Documentation:**
+See `AGENTS.md` §6.3 for complete guidelines on adding `STYLEGUIDE.md` references in code comments, format specifications, and discovery workflow when encountering new patterns.
+
+See `STYLEGUIDE.md` §3 for comprehensive guidelines and examples. See `AGENTS.md` §6.3 for comment and reference requirements.
 
 ---
 
@@ -213,5 +221,7 @@ Cursor, GitKraken MCP, and other copilots must follow the playbook in `AGENTS.md
 **AI agents must:**
 - Follow business requirements in `BUSINESS.md` by default
 - Align architectural decisions with `ARCHITECTURE.md` patterns
+- Follow code style standards in `STYLEGUIDE.md` for all code changes
+- Add `STYLEGUIDE.md` references in code comments and update documentation per `AGENTS.md` §6.3
 - Reference functional specifications and acceptance criteria from `BUSINESS.md` during implementation
 - Ensure all features satisfy MUST/SHOULD/WON'T priorities defined in `BUSINESS.md` §2

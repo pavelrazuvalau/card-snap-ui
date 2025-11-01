@@ -4,6 +4,9 @@
 /// Similar to Angular's app component factory that creates platform-specific root components.
 ///
 /// 🧠 Uses Strategy pattern to encapsulate platform-specific app initialization.
+///
+/// See STYLEGUIDE.md#42-meaningful-file-names (§4.2) (Co-location) and STYLEGUIDE.md#43-separate-files-by-role (§4.3) (Separate Files by Role)
+/// for factory pattern organization guidelines.
 library presentation.widgets.adaptive.app;
 
 import 'package:flutter/material.dart';
@@ -34,6 +37,11 @@ class AdaptiveAppFactory {
 
     // 🔶 Delegate to strategy
     // 🧠 Strategy creates its own theme internally
-    return strategy.buildApp(title: title, home: home, routes: routes, locale: locale);
+    return strategy.buildApp(
+      title: title,
+      home: home,
+      routes: routes,
+      locale: locale,
+    );
   }
 }

@@ -17,6 +17,9 @@
 /// ```
 ///
 /// In Flutter/Dart, we use simple in-memory storage for minimal startup.
+///
+/// See STYLEGUIDE.md#83-error-handling-pattern (§8.3) for Error Handling (Result<T>),
+/// STYLEGUIDE.md#22-dart-syntax-explained-with-angulartypescript-analogies (§2.2) for async/await patterns, and STYLEGUIDE.md#82-dependency-injection (§8.2) for Dependency Injection.
 library data.datasources;
 
 import '../models/card_model.dart';

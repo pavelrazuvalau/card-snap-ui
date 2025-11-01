@@ -4,6 +4,8 @@
 /// This eliminates duplication of platform-selection logic across multiple strategy factories.
 ///
 /// Similar to Angular's platform detection service that provides centralized platform decisions.
+///
+/// See STYLEGUIDE.md#13-best-practices---core-principles (§1.3) (DRY principle) and STYLEGUIDE.md#44-shared-utilities (§4.4) (Shared Utilities) for organization guidelines.
 import '../common/platform_types.dart';
 
 /// 🔶 Strategy Selector

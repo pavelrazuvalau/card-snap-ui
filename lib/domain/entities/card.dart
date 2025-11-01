@@ -15,6 +15,9 @@
 /// ```
 ///
 /// In Flutter/Dart, we use immutable classes with value semantics.
+///
+/// See STYLEGUIDE.md#81-immutable-models (§8.1) for Immutable Models guidelines,
+/// STYLEGUIDE.md#32-const-constructors (§3.2) for const constructors, and STYLEGUIDE.md#22-dart-syntax-explained-with-angulartypescript-analogies (§2.2) for factory methods and extensions.
 library domain.entities;
 
 /// Loyalty/discount card entity
@@ -70,6 +73,7 @@ class LoyaltyCard {
 
   /// Create a copy with updated fields
   /// 🔹 Immutable update pattern
+  /// See STYLEGUIDE.md#81-immutable-models (§8.1) for copyWith pattern in immutable models
   LoyaltyCard copyWith({
     String? id,
     String? name,
@@ -118,6 +122,7 @@ class LoyaltyCard {
 
   /// Create from JSON map
   /// 🔹 Simple deserialization from data persistence
+  /// See STYLEGUIDE.md#22-dart-syntax-explained-with-angulartypescript-analogies (§2.2) for factory constructor patterns
   factory LoyaltyCard.fromJson(Map<String, dynamic> json) {
     return LoyaltyCard(
       id: json['id'] as String,

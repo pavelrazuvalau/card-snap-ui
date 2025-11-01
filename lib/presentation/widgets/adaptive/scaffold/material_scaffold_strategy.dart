@@ -10,6 +10,9 @@
 /// - Provides Material Design 3 spacing and padding defaults
 ///
 /// Angular analogy: Angular Material Scaffold with Material Design 3 compliance.
+///
+/// See STYLEGUIDE.md#71-material-design-3-androidweb (§7.1) for Material Design 3 compliance requirements
+/// and STYLEGUIDE.md#73-style-guide-documentation-requirements (§7.3) for documentation standards with style guide references.
 
 import 'package:flutter/material.dart';
 import 'scaffold_strategy_interface.dart';

@@ -9,6 +9,9 @@
 /// - Supports Android, Web, Desktop platforms
 ///
 /// Angular analogy: Similar to Angular Material root app with Material module.
+///
+/// See STYLEGUIDE.md#71-material-design-3-androidweb (§7.1) for Material Design 3 compliance requirements,
+/// STYLEGUIDE.md#6-localization-standards (§6) for Localization standards, and STYLEGUIDE.md#73-style-guide-documentation-requirements (§7.3) for documentation requirements.
 library presentation.widgets.adaptive.app.material;
 
 import 'package:flutter/material.dart';

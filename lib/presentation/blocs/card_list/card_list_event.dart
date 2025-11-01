@@ -2,6 +2,8 @@
 ///
 /// Events for card list state management using BLoC pattern.
 /// Similar to Angular NgRx Actions: trigger state changes.
+///
+/// See STYLEGUIDE.md#32-const-constructors (§3.2) for const constructors and STYLEGUIDE.md#22-dart-syntax-explained-with-angulartypescript-analogies (§2.2) for sealed classes.
 library presentation.blocs.card_list;
 
 import 'package:equatable/equatable.dart';
@@ -10,6 +12,7 @@ import '../../../domain/entities/card.dart';
 /// Base class for card list events
 /// 🔹 All events extend this class for type safety
 /// 🧠 Similar to NgRx Actions in Angular
+/// See STYLEGUIDE.md#32-const-constructors (§3.2) for const constructors
 abstract class CardListEvent extends Equatable {
   const CardListEvent();
 

@@ -2,6 +2,8 @@
 ///
 /// Centralized controller for managing current app locale.
 /// Similar to Angular service that exposes current language and a setter.
+///
+/// See STYLEGUIDE.md#6-localization-standards (§6) for Localization standards and locale resolution patterns.
 library core.platform.locale_controller;
 
 import 'package:flutter/widgets.dart';
@@ -19,7 +21,10 @@ class LocaleController {
   }
 
   /// Shared resolver to keep fallback policy in one place.
-  static Locale resolveLocale(Locale? deviceLocale, Iterable<Locale> supported) {
+  static Locale resolveLocale(
+    Locale? deviceLocale,
+    Iterable<Locale> supported,
+  ) {
     if (supported.isEmpty) {
       return const Locale('en');
     }
@@ -32,5 +37,3 @@ class LocaleController {
     return supported.first; // fallback to first (en)
   }
 }
-
-

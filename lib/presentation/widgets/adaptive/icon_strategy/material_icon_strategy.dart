@@ -8,6 +8,9 @@
 /// - Uses Material Design color palette
 ///
 /// Angular analogy: Angular Material Icon service.
+///
+/// See STYLEGUIDE.md#71-material-design-3-androidweb (§7.1) for Material Design 3 compliance requirements
+/// and STYLEGUIDE.md#73-style-guide-documentation-requirements (§7.3) for documentation standards with style guide references.
 
 library presentation.widgets.adaptive.icon_strategy.material;
 
