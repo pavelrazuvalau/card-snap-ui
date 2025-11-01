@@ -1,0 +1,98 @@
+name: Release Branch CI (Pre-Release Testing)
+
+on:
+  push:
+    branches:
+      - 'release/**'
+
+jobs:
+  # Pre-release checks and validation
+  pre-release-checks:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.35.x'
+          channel: 'stable'
+          cache: true
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      # Validate CHANGELOG early (before running tests)
+      - name: Validate CHANGELOG for release
+        run: |
+          bash .github/scripts/validate-changelog.sh --type release
+        continue-on-error: false
+
+      - name: Verify formatting
+        run: dart format --set-exit-if-changed .
+
+      - name: Run analyzer
+        run: flutter analyze
+
+      - name: Run tests with coverage
+        run: flutter test --coverage
+
+      - name: Check coverage thresholds
+        run: |
+          echo "Coverage thresholds:"
+          echo "  Domain: 90%+"
+          echo "  Data: 80%+"
+          echo "  Presentation: 70%+"
+          echo "  Core: 85%+"
+          echo ""
+          echo "Review coverage/lcov.info to ensure thresholds are met"
+
+  # Pre-release build for testing
+  pre-release-build:
+    runs-on: ubuntu-latest
+    needs: pre-release-checks
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.35.x'
+          channel: 'stable'
+          cache: true
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Get version from pubspec
+        id: version
+        run: |
+          VERSION=$(grep -E "^version:" pubspec.yaml | sed -E 's/version: ([0-9]+\.[0-9]+\.[0-9]+).*/\1/')
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Version: $VERSION"
+
+      - name: Build Android APK (Pre-Release)
+        run: |
+          flutter build apk --release
+
+      - name: Upload Android APK (Pre-Release)
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-apk-pre-release
+          path: build/app/outputs/flutter-apk/app-release.apk
+          retention-days: 7
+
+      - name: Build summary
+        run: |
+          echo "## Pre-Release Build Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Branch:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Version:** ${{ steps.version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Purpose:** Pre-release testing before merging to main" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "After thorough testing, merge this branch to \`main\` to create the official release." >> $GITHUB_STEP_SUMMARY
+

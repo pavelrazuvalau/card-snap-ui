@@ -22,14 +22,15 @@ jobs:
         run: |
           echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
 
-      - name: Check if branch is feature or bugfix
+      - name: Check if branch requires CI verification
         id: branch_check
         run: |
           BRANCH_NAME="${{ github.ref_name }}"
           
-          # Check if branch is feature/ or bugfix/
+          # Check if branch is feature/, bugfix/, or release/
           IS_FEATURE=false
           IS_BUGFIX=false
+          IS_RELEASE=false
           
           if [[ "$BRANCH_NAME" =~ ^feature/ ]]; then
             IS_FEATURE=true
@@ -41,26 +42,41 @@ jobs:
             echo "Branch $BRANCH_NAME is a bugfix branch"
           fi
           
-          if [ "$IS_FEATURE" = "true" ] || [ "$IS_BUGFIX" = "true" ]; then
-            echo "is_feature_bugfix=true" >> $GITHUB_OUTPUT
+          if [[ "$BRANCH_NAME" =~ ^release/ ]]; then
+            IS_RELEASE=true
+            echo "Branch $BRANCH_NAME is a release branch"
+          fi
+          
+          if [ "$IS_FEATURE" = "true" ] || [ "$IS_BUGFIX" = "true" ] || [ "$IS_RELEASE" = "true" ]; then
+            echo "requires_ci_check=true" >> $GITHUB_OUTPUT
             echo "Checking CI status for branch $BRANCH_NAME..."
           else
-            echo "is_feature_bugfix=false" >> $GITHUB_OUTPUT
-            echo "Branch $BRANCH_NAME is not a feature/bugfix branch - skipping checks verification"
+            echo "requires_ci_check=false" >> $GITHUB_OUTPUT
+            echo "Branch $BRANCH_NAME does not require CI verification - skipping checks"
+          fi
+          
+          # Determine workflow name based on branch type
+          if [ "$IS_FEATURE" = "true" ] || [ "$IS_BUGFIX" = "true" ]; then
+            echo "workflow_name=Feature/Bugfix Branch CI" >> $GITHUB_OUTPUT
+          elif [ "$IS_RELEASE" = "true" ]; then
+            echo "workflow_name=Release Branch CI (Pre-Release Testing)" >> $GITHUB_OUTPUT
           fi
 
-      - name: Get latest workflow run for feature or bugfix branch
+      - name: Get latest workflow run for branch
         id: workflow_status
-        if: steps.branch_check.outputs.is_feature_bugfix == 'true'
+        if: steps.branch_check.outputs.requires_ci_check == 'true'
         run: |
           BRANCH_NAME="${{ github.ref_name }}"
+          WORKFLOW_NAME="${{ steps.branch_check.outputs.workflow_name }}"
           
-          # Get the latest workflow run for "Feature/Bugfix Branch CI" on this branch
-          # This workflow runs automatically on push to feature/* and bugfix/* branches
+          # Get the latest workflow run for this branch type
+          # Feature/bugfix branches: "Feature/Bugfix Branch CI"
+          # Release branches: "Release Branch CI (Pre-Release Testing)"
           echo "Checking CI status for branch: $BRANCH_NAME"
+          echo "Expected workflow: $WORKFLOW_NAME"
           RUN_INFO=$(gh run list \
             --branch "$BRANCH_NAME" \
-            --workflow "Feature/Bugfix Branch CI" \
+            --workflow "$WORKFLOW_NAME" \
             --limit 1 \
             --json conclusion,status,url,headSha,event 2>/dev/null || echo '[]')
           
@@ -87,9 +103,10 @@ jobs:
 
       - name: Wait for checks to complete (if running)
         id: wait_checks
-        if: steps.branch_check.outputs.is_feature_bugfix == 'true' && steps.workflow_status.outputs.has_run == 'true' && steps.workflow_status.outputs.status != 'completed'
+        if: steps.branch_check.outputs.requires_ci_check == 'true' && steps.workflow_status.outputs.has_run == 'true' && steps.workflow_status.outputs.status != 'completed'
         run: |
           BRANCH_NAME="${{ github.ref_name }}"
+          WORKFLOW_NAME="${{ steps.branch_check.outputs.workflow_name }}"
           MAX_WAIT_TIME=900   # 15 minutes in seconds (reasonable timeout)
           CHECK_INTERVAL=30   # Check every 30 seconds
           ELAPSED=0
@@ -102,7 +119,7 @@ jobs:
             # Get current workflow status
             RUN_INFO=$(gh run list \
               --branch "$BRANCH_NAME" \
-              --workflow "Feature/Bugfix Branch CI" \
+              --workflow "$WORKFLOW_NAME" \
               --limit 1 \
               --json conclusion,status,url 2>/dev/null || echo '[]')
             
@@ -159,10 +176,11 @@ jobs:
             echo "status=$STATUS" >> $GITHUB_OUTPUT
           fi
 
-      - name: Verify checks passed for feature or bugfix branch
-        if: steps.branch_check.outputs.is_feature_bugfix == 'true'
+      - name: Verify checks passed for branch
+        if: steps.branch_check.outputs.requires_ci_check == 'true'
         run: |
           BRANCH_NAME="${{ github.ref_name }}"
+          WORKFLOW_NAME="${{ steps.branch_check.outputs.workflow_name }}"
           HAS_RUN="${{ steps.workflow_status.outputs.has_run }}"
           
           # Use conclusion from wait step if checks were running, otherwise use initial status
@@ -179,11 +197,14 @@ jobs:
           if [ "$HAS_RUN" != "true" ]; then
             echo "❌ Error: No CI checks found for branch $BRANCH_NAME"
             echo ""
-            echo "This branch (feature/* or bugfix/*) requires CI checks to pass before building."
+            echo "This branch requires CI checks to pass before building:"
+            echo "  - feature/* and bugfix/* branches require 'Feature/Bugfix Branch CI'"
+            echo "  - release/* branches require 'Release Branch CI (Pre-Release Testing)'"
+            echo ""
             echo "Please ensure:"
             echo "  1. The branch has been pushed to the repository"
             echo "  2. CI checks have run at least once"
-            echo "  3. Expected workflow: 'Feature/Bugfix Branch CI'"
+            echo "  3. Expected workflow: '$WORKFLOW_NAME'"
             echo ""
             echo "Push your changes to trigger automatic CI checks."
             exit 1

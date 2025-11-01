@@ -4,6 +4,10 @@ on:
   push:
     branches:
       - main
+  # This workflow runs when:
+  # - Release branch is merged into main via PR
+  # - Direct pushes to main should be prevented by branch protection
+  # - Each merge to main represents a stable production release
 
 jobs:
   release-build:
@@ -53,9 +57,11 @@ jobs:
         run: |
           flutter build apk --release
 
-      - name: Build Android App Bundle
-        run: |
-          flutter build appbundle --release
+      # Android App Bundle build disabled until 1.0.0 release
+      # AAB is required for Google Play Store publication, but not needed for testing/development
+      # - name: Build Android App Bundle
+      #   run: |
+      #     flutter build appbundle --release
 
       # ============================================================================
       # iOS BUILD (DISABLED - Requires Apple Developer Program)
@@ -110,10 +116,9 @@ jobs:
           TAG="v${VERSION}"
           TITLE="Release v${VERSION} (Android)"
           
-          # Create release
+          # Create release (APK only until 1.0.0)
           gh release create "$TAG" \
             build/app/outputs/flutter-apk/app-release.apk \
-            build/app/outputs/bundle/release/app-release.aab \
             --title "$TITLE" \
             --notes-file release_notes.md \
             --latest \

@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - develop
+  # This workflow runs when:
+  # - Feature/bugfix branches are merged into develop via PR
+  # - Direct pushes to develop (should be rare, prefer PRs)
 
 jobs:
   nightly-build:
@@ -53,9 +56,11 @@ jobs:
         run: |
           flutter build apk --release
 
-      - name: Build Android App Bundle
-        run: |
-          flutter build appbundle --release
+      # Android App Bundle build disabled until 1.0.0 release
+      # AAB is required for Google Play Store publication, but not needed for testing/development
+      # - name: Build Android App Bundle
+      #   run: |
+      #     flutter build appbundle --release
 
       # ============================================================================
       # iOS BUILD (DISABLED - Requires Apple Developer Program)
@@ -124,10 +129,9 @@ jobs:
             CHANGELOG_NOTES="Nightly build for ${BUILD_DATE_DISPLAY}"
           fi
           
-          # Create release
+          # Create release (APK only until 1.0.0)
           gh release create "$TAG" \
             build/app/outputs/flutter-apk/app-release.apk \
-            build/app/outputs/bundle/release/app-release.aab \
             --title "$TITLE" \
             --notes "$CHANGELOG_NOTES" \
             --prerelease \

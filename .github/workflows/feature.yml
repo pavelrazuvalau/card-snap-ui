@@ -2,6 +2,7 @@ name: Feature/Bugfix Branch CI
 
 on:
   # Automatic checks on push to feature and bugfix branches
+  # These branches are merged via PR into 'develop' branch
   push:
     branches:
       - 'feature/**'
@@ -9,6 +10,7 @@ on:
   
 jobs:
   # Job for checks - runs automatically on push to feature/bugfix branches
+  # Purpose: Validate code quality before creating PR to develop branch
   checks:
     runs-on: ubuntu-latest
     
