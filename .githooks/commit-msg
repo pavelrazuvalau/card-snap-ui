@@ -1,0 +1,52 @@
+#!/bin/bash
+
+# ============================================================================
+# Commit Message Hook for Card Snap UI
+# ============================================================================
+# Validates commit message format (Conventional Commits)
+# Called by git when commit message is provided
+# ============================================================================
+
+set -e
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+
+COMMIT_MSG_FILE="$1"
+COMMIT_MSG=$(cat "$COMMIT_MSG_FILE")
+
+# Get first line (subject line)
+FIRST_LINE=$(echo "$COMMIT_MSG" | head -n 1 | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+
+# Check if message is empty
+if [ -z "$FIRST_LINE" ]; then
+  echo -e "${RED}❌ Commit message cannot be empty${NC}"
+  exit 1
+fi
+
+# Conventional Commits pattern: type(scope): description
+# Types: feat, fix, docs, style, refactor, test, chore
+CONVENTIONAL_PATTERN='^(feat|fix|docs|style|refactor|test|chore)(\([^)]+\))?: .+$'
+
+if echo "$FIRST_LINE" | grep -qE "$CONVENTIONAL_PATTERN"; then
+  echo -e "${GREEN}✓ Commit message format is valid${NC}"
+  exit 0
+else
+  echo -e "${RED}❌ Invalid commit message format${NC}"
+  echo -e "${YELLOW}Commit message must follow Conventional Commits:${NC}"
+  echo -e "  Format: \`type(scope): description\`"
+  echo -e "  Types: feat, fix, docs, style, refactor, test, chore"
+  echo -e ""
+  echo -e "${YELLOW}Examples:${NC}"
+  echo -e "  feat(auth): add token refresh on login"
+  echo -e "  fix(devices): prevent crash when device id is null"
+  echo -e "  docs(domain): explain device sync use case"
+  echo -e "  refactor(ui): simplify dashboard rebuild logic"
+  echo -e ""
+  echo -e "${YELLOW}Your message:${NC} $FIRST_LINE"
+  exit 1
+fi
+

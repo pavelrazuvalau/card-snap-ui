@@ -1,0 +1,130 @@
+name: Main Branch CI (Releases)
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  release-build:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.x'
+          channel: 'stable'
+          cache: true
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      # Validate CHANGELOG early (before running tests)
+      - name: Validate CHANGELOG for release
+        run: |
+          bash .github/scripts/validate-changelog.sh --type release
+        continue-on-error: false
+
+      - name: Verify formatting
+        run: dart format --set-exit-if-changed .
+
+      - name: Run analyzer
+        run: flutter analyze
+
+      - name: Run tests with coverage
+        run: flutter test --coverage
+
+      - name: Check coverage thresholds
+        run: |
+          echo "Coverage thresholds:"
+          echo "  Domain: 90%+"
+          echo "  Data: 80%+"
+          echo "  Presentation: 70%+"
+          echo "  Core: 85%+"
+          echo ""
+          echo "Review coverage/lcov.info to ensure thresholds are met"
+
+      # Build Android (release)
+      - name: Build Android APK
+        run: |
+          flutter build apk --release
+
+      - name: Build Android App Bundle
+        run: |
+          flutter build appbundle --release
+
+      # ============================================================================
+      # iOS BUILD (DISABLED - Requires Apple Developer Program)
+      # ============================================================================
+      # To enable iOS release builds:
+      # 1. Subscribe to Apple Developer Program ($99/year)
+      # 2. Create certificates and provisioning profiles
+      # 3. Store them in GitHub Secrets
+      # 4. Uncomment the steps below and switch to macOS runner
+      # 5. Add: runs-on: macos-latest (or use matrix strategy)
+      # 
+      # Documentation: https://docs.flutter.dev/deployment/ios
+      # ============================================================================
+      #
+      # - name: Setup iOS Build
+      #   uses: maxim-lobanov/setup-xcode@v1
+      #   with:
+      #     xcode-version: latest-stable
+      #
+      # - name: Build iOS IPA
+      #   run: |
+      #     flutter build ipa --release
+
+      - name: Get version from pubspec
+        id: version
+        run: |
+          VERSION=$(grep -E "^version:" pubspec.yaml | sed -E 's/version: ([0-9]+\.[0-9]+\.[0-9]+).*/\1/')
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Version: $VERSION"
+
+      - name: Extract release notes from CHANGELOG
+        id: changelog
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          
+          # Extract changelog section for this version
+          CHANGELOG_SECTION=$(awk "/^## \[${VERSION}\]/,/^## \[/" CHANGELOG.md)
+          
+          # Remove the version header line
+          CHANGELOG_NOTES=$(echo "$CHANGELOG_SECTION" | tail -n +2)
+          
+          # Save to file for gh release create
+          echo "$CHANGELOG_NOTES" > release_notes.md
+          
+          echo "Extracted changelog notes for version $VERSION"
+
+      - name: Create GitHub Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          TAG="v${VERSION}"
+          TITLE="Release v${VERSION} (Android)"
+          
+          # Create release
+          gh release create "$TAG" \
+            build/app/outputs/flutter-apk/app-release.apk \
+            build/app/outputs/bundle/release/app-release.aab \
+            --title "$TITLE" \
+            --notes-file release_notes.md \
+            --latest \
+            --repo "${{ github.repository }}"
+
+      - name: Build summary
+        run: |
+          echo "## Release Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Version:** ${{ steps.version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Release Tag:** \`v${{ steps.version.outputs.version }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "GitHub Release created: https://github.com/${{ github.repository }}/releases/tag/v${{ steps.version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+

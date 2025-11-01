@@ -150,6 +150,31 @@ dart format .
 flutter build web
 ```
 
+### Git Hooks
+
+The repository includes pre-commit hooks that automatically validate:
+- ✅ **Branch naming**: Must match `feature/*`, `bugfix/*`, `release/*`, `hotfix/*`, `main`, or `develop`
+- ✅ **Code formatting**: Dart files must be properly formatted
+- ✅ **Commit message format**: Must follow Conventional Commits (see `ARCHITECTURE.md` §19)
+
+**Installation:**
+```bash
+# Install hooks (run once after cloning)
+bash scripts/install-git-hooks.sh
+```
+
+**Commit message format:**
+```
+type(scope): description
+
+Examples:
+- feat(auth): add token refresh on login
+- fix(ui): resolve button alignment issue
+- docs(domain): explain device sync use case
+```
+
+See `.githooks/README.md` for detailed information about hooks.
+
 See `test/README.md` for detailed testing strategy and coverage requirements. Use `flutter test integration_test` for end-to-end suites when changes cross layers. See `ARCHITECTURE.md` for architecture-specific testing guidance.
 
 ### Code Quality Standards
