@@ -12,6 +12,10 @@ jobs:
   nightly-build:
     runs-on: ubuntu-latest
     
+    # Grant permissions for creating releases
+    permissions:
+      contents: write  # Required for creating releases and uploading assets
+    
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
