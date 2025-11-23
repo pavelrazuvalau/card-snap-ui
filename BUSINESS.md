@@ -75,93 +75,44 @@ Author: Pavel Razuvalau
 
 ---
 
-### 2.1 Baseline Features (Market Standard)
+### 2.1 MVP Features (v0.1.0)
 
-These features represent the **standard market baseline** expected by users of loyalty card wallet applications. Our implementation will deliver these capabilities while prioritizing offline-first architecture and enhanced privacy.
+**Core Card Management:**
+- Add cards via QR/1D barcode scanning or manual entry with format selection
+- Edit card metadata (name, notes, store association, visual customization)
+- Delete cards with soft delete/archive capability
+- Support formats: QR Code, Code128, EAN-13, UPC-A, PDF417
 
-#### Core Card Management
-- **Add Card** — Users can add loyalty/discount cards via:
-  - QR code scanning (2D matrix codes)
-  - 1D barcode scanning (Code128, EAN-13, UPC-A)
-  - Manual entry with format selection
-- **Edit Card** — Users can modify card metadata after creation:
-  - Display name (e.g., "My Starbucks Card")
-  - Store/brand association
-  - Notes and personal remarks
-  - Visual customization (color hint, icon selection)
-- **Delete Card** — Soft delete with archive capability for recovery
-- **Display Format Selection** — Users can choose between QR, 1D barcode formats with auto-detection as fallback
+**Offline-First Storage:**
+- All data encrypted at rest (AES-256-GCM) with device-specific keys (Android Keystore/iOS Keychain)
+- No network dependency for core operations
+- Fast access (< 200ms card rendering, < 100ms offline search)
 
-#### Barcode and QR Support
-- **Format Compatibility** — Support for industry-standard formats:
-  - QR Code (2D matrix)
-  - Code 128, Code 39 (1D linear)
-  - EAN-13, UPC-A (retail standard)
-  - PDF417 (2D stacked)
-- **Rendering Fidelity** — Pixel-equivalent barcode/QR code generation matching original quality
-- **Scanning Reliability** — Automatic detection and fallback to manual entry on failure
+**Backup & Restore:**
+- Encrypted QR-based backup for offline transfer
+- Encrypted archive export/import (`.zip` with cards.json, stores.json, metadata.json)
+- Conflict resolution (merge/replace/skip strategies)
 
-#### Basic Offline Storage
-- **Local-First Architecture** — All card data stored securely on device
-- **Encryption at Rest** — AES-256-GCM with per-record IV and authentication tag
-- **Key Management** — Device-specific keys stored in Android Keystore / iOS Keychain
-- **No Network Dependency** — All core features work without internet connection
+**Screenshot Import:**
+- Image selection from photo library
+- Automatic barcode/QR detection and extraction
+- Batch processing and format validation
 
-#### Widget Support (Future)
-- **Single-Card Widget** — Display a selected card’s barcode directly on home screen
-- **Multi-Card Widget** — Show list of favorite or recently-used cards with quick access
-- **Platform Integration** — Native Android and iOS widget APIs
+**Offline Store Search:**
+- Local index with basic facets (location, barcode type, deep link availability)
+- Fast search (< 100ms for 10k entries)
 
-#### Screenshot Import (Baseline)
-- **Image Selection** — Users can select screenshots from photo library or camera roll
-- **Barcode Recognition** — Automatic detection and extraction of barcodes/QR codes from images
-- **Import Confirmation** — Preview extracted codes before saving to collection
-- **Multiple Card Support** — Import multiple cards from a single image if multiple codes detected
+### 2.2 Enhanced Features (v0.1.0+)
 
-**Note:** The standard screenshot import feature has UX limitations. Our enhanced implementation adds step-by-step guidance and visual tutorials as described in section 2.2.
+**Enhanced Import Flow:**
+- Step-by-step guidance and visual tutorials
+- Real-time format validation
+- Manual file import (`.json`, `.zip`, `.csv`)
 
----
-
-### 2.2 Enhanced Features (Offline-First Improvements)
-
-These features represent **significant improvements** over the baseline market standard, with emphasis on offline reliability, privacy, and extensibility.
-
-#### Enhanced Import Flow
-- **Step-by-Step Guidance** — Visual tutorial explaining screenshot selection and capture
-- **Format Validation** — Real-time feedback on code format and validity before import
-- **Batch Processing** — Import multiple cards from multiple screenshots in one session
-- **Manual File Import** — Support for `.json`, `.zip`, `.csv` file formats for advanced users
-- **Future AI-OCR** — Roadmap for AI-powered card number recognition from images (planned for v1.0)
-- **Full Offline Operation** — No cloud uploads; all processing happens on-device
-
-#### Offline-First Backup and Restore
-- **Encrypted QR Backup** — Generate scannable QR code containing encrypted card collection for offline transfer
-- **QR Restoration** — Scan QR on another device to restore entire card collection
-- **Archive Export/Import** — Create encrypted `.zip` archives containing:
-  - `cards.json` — All card data in encrypted format
-  - `stores.json` — Store metadata and associations
-  - `metadata.json` — Schema versioning and integrity checks
-  - `images/` — Optional card artwork and icons
-- **Conflict Resolution** — User-controlled merge strategies during restore (merge/replace/skip)
-- **Future Storage Providers** — Extensible `StorageProvider` abstraction for:
-  - Google Drive sync (planned v1.0)
-  - iCloud sync (planned v1.0)
-  - Dropbox sync (planned v1.0)
-  - Self-hosted server integration (future)
-
-#### Enhanced UX Improvements
-- **Instant Rendering** — Card codes display in < 200 ms from app open
-- **Fast Startup** — App cold start < 1.0 s on reference devices
-- **Metadata Management** — Rich editing for store names, categories, locations
-- **Visual Customization** — Color themes, icons, and branding per card
-- **Search Performance** — Offline search completes in < 100 ms for 10k entries
-
-#### Encryption and Privacy Enhancements
-- **Granular Encryption** — Per-card encryption with unique IV and authentication tag
-- **Biometric Unlock** — Optional FaceID/TouchID gating for sensitive operations
-- **Password-Protected Backups** — PBKDF2-derived keys (≥ 150k iterations) for backup archives
-- **GDPR Compliance** — No data leaves device without explicit user action
-- **Transparent Policies** — Clear communication about data storage and encryption methods
+**Enhanced UX:**
+- Cold start < 1.0s, instant rendering < 200ms
+- Rich metadata management and visual customization
+- Biometric unlock (FaceID/TouchID) for sensitive operations
 
 ---
 
@@ -314,133 +265,20 @@ THEN the data decrypts, conflicts (duplicates or outdated entries) are surfaced,
 
 ### 5.3 Data Models
 
-#### Loyalty Card (JSON Schema)
+**Core Entities:**
+- **LoyaltyCard** - Card entity with barcode data, metadata, timestamps, encryption info. Required fields: `id`, `displayName`, `code`, `codeFormat`, `createdAt`, `updatedAt`, `encryption`. Supports formats: `qr`, `code128`, `ean13`, `upca`, `pdf417`.
+- **Store** - Merchant/store with location data, barcode format support, deep link info. Required fields: `id`, `brandName`, `countryCode`.
+- **BackupArchive** - Encrypted backup with schema versioning. Structure: `cards.json`, `stores.json`, `metadata.json`, `images/` (optional).
 
-```json
-{
-  "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "LoyaltyCard",
-  "type": "object",
-  "required": ["id", "displayName", "code", "codeFormat", "createdAt", "updatedAt", "encryption"],
-  "properties": {
-    "id": { "type": "string", "format": "uuid" },
-    "displayName": { "type": "string", "minLength": 1 },
-    "notes": { "type": "string" },
-    "code": { "type": "string" },
-    "codeFormat": { "type": "string", "enum": ["qr", "code128", "ean13", "upca", "pdf417"] },
-    "barcodeChecksum": { "type": "string" },
-    "storeRef": { "type": ["null", "string"], "format": "uuid" },
-    "favorite": { "type": "boolean", "default": false },
-    "colorHint": { "type": "string", "pattern": "^#([A-Fa-f0-9]{6})$" },
-    "imageRef": { "type": ["null", "string"] },
-    "createdAt": { "type": "string", "format": "date-time" },
-    "updatedAt": { "type": "string", "format": "date-time" },
-    "encryption": {
-      "type": "object",
-      "required": ["scheme", "keyAlias"],
-      "properties": {
-        "scheme": { "type": "string", "enum": ["aes-256-gcm"] },
-        "keyAlias": { "type": "string" },
-        "iv": { "type": "string", "contentEncoding": "base64" },
-        "tag": { "type": "string", "contentEncoding": "base64" }
-      }
-    }
-  }
-}
-```
+**Encryption:** All sensitive data encrypted with AES-256-GCM. Keys stored in Android Keystore/iOS Keychain. Backup archives use PBKDF2-derived keys (≥ 150k iterations).
 
-#### Store / Merchant (JSON Schema)
-
-```json
-{
-  "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "Store",
-  "type": "object",
-  "required": ["id", "brandName", "countryCode"],
-  "properties": {
-    "id": { "type": "string", "format": "uuid" },
-    "brandName": { "type": "string" },
-    "branchName": { "type": "string" },
-    "location": {
-      "type": "object",
-      "properties": {
-        "addressLine1": { "type": "string" },
-        "postalCode": { "type": "string" },
-        "city": { "type": "string" },
-        "region": { "type": "string" },
-        "countryCode": { "type": "string", "pattern": "^[A-Z]{2}$" },
-        "latitude": { "type": "number" },
-        "longitude": { "type": "number" }
-      }
-    },
-    "acceptsBarcodeTypes": {
-      "type": "array",
-      "items": { "type": "string", "enum": ["qr", "code128", "ean13", "upca", "pdf417"] }
-    },
-    "hasAppDeepLink": { "type": "boolean" },
-    "appDeepLink": { "type": "string", "format": "uri" },
-    "loyaltyProgramId": { "type": "string" },
-    "metadataVersion": { "type": "number" },
-    "lastSyncedAt": { "type": "string", "format": "date-time" }
-  }
-}
-```
-
-#### Backup Archive (metadata.json fragment)
-
-```json
-{
-  "version": "1.0",
-  "exportedAt": "2024-05-20T12:34:56Z",
-  "device": {
-    "platform": "android",
-    "osVersion": "14",
-    "appVersion": "0.1.0"
-  },
-  "cards": [
-    {
-      "id": "550e8400-e29b-41d4-a716-446655440000",
-      "checksum": "sha256:ab12cd34...",
-      "storeRef": "d9e6c9a4-61b9-4d59-bb5e-8c67443331f5",
-      "image": "images/550e8400.png"
-    }
-  ],
-  "stores": [
-    {
-      "id": "d9e6c9a4-61b9-4d59-bb5e-8c67443331f5",
-      "metadataVersion": 3
-    }
-  ],
-  "encryption": {
-    "scheme": "aes-256-gcm",
-    "salt": "base64...",
-    "iterations": 150000,
-    "iv": "base64...",
-    "tag": "base64..."
-  }
-}
-```
-
-Backup archive layout:
-
-```
-backup_YYYYMMDD_HHMM.zip
- ├── cards.json           # array of LoyaltyCard entries (encrypted per field or per file)
- ├── stores.json          # array of Store entries
- ├── metadata.json        # control information and versioning
- └── images/              # optional card artwork or previews
-```
+**Full JSON schemas:** See `docs/data-models.md` for complete schemas and validation rules.
 
 ### 5.4 Local Storage Structure
 
-Recommended storage: SQLite (`sqflite`) with DAO wrappers. Enforce encryption via SQLCipher or by encrypting payloads before persistence.
+**Storage:** SQLite (`sqflite`) with SQLCipher encryption. Tables: `cards` (encrypted code BLOB), `stores`, `facets_index` (offline search), `settings` (backup timestamps, sync flags).
 
-| Table | Columns (type) | Notes |
-|-------|----------------|-------|
-| `cards` | `id TEXT PK`, `display_name TEXT`, `code BLOB`, `code_format TEXT`, `checksum TEXT`, `notes TEXT`, `store_id TEXT FK`, `favorite INTEGER`, `color_hint TEXT`, `image_path TEXT`, `created_at INTEGER`, `updated_at INTEGER` | `code` stores encrypted payloads; decode in repository layer. |
-| `stores` | `id TEXT PK`, `brand_name TEXT`, `branch_name TEXT`, `city TEXT`, `region TEXT`, `country_code TEXT`, `latitude REAL`, `longitude REAL`, `accepts_formats TEXT JSON`, `has_app_deeplink INTEGER`, `app_deeplink TEXT`, `loyalty_program_id TEXT`, `metadata_version INTEGER`, `last_synced_at INTEGER` | `accepts_formats` persisted as JSON string. |
-| `facets_index` | `facet_name TEXT`, `facet_value TEXT`, `store_id TEXT`, `last_updated_at INTEGER` | Supports fast offline facet filtering. |
-| `settings` | `key TEXT PK`, `value TEXT` | Tracks last backup timestamp, sync flags, etc. |
+**Full schema:** See `docs/schema.md` for complete table definitions and relationships.
 
 Domain repositories expose immutable models (`freezed`) maintaining clean architecture boundaries.
 

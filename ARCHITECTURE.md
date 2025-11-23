@@ -40,14 +40,9 @@ This architecture ensures consistency in code, commits, and documentation across
 
 ### 2.1 Flutter-First Principle
 
-**Critical:** Despite the Angular developer background, code must be **pure, idiomatic Flutter**.
+**See `STYLEGUIDE.md` §1.1 for complete Flutter-First Principle guidelines.**
 
-- ✅ **Code patterns:** Use Flutter-native patterns (Factory, Strategy, Repository, etc.)
-- ✅ **Educational analogies:** Use Angular comparisons in comments/docs (`/// Similar to Angular's...`)
-- ❌ **Never import Angular patterns:** No DI containers, tokens, registries in Flutter code
-- ❌ **Avoid Angular abstractions:** Use Flutter-native solutions instead
-
-**Angular analogies are teaching tools, not architectural patterns.** Code must follow Flutter/Dart best practices exclusively.
+Code must be pure, idiomatic Flutter. Angular analogies exist only in documentation/comments for teaching purposes.
 
 ---
 
@@ -65,9 +60,7 @@ This architecture ensures consistency in code, commits, and documentation across
 
 ## 4. Syntax Comparison (Angular → Flutter / Dart)
 
-**All syntax comparisons and Dart language explanations with Angular/TypeScript analogies are defined in `STYLEGUIDE.md` §2.**
-
-See `STYLEGUIDE.md` §2.1 for the complete syntax comparison table and §2.2 for detailed Dart syntax explanations with examples.
+**See `STYLEGUIDE.md` §2 for complete syntax comparisons and Dart language explanations with Angular/TypeScript analogies.**
 
 ---
 
@@ -79,59 +72,16 @@ The application uses adaptive widget factory for cross-platform UI adaptation, s
 
 **Architecture:** `AdaptiveWidgetFactory` (facade) → `AdaptiveCardFactory` (specialized) → `StrategyFactory` → `Strategy` (platform-specific)
 
+**Architecture:** `AdaptiveWidgetFactory` (facade) → `AdaptiveCardFactory` (specialized) → `StrategyFactory` → `Strategy` (platform-specific)
+
 ```dart
 /// 🔶 Adaptive Widget Factory: Platform-Specific UI Adaptation
 /// Main facade that delegates to specialized factories for each widget type.
-/// Similar to Angular's platform detection service that adapts components
-/// based on browser/device capabilities and user preferences.
-///
-/// 🧠 Uses Facade pattern: delegates to specialized factories (AdaptiveCardFactory, 
-/// AdaptiveScaffoldFactory, etc.) rather than implementing logic inline.
 class AdaptiveWidgetFactory {
-  /// Get the current platform theme
-  /// 🔹 Delegates to PlatformDetector for centralized platform detection
-  /// 🧠 Web platform uses Material by default but can be customized
-  static PlatformTheme getCurrentTheme() {
-    return PlatformDetector.getCurrentTheme();
-  }
+  static PlatformTheme getCurrentTheme() => PlatformDetector.getCurrentTheme();
   
-  /// Create adaptive card widget based on platform
-  /// 🔹 Delegates to AdaptiveCardFactory which uses Strategy pattern internally
-  /// 🧠 Self-contained factory that doesn't depend on central registry
-  static Widget createCard({
-    required Widget child,
-    EdgeInsetsGeometry? margin,
-    EdgeInsetsGeometry? padding,
-    Color? color,
-    double? elevation,
-    ShapeBorder? shape,
-  }) {
-    return AdaptiveCardFactory.createCard(
-      child: child,
-      margin: margin,
-      padding: padding,
-      color: color,
-      elevation: elevation,
-      shape: shape,
-    );
-  }
-  
-  // Other methods delegate to similar specialized factories...
-}
-
-/// 🔶 Platform Detection
-/// Centralized platform detection logic reused by all factories.
-class PlatformDetector {
-  static PlatformTheme getCurrentTheme() {
-    try {
-      if (Platform.isIOS) return PlatformTheme.cupertino;
-      if (Platform.isAndroid) return PlatformTheme.material;
-      // Web platform - default to Material
-      return PlatformTheme.material;
-    } catch (e) {
-      // Web platform fallback
-      return PlatformTheme.material;
-    }
+  static Widget createCard({required Widget child, ...}) {
+    return AdaptiveCardFactory.createCard(child: child, ...);
   }
 }
 ```
@@ -146,32 +96,14 @@ class PlatformDetector {
 
 **StrategySelector Pattern** - Centralizes platform detection and strategy selection logic. All factories delegate to `StrategySelector` to avoid code duplication. This follows DRY principle by implementing the selection logic once and reusing it across all factory classes. Each factory only needs to specify its specific strategy constructors (Cupertino vs Material implementations).
 
+**Example:**
 ```dart
-/// 🔶 Strategy Factory Implementation
-/// Each factory is minimal - it only defines constructors for its strategies.
-/// All platform logic is centralized in StrategySelector.
 class AppBarStrategyFactory {
   static AppBarStrategy getStrategy() =>
       StrategySelector.getStrategyForCurrentPlatform(
         () => CupertinoAppBarStrategy(),
         () => MaterialAppBarStrategy(),
       );
-
-  static AppBarStrategy getStrategyForTheme(PlatformTheme theme) =>
-      StrategySelector.getStrategyForTheme(
-        theme,
-        () => CupertinoAppBarStrategy(),
-        () => MaterialAppBarStrategy(),
-      );
-}
-
-/// 🔶 Adaptive Factory Usage
-/// Adaptive factories are even simpler - they just call strategy factories.
-class AdaptiveAppBarFactory {
-  static Widget createAppBar({required String title, ...}) {
-    final strategy = AppBarStrategyFactory.getStrategy();
-    return strategy.createAppBar(title: title, ...);
-  }
 }
 ```
 
@@ -181,27 +113,9 @@ class AdaptiveAppBarFactory {
 - Easy to add new widgets: Just create folder with factory + strategy, no central registry changes needed
 - Flutter-idiomatic: Uses arrow functions and direct delegation patterns
 
-**Adaptive Root App Widget** - The application root uses adaptive app factory to switch between MaterialApp and CupertinoApp based on platform. This ensures native look-and-feel on each platform without platform-specific code in main.dart.
+**Adaptive Root App Widget** - The application root uses `AdaptiveAppFactory.createApp()` to switch between MaterialApp and CupertinoApp based on platform. Strategies create their own themes internally—complete encapsulation.
 
-```dart
-/// 🔶 Adaptive App Factory
-/// Creates platform-appropriate root app widget.
-/// Strategies create their own themes internally - complete encapsulation.
-return AdaptiveAppFactory.createApp(
-  title: AppConstants.appName,
-  home: const CardListPage(),
-);
-```
-
-**Key Points:**
-- **Encapsulation:** Themes are created within strategies, not passed from main.dart
-- **Platform Detection:** Automatic selection between Material and Cupertino based on runtime platform
-- **Zero Configuration:** main.dart doesn't need to know about themes at all
-
-**Style Guide Compliance** - All strategy implementations must follow official platform design guidelines. **See `STYLEGUIDE.md` §7** for comprehensive platform style guide compliance requirements, examples, and documentation standards.
-
-- **Material Design 3** ([https://m3.material.io/](https://m3.material.io/)) for Android/Web (elevation 1dp, padding 16dp, 12dp border radius) - **See `STYLEGUIDE.md` §7.1**
-- **iOS Human Interface Guidelines** ([https://developer.apple.com/design/human-interface-guidelines](https://developer.apple.com/design/human-interface-guidelines)) for iOS (shadows instead of elevation, padding 16pt, 44pt minimum touch target) - **See `STYLEGUIDE.md` §7.2**
+**Style Guide Compliance** - All strategy implementations must follow official platform design guidelines. See `STYLEGUIDE.md` §7 for Material Design 3 and iOS HIG compliance requirements.
 
 **Repository Pattern** - Abstracts data access layer with `CardRepository` interface and implementations. Similar to Angular's service layer that abstracts HTTP calls.
 
@@ -209,17 +123,7 @@ return AdaptiveAppFactory.createApp(
 
 **Dependency Injection** - Domain layer depends on abstractions (repository interfaces) rather than concrete implementations, ensuring loose coupling. Use Flutter DI solutions (`get_it`, `provider`) for business logic (repositories, use cases, services), but NOT for UI factories.
 
-**Best Practices Applied**
-
-**All best practices (YAGNI, DRY, KISS, SOLID, Occam's Razor, Avoid Premature Optimization) are defined in `STYLEGUIDE.md` §1.3.**
-
-See `STYLEGUIDE.md` §1.3 for comprehensive best practices guidelines with detailed explanations and examples.
-
-**File Organization**
-
-**All file organization rules (co-location, meaningful names, separate files by role, shared utilities) are defined in `STYLEGUIDE.md` §4.**
-
-See `STYLEGUIDE.md` §4 for comprehensive file organization guidelines with structure examples and naming conventions.
+**Best Practices & File Organization** - See `STYLEGUIDE.md` §1.3 for best practices (YAGNI, DRY, KISS, SOLID) and §4 for file organization guidelines.
 
 **SOLID Compliance**
 - **Open/Closed Principle**: Each widget factory is self-contained. To add a new widget, create a new folder with factory + strategy. No central registry needs modification.
@@ -450,36 +354,15 @@ Card Snap UI must deliver identical learning and runtime value on **Android** an
 | **Dependencies** | Avoid platform-only packages unless there is no Flutter-first alternative; when required, wrap them behind abstractions and document trade-offs. | Maintains educational focus on shared architecture patterns. |
 | **Style Guide Compliance** | All UI components must follow [Material Design 3](https://m3.material.io/) (Android) and [iOS Human Interface Guidelines](https://developer.apple.com/design/human-interface-guidelines) (iOS). Document specific values (padding, colors, elevation) with style guide references. | Ensures platform-native look and feel, improves user experience, maintains design consistency. |
 
-### 8.2 Localization (Offline-First)
-
-**All localization standards, ICU message patterns, ARB file structure, and best practices are defined in `STYLEGUIDE.md` §6.**
-
-Card Snap UI uses Flutter gen_l10n with ARB files stored locally (`lib/l10n/`) for offline-first translations, similar to Angular i18n JSON catalogs.
-
-**Key Points:**
-- Production-standard Flutter i18n, compatible with ICU messages, pluralization, and formatting
-- Offline-first: ARB files bundled in app, no network dependency
-- Type-safe generated Dart API (gen_l10n)
-- MVP languages: en, ru, uk, pl; extended set includes de, fr, es, it, nl, sv
-
-See `STYLEGUIDE.md` §6 for:
-- ARB file structure and wiring (§6.2)
-- Why gen_l10n over runtime YAML/JSON/XML (§6.2 rationale)
-- ICU message patterns with examples (§6.4)
-- Supported locales handling (§6.3)
-- CI guards and validation (§6.7)
-
-> When introducing new features, include a note in the PR/commit describing cross-platform considerations (UI, permissions, native integrations) and reference relevant tests or platform adapters.
-
 ### 8.1 Platform Style Guides
 
-**All platform style guide compliance requirements, default values, implementation examples, and documentation standards are defined in `STYLEGUIDE.md` §7.**
+**See `STYLEGUIDE.md` §7 for complete platform style guide compliance requirements (Material Design 3 and iOS HIG).**
 
-All strategy implementations must follow official platform design guidelines:
-- **Material Design 3** (Android/Web) - See `STYLEGUIDE.md` §7.1
-- **iOS Human Interface Guidelines** (iOS) - See `STYLEGUIDE.md` §7.2
+### 8.2 Localization (Offline-First)
 
-Strategy files in `lib/presentation/widgets/adaptive/*/material_*_strategy.dart` and `cupertino_*_strategy.dart` must include style guide references and explain chosen values. See `STYLEGUIDE.md` §7.3 for documentation requirements.
+**See `STYLEGUIDE.md` §6 for complete localization standards, ICU message patterns, ARB file structure, and best practices.**
+
+Card Snap UI uses Flutter gen_l10n with ARB files stored locally (`lib/l10n/`) for offline-first translations. MVP languages: en, ru, uk, pl; extended set includes de, fr, es, it, nl, sv.
 
 ---
 
@@ -530,14 +413,7 @@ class AddCard {
 
 ### 9.1 Dependency Injection in Flutter
 
-**All Dependency Injection guidelines, when to use DI, Flutter DI solutions, and examples are defined in `STYLEGUIDE.md` §8.2.**
-
-See `STYLEGUIDE.md` §8.2 for comprehensive Dependency Injection guidelines including:
-- When to use DI (repositories, use cases, services, data sources)
-- When NOT to use DI (UI factories, UI components, strategy classes)
-- Flutter DI solutions (`get_it`, `provider`, `riverpod`)
-- Rationale and examples
-```
+**See `STYLEGUIDE.md` §8.2 for complete Dependency Injection guidelines, when to use DI, Flutter DI solutions, and examples.**
 
 Feature narratives should outline end-to-end flows and highlight caching/offline strategies. Refer to `BUSINESS.md` for specific user stories and acceptance criteria.
 
@@ -553,13 +429,10 @@ Feature narratives should outline end-to-end flows and highlight caching/offline
 | Local Strategy | Hive/SQLite persistence | Offline-first and caching patterns. |
 | Hybrid Strategy | API + Local cache | Resilience and graceful degradation. |
 
+**Example:**
 ```dart
-/// 🔷 Strategy Pattern Implementation teaches resilience and fallback patterns.
-/// Similar to Angular's service strategies that can be injected based on configuration.
 abstract class CardManagementStrategy {
   Future<Result<List<LoyaltyCard>>> getAllCards();
-  Future<Result<LoyaltyCard>> addCard(CardData data);
-  Future<Result<void>> deleteCard(String cardId);
 }
 
 class LocalCardStrategy implements CardManagementStrategy {
@@ -568,8 +441,7 @@ class LocalCardStrategy implements CardManagementStrategy {
   
   @override
   Future<Result<List<LoyaltyCard>>> getAllCards() async {
-    // 🧠 Local-only implementation: fast, offline-capable
-    return repository.getAllCards();
+    return repository.getAllCards(); // Fast, offline-capable
   }
 }
 
@@ -577,25 +449,18 @@ class HybridCardStrategy implements CardManagementStrategy {
   final ApiCardRepository api;
   final LocalCardRepository cache;
   
-  HybridCardStrategy(this.api, this.cache);
-  
   @override
   Future<Result<List<LoyaltyCard>>> getAllCards() async {
     try {
       final remote = await api.getAllCards();
-      for (final card in remote.dataOrNull!) {
-        await cache.saveCard(card);
-      }
+      await cache.saveCards(remote.dataOrNull!);
       return remote;
     } catch (_) {
-      // 🧠 Offline fallback: highlight resilience and UX.
-      return cache.getAllCards();
+      return cache.getAllCards(); // Offline fallback
     }
   }
 }
 ```
-
-Document why a pattern is chosen and how it improves the learner’s understanding.
 
 ---
 
@@ -697,76 +562,19 @@ Each user journey emits structured logs with a shared `traceId`, linking UI even
 
 ## 14. Educational Comment & Documentation Policy
 
-**All comment taxonomy, documentation standards, and examples are defined in `STYLEGUIDE.md` §5.**
+**See `STYLEGUIDE.md` §5 for complete comment taxonomy, documentation standards, and examples.**
 
-Comments are part of the architecture. AI assistants must preserve all comment layers when generating or refactoring code. See `STYLEGUIDE.md` §5 for:
-- Comment taxonomy table with all prefixes
-- Documentation expectations and usage guidelines
-- Detailed examples showing proper comment usage
+**See `AGENTS.md` §4 for STYLEGUIDE.md references in code comments and discovery workflow.**
 
-### STYLEGUIDE.md References in Code Comments
-
-**All requirements for adding `STYLEGUIDE.md` references in code comments, format specifications, and discovery workflow are defined in `AGENTS.md` §6.3.**
-
-AI assistants must follow the complete workflow in `AGENTS.md` §6.3 when:
-- Adding references to documented patterns, practices, or syntax
-- Discovering new patterns not yet documented in `STYLEGUIDE.md`
-- Updating `STYLEGUIDE.md` before referencing in code
-
-### Using Documentation for AI Context
-
-1. Comments serve as the curriculum—do not remove them.
-2. DartDoc output feeds AI context for future tasks.
-3. Annotate commits/pull requests with links to relevant comments or docs.
-4. Include `STYLEGUIDE.md` references in code comments for context.
-
-> Treat comments as immutable contracts unless the learning content changes.
+Comments are part of the architecture. AI assistants must preserve all comment layers when generating or refactoring code.
 
 ---
 
-## 15. Syntax Explanation Policy
+## 15. Documentation Integration Workflow
 
-**All Dart syntax explanations with Angular/TypeScript analogies are defined in `STYLEGUIDE.md` §2.2.**
+**DartDoc** - Generates static HTML in `/doc/api/`, surfacing `///` comments. Run `dart doc` to regenerate.
 
-Dart syntax should be explained using TypeScript analogies so cross-ecosystem developers learn faster. See `STYLEGUIDE.md` §2.2 for comprehensive syntax explanations with examples, including how each keyword impacts rebuilds, isolates, or state management.
-
----
-
-## 16. Documentation Integration Workflow
-
-**DartDoc**
-
-```bash
-dart doc
-```
-
-Generates static HTML in `/doc/api/`, surfacing `///` comments.
-
-**MkDocs**
-
-```bash
-pip install mkdocs mkdocs-material
-mkdocs serve
-```
-
-Example `mkdocs.yml`:
-
-```yaml
-site_name: Card Snap UI Documentation
-docs_dir: docs
-nav:
-  - Overview: index.md
-  - Architecture: architecture_overview.md
-  - Features:
-      - Authentication: features/auth.md
-      - Devices: features/devices.md
-  - Domain: domain/overview.md
-theme:
-  name: material
-  features:
-    - navigation.expand
-    - search.highlight
-```
+**MkDocs** - Optional documentation site. Run `pip install mkdocs mkdocs-material && mkdocs serve` to preview.
 
 > Documentation updates are part of every feature or bugfix. Regenerate artifacts when comments or guides change.
 

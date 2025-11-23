@@ -34,12 +34,7 @@ Depth of understanding comes before delivery speed. Clarity, commentary, and rep
 
 ## Project Structure & Key Files
 
-### Documentation
-- [ARCHITECTURE.md](ARCHITECTURE.md) - Detailed architecture guide
-- [BUSINESS.md](BUSINESS.md) - Business requirements
-- [STYLEGUIDE.md](STYLEGUIDE.md) - Code style standards and Dart/Flutter best practices
-- [AGENTS.md](AGENTS.md) - AI copilot playbook
-- [MOBILE_SETUP.md](MOBILE_SETUP.md) - Mobile development setup guide
+**Documentation:** See "Where to Go Next" above for main documentation files. Additional guides: [MOBILE_SETUP.md](MOBILE_SETUP.md) for mobile development setup.
 
 ### Launch Scripts
 - [run_web.sh](run_web.sh) - Linux/macOS web launcher
@@ -131,24 +126,9 @@ flutter build ios --release    # iOS
 
 ### Verification & Testing
 
-Before committing changes, verify the project:
+**See `AGENTS.md` §5 (Verification & Compliance) for complete verification workflow and requirements.**
 
-```bash
-# 1. Run linter (must pass with no errors or warnings)
-flutter analyze
-
-# 2. Run tests (all tests must pass)
-flutter test
-
-# 3. Run tests with coverage
-flutter test --coverage
-
-# 4. Format code
-dart format .
-
-# 5. Verify build (optional but recommended)
-flutter build web
-```
+Quick checks: `flutter analyze`, `flutter test --coverage`, `dart format .`. See `test/README.md` for testing strategy and coverage requirements.
 
 ### Git Hooks
 
@@ -179,19 +159,7 @@ See `test/README.md` for detailed testing strategy and coverage requirements. Us
 
 ### Code Quality Standards
 
-AI agents must follow code quality requirements defined in `STYLEGUIDE.md`. **See `STYLEGUIDE.md` §3** for comprehensive code quality and linting requirements.
-
-**Quick Reference:**
-- Use `super.parameter` syntax for cleaner constructors
-- Add `const` keyword for compile-time constants
-- Avoid redundant default arguments
-- Run `dart format .` and `flutter analyze` before committing
-- Include `STYLEGUIDE.md` references in code comments (see `AGENTS.md` §6.3)
-
-**Code Comments & Documentation:**
-See `AGENTS.md` §6.3 for complete guidelines on adding `STYLEGUIDE.md` references in code comments, format specifications, and discovery workflow when encountering new patterns.
-
-See `STYLEGUIDE.md` §3 for comprehensive guidelines and examples. See `AGENTS.md` §6.3 for comment and reference requirements.
+**See `STYLEGUIDE.md` §3 for code quality and linting requirements, and `AGENTS.md` §4 for coding standards workflow.**
 
 ---
 
@@ -229,11 +197,7 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for detailed pattern documentation.
 
 ## Educational Comment Philosophy
 
-| Type | Prefix | Purpose |
-|------|--------|---------|
-| Documentation | `///` | Architectural intent captured by `dartdoc`/mkdocs. |
-| Syntax Explanation | `//` | Dart language clarifications for developers who think in Angular. |
-| Deep Insights | `// 🧠` | Runtime, async, and memory insights that invite deeper exploration. |
+**See `STYLEGUIDE.md` §5 for complete comment taxonomy, documentation standards, and examples.**
 
 Comments are part of the architecture. Preserve and extend them when making changes.
 
@@ -241,12 +205,6 @@ Comments are part of the architecture. Preserve and extend them when making chan
 
 ## Collaborating with AI
 
-Cursor, GitKraken MCP, and other copilots must follow the playbook in `AGENTS.md`. The playbook defines identity, guardrails, workflow, and communication style so every automated change remains faithful to the project's teaching mission and business requirements.
+**See `AGENTS.md` for complete AI copilot playbook, workflow, and requirements.**
 
-**AI agents must:**
-- Follow business requirements in `BUSINESS.md` by default
-- Align architectural decisions with `ARCHITECTURE.md` patterns
-- Follow code style standards in `STYLEGUIDE.md` for all code changes
-- Add `STYLEGUIDE.md` references in code comments and update documentation per `AGENTS.md` §6.3
-- Reference functional specifications and acceptance criteria from `BUSINESS.md` during implementation
-- Ensure all features satisfy MUST/SHOULD/WON'T priorities defined in `BUSINESS.md` §2
+AI agents must follow business requirements in `BUSINESS.md`, align with `ARCHITECTURE.md` patterns, and follow `STYLEGUIDE.md` standards. See `AGENTS.md` §1 for key principles.

@@ -31,11 +31,7 @@ Despite the Angular developer's background:
 
 ### 1.2 Effective Dart & Flutter
 
-- Follow [Effective Dart](https://dart.dev/effective-dart) for style, documentation, usage, and API design.
-- Structure Flutter apps per [Architecture Recommendations](https://docs.flutter.dev/app-architecture/recommendations), with clear data/UI separation, repository abstractions, and (as needed) domain use cases.
-- Apply Factory and Strategy patterns for cross-platform adaptation.
-- Create clean separation between data, domain, and presentation layers.
-- Ensure all UI components use adaptive abstractions for platform-specific behavior.
+Follow [Effective Dart](https://dart.dev/effective-dart) and [Flutter Architecture Recommendations](https://docs.flutter.dev/app-architecture/recommendations). Apply Factory and Strategy patterns for cross-platform adaptation. See `ARCHITECTURE.md` §5 for design patterns.
 
 ### 1.3 Best Practices - Core Principles
 
@@ -65,44 +61,22 @@ Use this mapping when writing comments so Angular developers can build Dart intu
 
 ### 2.2 Dart Syntax Explained (with Angular/TypeScript Analogies)
 
-```dart
-// 🔹 `final` = assign once; similar to TS `const`, but runtime-bound flexibly.
-final String name = 'Card Snap';
+**Key syntax patterns for Angular developers:**
 
-// 🔹 `const` = compile-time constant; useful for immutable widgets.
-const Color primaryColor = Color(0xFF0078D4);
+| Dart Syntax | TypeScript Equivalent | Usage |
+|-------------|----------------------|-------|
+| `final` | `const` (runtime-bound) | Single assignment |
+| `const` | Compile-time constant | Immutable widgets |
+| `late` | Non-null `!` assertion | Deferred initialization |
+| `factory` | Constructor pattern | Cached/custom instances |
+| `async`/`await` | `Promise`/`async`/`await` | Async operations |
+| `??` | `??` or `\|\|` | Null coalescing |
+| `?.` | `?.` | Optional chaining |
+| `...` | `...` | Spread operator |
+| `required` | Required properties | Named parameters |
+| `super.parameter` | Constructor forwarding | Parent delegation |
 
-// 🔹 `late` = deferred initialization; like the TS non-null `!` assertion.
-late String initializedLater;
-
-// 🔹 `factory` = constructor returning cached/custom instances (akin to Angular providers).
-factory Card.fromJson(Map<String, dynamic> json) {
-  return Card(id: json['id'], name: json['name']);
-}
-
-// 🔹 `async` / `await` = Futures; similar to Promises but scheduled via Dart's event loop.
-Future<List<Card>> loadCards() async {
-  final data = await repository.getAllCards();
-  return data;
-}
-
-// 🔹 `??` = null coalescing operator; like TS `??` or `||`.
-final displayName = card.name ?? 'Unnamed Card';
-
-// 🔹 `?.` = null-aware operator; like TS optional chaining.
-final length = card.name?.length;
-
-// 🔹 `...` = spread operator; similar to TS array/object spread.
-final allCards = [...localCards, ...remoteCards];
-
-// 🔹 `required` = named parameter that must be provided; like TS required properties.
-Card({required this.id, required this.name});
-
-// 🔹 `super.parameter` = forward to parent constructor; cleaner than manual passing.
-class CustomException extends Exception {
-  const CustomException(super.message, {super.technicalDetails});
-}
-```
+**See `ARCHITECTURE.md` §4 for complete syntax comparison table.**
 
 ### 2.3 Type Safety & Null Safety
 
@@ -393,19 +367,9 @@ AppBar(title: Text(AppLocalizations.of(context).myCards))
 
 **Rule:** Use Flutter gen_l10n with ARB files stored locally (`lib/l10n/`) for offline-first translations.
 
-**Files:**
-- `l10n.yaml` — generator config
-- `lib/l10n/app_en.arb`, `app_ru.arb`, `app_uk.arb`, `app_pl.arb` — MVP languages
-- Output Dart: `lib/l10n/app_localizations.dart`
+**Files:** `l10n.yaml` (config), `lib/l10n/app_*.arb` (translations), output: `lib/l10n/app_localizations.dart`
 
-**Supported Languages (MVP):**
-- English (`en`) — global baseline
-- Russian (`ru`) — core audience
-- Ukrainian (`uk`) — growing demand
-- Polish (`pl`) — critical market
-
-**Extended Languages (v1.0+):**
-- German (`de`), French (`fr`), Spanish (`es`), Italian (`it`), Dutch (`nl`), Swedish (`sv`)
+**Languages:** MVP: `en`, `ru`, `uk`, `pl`. Extended (v1.0+): `de`, `fr`, `es`, `it`, `nl`, `sv`. See `BUSINESS.md` §2 for localization coverage.
 
 ### 6.3 Supported Locales
 
@@ -526,26 +490,9 @@ rg -n --glob '!**/test/**' --glob '!**/lib/l10n/**' "\b(Text|SnackBar|AppBar)\s*
 - Comments must explain WHY values were chosen (e.g., "16dp ensures proper content breathing room per Material guidelines")
 - File header MUST include link to relevant Material Design component page
 
-**Example:**
-```dart
-/// 🔶 Material Card Strategy
-/// Platform-specific implementation following Material Design 3 guidelines.
-/// Reference: https://m3.material.io/components/cards
-class MaterialCardStrategy implements CardStrategy {
-  Widget createCard({required Widget child, EdgeInsetsGeometry? padding}) {
-    return Card(
-      elevation: 1.0, // M3 elevation level 1 for cards
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12.0), // M3 default border radius
-      ),
-      child: Padding(
-        padding: padding ?? const EdgeInsets.all(16.0), // M3 spacing standard
-        child: child,
-      ),
-    );
-  }
-}
-```
+**Key values:** Elevation 1dp (cards), 3dp (elevated), padding 16dp, border radius 12dp, touch target 40dp×40dp.
+
+**Example:** See `lib/presentation/widgets/adaptive/card/material_card_strategy.dart` for implementation.
 
 ### 7.2 iOS Human Interface Guidelines (HIG)
 
@@ -567,33 +514,9 @@ class MaterialCardStrategy implements CardStrategy {
 - Comments must explain differences from Material (e.g., "iOS uses shadows instead of elevation")
 - File header MUST include link to relevant iOS HIG component page
 
-**Example:**
-```dart
-/// 🔶 Cupertino Card Strategy
-/// Platform-specific implementation following iOS Human Interface Guidelines.
-/// Reference: https://developer.apple.com/design/human-interface-guidelines/components/content-views/cards
-class CupertinoCardStrategy implements CardStrategy {
-  Widget createCard({required Widget child, EdgeInsetsGeometry? padding}) {
-    return Container(
-      decoration: BoxDecoration(
-        color: CupertinoColors.systemBackground, // Automatic light/dark mode
-        borderRadius: BorderRadius.circular(12.0), // iOS standard border radius
-        boxShadow: [
-          BoxShadow(
-            color: CupertinoColors.black.withOpacity(0.1),
-            blurRadius: 8.0, // iOS shadow blur standard
-            offset: const Offset(0, 2.0), // iOS shadow offset standard
-          ),
-        ],
-      ),
-      child: Padding(
-        padding: padding ?? const EdgeInsets.all(16.0), // iOS HIG content inset
-        child: child,
-      ),
-    );
-  }
-}
-```
+**Key values:** Shadows (8pt blur, 2pt offset) instead of elevation, border radius 12pt, padding 16pt, touch target 44pt×44pt, use `CupertinoColors.systemBackground`.
+
+**Example:** See `lib/presentation/widgets/adaptive/card/cupertino_card_strategy.dart` for implementation.
 
 ### 7.3 Style Guide Documentation Requirements
 
@@ -740,43 +663,9 @@ test/
 
 ## 10. Code Review Checklist
 
-Before submitting code for review, verify:
+**See `AGENTS.md` §5 (Enterprise Standards Checklist) for complete verification requirements.**
 
-- ✅ Code follows Flutter best practices (not Angular patterns)
-- ✅ Uses proper state management (BLoC, Riverpod, etc.)
-- ✅ Implements Clean Architecture (domain/data/presentation separation)
-- ✅ Cross-platform compatibility (Material + Cupertino strategies)
-- ✅ Proper error handling with Result pattern
-- ✅ Dependency injection (get_it or provider) for business logic
-- ✅ Tests written and passing
-- ✅ Documentation includes educational comments
-- ✅ No platform-specific hardcoding
-- ✅ Follows SOLID principles
-- ✅ All user-facing strings use `AppLocalizations`
-- ✅ Code formatted with `dart format .`
-- ✅ No linting errors (`flutter analyze`)
-- ✅ Test coverage thresholds met
-
----
-
-## 11. Quick Reference Commands
-
-```bash
-# Format code
-dart format .
-
-# Analyze for linting issues
-flutter analyze
-
-# Run tests
-flutter test
-
-# Run tests with coverage
-flutter test --coverage
-
-# Generate localization files
-flutter gen-l10n
-```
+Key checks: Flutter best practices, Clean Architecture, cross-platform compatibility, Result pattern, DI, tests, localization, formatting, coverage thresholds.
 
 ---
 
